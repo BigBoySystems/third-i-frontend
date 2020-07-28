@@ -1,11 +1,37 @@
-import React, { useState } from "react";
-import logo from "./logo.svg";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { Button, Drawer } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
+import WSAvcPlayer from "ws-avc-player";
+
+const player = new WSAvcPlayer({ useWorker: false });
+
+function startVideo() {
+  const video = document.getElementById("video");
+  (video as any).appendChild(player.AvcPlayer.canvas);
+  player.on("disconnected", () => console.log("WS disconnected"));
+  player.on("connected", () => console.log("WS connected"));
+  player.on("disconnected", () => {
+    setTimeout(connect, 1000);
+  });
+  connect();
+}
+
+function connect() {
+  const host = document.location.hostname;
+  const uri = `ws://${host}:8080`;
+  player.connect(uri);
+}
 
 function App() {
-  const [menubarVisible, setMenubarVisibility] = useState(true);
+  const [menubarVisible, setMenubarVisibility] = useState(false);
+  const [videoStarted, setVideoStarted] = useState(false);
+  useEffect(() => {
+    if (!videoStarted) {
+      startVideo();
+      setVideoStarted(true);
+    }
+  }, [videoStarted]);
 
   return (
     <div className="App bp3-dark">
@@ -21,18 +47,7 @@ function App() {
         <MenuBar />
       </Drawer>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn more React
-        </a>
+        <div id="video" style={{ width: "1280", height: "720" }} />
         <Button
           icon="menu"
           onClick={() => setMenubarVisibility(!menubarVisible)}
