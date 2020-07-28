@@ -1,14 +1,21 @@
 import React, { useState } from "react";
 import "./Menubar.css";
-import { Menu, MenuItem, MenuDivider, PanelStack } from "@blueprintjs/core";
+import {
+  Menu,
+  MenuItem,
+  MenuDivider,
+  PanelStack,
+  IPanel,
+  IPanelProps,
+} from "@blueprintjs/core";
 
 function Menubar() {
-  const [panels, setPanels] = useState([
+  const [panels, setPanels] = useState<IPanel[]>([
     {
       component: MenubarRoot,
       props: {},
       title: "Menu",
-    } as any,
+    },
   ]);
 
   return (
@@ -21,7 +28,7 @@ function Menubar() {
   );
 }
 
-function MenubarRoot({ openPanel }: any) {
+function MenubarRoot({ openPanel }: IPanelProps) {
   return (
     <Menu>
       <MenuItem
@@ -35,13 +42,29 @@ function MenubarRoot({ openPanel }: any) {
   );
 }
 
-function MenubarSettings() {
+function MenubarSettings({ openPanel }: IPanelProps) {
   return (
     <Menu>
-      <MenuItem icon="desktop" text="Display" />
+      <MenuItem
+        icon="desktop"
+        text="Display"
+        onClick={() =>
+          openPanel({ component: MenubarDisplay, title: "Display" })
+        }
+      />
       <MenuItem icon="fullscreen" text="Resolution" />
       <MenuDivider />
       <MenuItem icon="cog" text="Advanced parameters" />
+    </Menu>
+  );
+}
+
+function MenubarDisplay() {
+  return (
+    <Menu>
+      <MenuItem icon="desktop" text="3D flat" />
+      <MenuItem icon="fullscreen" text="2D left only" />
+      <MenuItem icon="fullscreen" text="2D right only" />
     </Menu>
   );
 }
