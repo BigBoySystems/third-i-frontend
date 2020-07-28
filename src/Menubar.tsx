@@ -1,16 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Menubar.css";
-import { Menu, MenuItem, MenuDivider, Classes } from "@blueprintjs/core";
+import { Menu, MenuItem, MenuDivider, PanelStack } from "@blueprintjs/core";
 
 function Menubar() {
+  const [panels, setPanels] = useState([
+    {
+      component: MenubarRoot,
+      props: {},
+      title: "Menu",
+    } as any,
+  ]);
+
   return (
-    <Menu className={Classes.ELEVATION_1}>
-      <MenuItem icon="settings" text="Settings...">
-        <MenuItem icon="desktop" text="Display" />
-        <MenuItem icon="fullscreen" text="Resolution" />
-        <MenuDivider />
-        <MenuItem icon="cog" text="Advanced parameters" />
-      </MenuItem>
+    <PanelStack
+      className="Menubar"
+      initialPanel={panels[0]}
+      onOpen={(new_) => setPanels([new_, ...panels])}
+      onClose={() => setPanels(panels.slice(1))}
+    />
+  );
+}
+
+function MenubarRoot({ openPanel }: any) {
+  return (
+    <Menu>
+      <MenuItem
+        icon="settings"
+        text="Settings..."
+        onClick={() =>
+          openPanel({ component: MenubarSettings, title: "Settings" })
+        }
+      />
+    </Menu>
+  );
+}
+
+function MenubarSettings() {
+  return (
+    <Menu>
+      <MenuItem icon="desktop" text="Display" />
+      <MenuItem icon="fullscreen" text="Resolution" />
+      <MenuDivider />
+      <MenuItem icon="cog" text="Advanced parameters" />
     </Menu>
   );
 }

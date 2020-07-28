@@ -10,6 +10,7 @@ function App() {
   return (
     <div className="App bp3-dark">
       <Drawer
+        className="bp3-dark"
         isOpen={menubarVisible}
         size="25%"
         position="left"
