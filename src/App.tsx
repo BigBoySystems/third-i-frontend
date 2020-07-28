@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { Button } from "@blueprintjs/core";
+import MenuBar from './Menubar';
 
 function App() {
+  const [menubarVisible, setMenubarVisibility] = useState(false);
+
   return (
-    <div className="App">
+    <div className="App bp3-dark">
+      {menubarVisible ? <MenuBar /> : ""}
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -18,6 +23,9 @@ function App() {
         >
           Learn more React
         </a>
+	<Button icon="menu"
+	  onClick={() => setMenubarVisibility(!menubarVisible)}
+	/>
       </header>
     </div>
   );
