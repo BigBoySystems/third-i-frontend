@@ -1,22 +1,17 @@
 import React from "react";
 import "./Menubar.css";
-import { Menu, MenuItem, Icon, MenuDivider, Classes } from "@blueprintjs/core";
+import { Menu, MenuItem, MenuDivider, Classes } from "@blueprintjs/core";
 
 function Menubar() {
   return (
-    <div className="Menubar">
-      <Menu className={Classes.ELEVATION_1}>
-        <MenuItem icon="new-text-box" text="New text box" />
-        <MenuItem icon="new-object" text="New object" />
-        <MenuItem icon="new-link" text="New link" />
+    <Menu className={Classes.ELEVATION_1}>
+      <MenuItem icon="settings" text="Settings...">
+        <MenuItem icon="desktop" text="Display" />
+        <MenuItem icon="fullscreen" text="Resolution" />
         <MenuDivider />
-        <MenuItem
-          icon="cog"
-          labelElement={<Icon icon="share" />}
-          text="Settings..."
-        />
-      </Menu>
-    </div>
+        <MenuItem icon="cog" text="Advanced parameters" />
+      </MenuItem>
+    </Menu>
   );
 }
 

@@ -1,15 +1,24 @@
 import React, { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { Button } from "@blueprintjs/core";
+import { Button, Drawer } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 
 function App() {
-  const [menubarVisible, setMenubarVisibility] = useState(false);
+  const [menubarVisible, setMenubarVisibility] = useState(true);
 
   return (
     <div className="App bp3-dark">
-      {menubarVisible ? <MenuBar /> : ""}
+      <Drawer
+        isOpen={menubarVisible}
+        size="25%"
+        position="left"
+        hasBackdrop={false}
+        canOutsideClickClose={true}
+        onClose={() => setMenubarVisibility(false)}
+      >
+        <MenuBar />
+      </Drawer>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
