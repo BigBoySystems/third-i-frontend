@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
 import { Button } from "@blueprintjs/core";
-import MenuBar from './Menubar';
+import MenuBar from "./Menubar";
 
 function App() {
   const [menubarVisible, setMenubarVisibility] = useState(false);
@@ -23,9 +23,10 @@ function App() {
         >
           Learn more React
         </a>
-	<Button icon="menu"
-	  onClick={() => setMenubarVisibility(!menubarVisible)}
-	/>
+        <Button
+          icon="menu"
+          onClick={() => setMenubarVisibility(!menubarVisible)}
+        />
       </header>
     </div>
   );
