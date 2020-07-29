@@ -69,7 +69,7 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         icon="lightbulb"
         text="Lightning"
         onClick={() =>
-          openPanel({ component: MenuLightning, title: "Lighting"})
+          openPanel({ component: MenubarLightning, title: "Lighting"})
         }
         />
       <MenuDivider />
@@ -117,14 +117,20 @@ function MenubarAngle() {
     </RadioGroup>
   );
 }
-function MenuLightning() {
+
+function MenubarLightning() {
+  const [radioCheck, setRadioCheck] = useState("nightOutside");
   return (
-    <Menu>
-      <MenuItem icon="moon" text="Night outside" />
-      <MenuItem icon="lightbulb" text="Day inside" />
-      <MenuItem icon="torch" text="Night inside" />
-      <MenuItem icon="flash" text="Day outside" />
-    </Menu>
+
+    <RadioGroup
+      label="Display Choice"
+      onChange={(event) => setRadioCheck(event.currentTarget.value)}
+      selectedValue={radioCheck}>
+      <Radio label="Night outside" value="nightOutside" />
+      <Radio label="Day inside" value="dayInside" />
+      <Radio label="Night inside" value="nightInside" />
+      <Radio label="Day outside" value="dayOutside" />
+    </RadioGroup>
   );
 }
 
