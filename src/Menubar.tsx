@@ -53,6 +53,23 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         }
       />
       <MenuItem icon="fullscreen" text="Resolution" />
+      <MenuItem icon="camera" text="Photo/Video Mode" />
+      <MenuItem icon="mobile-video" text="Streaming settings" />
+      <MenuItem icon="headset" text="Audio settings" />
+      <MenuItem
+        icon="square"
+        text="Viewing Angle"
+        onClick={() =>
+          openPanel({ component: MenubarAngle, title: "Viewing Angle"})
+        }
+        />
+      <MenuItem
+        icon="lightbulb"
+        text="Lightning"
+        onClick={() =>
+          openPanel({ component: MenuLightning, title: "Lighting"})
+        }
+        />
       <MenuDivider />
       <MenuItem icon="cog" text="Advanced parameters" />
     </Menu>
@@ -69,6 +86,27 @@ function MenubarDisplay() {
       <MenuItem icon="group-objects" text="Anaglyph" />
       <MenuItem icon="swap-horizontal" text="Inverted" />
       <MenuItem icon="swap-vertical" text="Flipped" />
+    </Menu>
+  );
+}
+
+function MenubarAngle() {
+  return (
+    <Menu>
+      <MenuItem icon="split-columns" text="Extended" />
+      <MenuItem icon="merge-columns" text="Square" />
+      <MenuItem icon="column-layout" text="Custom" />
+    </Menu>
+  );
+}
+
+function MenuLightning() {
+  return (
+    <Menu>
+      <MenuItem icon="moon" text="Night outside" />
+      <MenuItem icon="lightbulb" text="Day inside" />
+      <MenuItem icon="torch" text="Night inside" />
+      <MenuItem icon="flash" text="Day outside" />
     </Menu>
   );
 }
