@@ -71,7 +71,13 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         }
         />
       <MenuDivider />
-      <MenuItem icon="cog" text="Advanced parameters" />
+      <MenuItem 
+        icon="cog" 
+        text="Advanced parameters"
+        onClick={() =>
+        openPanel({ component : MenuAdvanced, title: "Advanced parameters"})
+        }
+      />
     </Menu>
   );
 }
@@ -108,6 +114,42 @@ function MenuLightning() {
       <MenuItem icon="torch" text="Night inside" />
       <MenuItem icon="flash" text="Day outside" />
     </Menu>
+  );
+}
+
+function MenuAdvanced({ openPanel }: IPanelProps) {
+  return (
+    <Menu>
+      <MenuItem icon="refresh" text="Loop record" />
+      <MenuItem icon="dashboard" text="Framerate" />
+      <MenuItem icon="globe-network" text="Wifi settings" />
+      <MenuItem icon="power" text="Auto shut off" />
+      <MenuItem icon="lock" text="Auto Standby" />
+      <MenuItem icon="time" text="Timer" />
+      <MenuItem 
+        icon="media" 
+        text="Picture settings"
+        onClick={() =>
+        openPanel({ component : MenuPicture, title: "Picture settings"})
+        }
+      />
+      <MenuItem icon="pulse" text="Bitrate" />
+      <MenuItem icon="wrench" text="Factory reset" />
+      <MenuItem icon="updated" text="Update" />
+    </Menu>
+  );
+}
+
+function MenuPicture() {
+  return (
+  <Menu>
+    <MenuItem icon="wrench" text="WB" />
+    <MenuItem icon="flash" text="Exposure" />
+    <MenuItem icon="contrast" text="Contrast" />
+    <MenuItem icon="delta" text="Sharpness" />
+    <MenuItem icon="pivot-table" text="Stabilization" />
+    <MenuItem icon="cell-tower" text="Av gain" />
+  </Menu>
   );
 }
 
