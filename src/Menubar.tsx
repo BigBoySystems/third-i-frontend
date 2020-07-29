@@ -104,15 +104,19 @@ function MenubarDisplay() {
 }
 
 function MenubarAngle() {
+  const [radioCheck, setRadioCheck] = useState("extended");
   return (
-    <Menu>
-      <MenuItem icon="split-columns" text="Extended" />
-      <MenuItem icon="merge-columns" text="Square" />
-      <MenuItem icon="column-layout" text="Custom" />
-    </Menu>
+
+    <RadioGroup
+      label="Display Choice"
+      onChange={(event) => setRadioCheck(event.currentTarget.value)}
+      selectedValue={radioCheck}>
+      <Radio label="Extended" value="extended" />
+      <Radio label="Square" value="square" />
+      <Radio label="Custom" value="custom" />
+    </RadioGroup>
   );
 }
-
 function MenuLightning() {
   return (
     <Menu>
