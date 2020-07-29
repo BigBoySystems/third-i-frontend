@@ -62,9 +62,13 @@ function MenubarSettings({ openPanel }: IPanelProps) {
 function MenubarDisplay() {
   return (
     <Menu>
-      <MenuItem icon="desktop" text="3D flat" />
-      <MenuItem icon="fullscreen" text="2D left only" />
-      <MenuItem icon="fullscreen" text="2D right only" />
+      <MenuItem icon="arrows-horizontal" text="3D flat" />
+      <MenuItem icon="double-caret-horizontal" text="3D distored" />
+      <MenuItem icon="arrow-left" text="2D left only" />
+      <MenuItem icon="arrow-right" text="2D right only" />
+      <MenuItem icon="group-objects" text="Anaglyph" />
+      <MenuItem icon="swap-horizontal" text="Inverted" />
+      <MenuItem icon="swap-vertical" text="Flipped" />
     </Menu>
   );
 }
