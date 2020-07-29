@@ -7,6 +7,8 @@ import {
   PanelStack,
   IPanel,
   IPanelProps,
+  Radio, 
+  RadioGroup,
 } from "@blueprintjs/core";
 
 function Menubar() {
@@ -83,16 +85,21 @@ function MenubarSettings({ openPanel }: IPanelProps) {
 }
 
 function MenubarDisplay() {
+  const [radioCheck, setRadioCheck] = useState("3dFlat");
   return (
-    <Menu>
-      <MenuItem icon="arrows-horizontal" text="3D flat" />
-      <MenuItem icon="double-caret-horizontal" text="3D distored" />
-      <MenuItem icon="arrow-left" text="2D left only" />
-      <MenuItem icon="arrow-right" text="2D right only" />
-      <MenuItem icon="group-objects" text="Anaglyph" />
-      <MenuItem icon="swap-horizontal" text="Inverted" />
-      <MenuItem icon="swap-vertical" text="Flipped" />
-    </Menu>
+
+    <RadioGroup
+      label="Display Choice"
+      onChange={(event) => setRadioCheck(event.currentTarget.value)}
+      selectedValue={radioCheck}>
+      <Radio label="3D flat" value="3dFlat" />
+      <Radio label="3D distored" value="3dDistored" />
+      <Radio label="2D left only" value="2dLeftOnly" />
+      <Radio label="2D right only" value="2dRightOnly" />
+      <Radio label="Anaglyph" value="anaglyph" />
+      <Radio label="Inverted" value="inverted" />
+      <Radio label="Flipped" value="flipped" />
+    </RadioGroup>
   );
 }
 
