@@ -106,7 +106,6 @@ function MenubarDisplay() {
 function MenubarAngle() {
   const [radioCheck, setRadioCheck] = useState("extended");
   return (
-
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
