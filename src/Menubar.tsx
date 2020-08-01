@@ -86,6 +86,7 @@ function MenubarSettings({ openPanel }: IPanelProps) {
 
 function MenubarDisplay() {
   const [radioCheck, setRadioCheck] = useState("3dFlat");
+
   return (
     <RadioGroup
       label="Display Choice"
@@ -104,6 +105,7 @@ function MenubarDisplay() {
 
 function MenubarAngle() {
   const [radioCheck, setRadioCheck] = useState("extended");
+
   return (
     <RadioGroup
       label="Display Choice"
@@ -118,6 +120,7 @@ function MenubarAngle() {
 
 function MenubarLightning() {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
+
   return (
     <RadioGroup
       label="Display Choice"
@@ -156,14 +159,14 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
 
 function MenuPicture() {
   return (
-  <Menu>
-    <MenuItem icon="wrench" text="WB" />
-    <MenuItem icon="flash" text="Exposure" />
-    <MenuItem icon="contrast" text="Contrast" />
-    <MenuItem icon="delta" text="Sharpness" />
-    <MenuItem icon="pivot-table" text="Stabilization" />
-    <MenuItem icon="cell-tower" text="Av gain" />
-  </Menu>
+    <Menu>
+      <MenuItem icon="wrench" text="WB" />
+      <MenuItem icon="flash" text="Exposure" />
+      <MenuItem icon="contrast" text="Contrast" />
+      <MenuItem icon="delta" text="Sharpness" />
+      <MenuItem icon="pivot-table" text="Stabilization" />
+      <MenuItem icon="cell-tower" text="Av gain" />
+    </Menu>
   );
 }
 
