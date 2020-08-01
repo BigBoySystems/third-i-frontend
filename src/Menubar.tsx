@@ -121,7 +121,6 @@ function MenubarAngle() {
 function MenubarLightning() {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
   return (
-
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
