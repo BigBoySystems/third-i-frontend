@@ -87,7 +87,6 @@ function MenubarSettings({ openPanel }: IPanelProps) {
 function MenubarDisplay() {
   const [radioCheck, setRadioCheck] = useState("3dFlat");
   return (
-
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
