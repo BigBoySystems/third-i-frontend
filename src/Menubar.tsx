@@ -10,6 +10,10 @@ import {
   Radio,
   RadioGroup,
   Switch,
+  Icon,
+  Label,
+  Slider,
+  Button,
 } from "@blueprintjs/core";
 
 function Menubar() {
@@ -44,6 +48,8 @@ function MenubarRoot({ openPanel }: IPanelProps) {
 }
 
 function MenubarSettings({ openPanel }: IPanelProps) {
+  const [photoMode, setPhotoMode] = useState(false);
+
   return (
     <Menu>
       <MenuItem
@@ -51,8 +57,12 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         text="Display"
         onClick={() => openPanel({ component: MenubarDisplay, title: "Display" })}
       />
-      <MenuItem icon="fullscreen" text="Resolution" />
-      <MenuItem icon="camera" text="Photo/Video mode" />
+      <MenuItem
+        icon="camera"
+        text="Photo/Video mode"
+        labelElement={<Icon icon={photoMode ? "media" : "mobile-video"} />}
+        onClick={() => setPhotoMode(!photoMode)}
+      />
       <MenuItem icon="mobile-video" text="Streaming settings" />
       <MenuItem icon="headset" text="Audio settings" />
       <MenuItem
@@ -62,7 +72,7 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       />
       <MenuItem
         icon="lightbulb"
-        text="Lightning"
+        text="Lighting"
         onClick={() => openPanel({ component: MenubarLightning, title: "Lighting" })}
       />
       <MenuDivider />
@@ -133,10 +143,11 @@ function MenubarLightning() {
 }
 
 function MenuAdvanced({ openPanel }: IPanelProps) {
-  return (
-    <Menu>
+  const [framerate, setFramerate] = useState(30);
+
+  /*
       <MenuItem icon="refresh" text="Loop record" />
-      <MenuItem icon="dashboard" text="Framerate" />
+
       <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
@@ -147,22 +158,38 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
         onClick={() => openPanel({ component: MenuPicture, title: "Picture settings" })}
       />
       <MenuItem icon="pulse" text="Bitrate" />
-      <MenuItem icon="wrench" text="Factory reset" />
-      <MenuItem icon="updated" text="Update" />
-    </Menu>
+  */
+  return (
+    <div className="Menubar-content">
+      <Label>
+        Framerate
+        <Slider
+          min={25}
+          max={60}
+          stepSize={1}
+          labelStepSize={5}
+          value={framerate}
+          onChange={(x) => setFramerate(x)}
+        />
+      </Label>
+      <Button icon="wrench" text="Factory reset" fill />
+      <Button icon="updated" text="Update" fill />
+    </div>
   );
 }
 
 function MenuPicture() {
   return (
-    <Menu>
-      <MenuItem icon="wrench" text="WB" />
-      <MenuItem icon="flash" text="Exposure" />
-      <MenuItem icon="contrast" text="Contrast" />
-      <MenuItem icon="delta" text="Sharpness" />
-      <MenuItem icon="pivot-table" text="Stabilization" />
-      <MenuItem icon="cell-tower" text="Av gain" />
-    </Menu>
+    <div className="Menubar-content">
+      <Menu>
+        <MenuItem icon="wrench" text="WB" />
+        <MenuItem icon="flash" text="Exposure" />
+        <MenuItem icon="contrast" text="Contrast" />
+        <MenuItem icon="delta" text="Sharpness" />
+        <MenuItem icon="pivot-table" text="Stabilization" />
+        <MenuItem icon="cell-tower" text="Av gain" />
+      </Menu>
+    </div>
   );
 }
 
