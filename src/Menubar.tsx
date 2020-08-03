@@ -63,7 +63,11 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         labelElement={<Icon icon={photoMode ? "media" : "mobile-video"} />}
         onClick={() => setPhotoMode(!photoMode)}
       />
-      <MenuItem icon="mobile-video" text="Streaming settings" />
+      <MenuItem 
+        icon="mobile-video" 
+        text="Streaming settings" 
+        onClick={() => openPanel({ component: MenubarStreaming, title: "Streaming settings" })}
+        />
       <MenuItem icon="headset" text="Audio settings" />
       <MenuItem
         icon="square"
@@ -104,6 +108,29 @@ function MenubarDisplay() {
       </RadioGroup>
       <Switch label="Inverted" checked={inverted} onChange={() => setInverted(!inverted)} />
       <Switch label="Flipped" checked={flipped} onChange={() => setFlipped(!flipped)} />
+    </div>
+  );
+}
+
+function MenubarStreaming () {
+  const [browser, setBrowser] = useState(false);
+  const [udp, setUdp] = useState(false);
+  const [usb, setUsb] = useState(false);
+  const [rtmp, setRtmp] = useState(false);
+  const [mpeg, setMpeg] = useState(false);
+  const [rtsp, setRtsp] = useState(false);
+
+  return (
+    <div className="Menubar-content">
+      <Switch label="Browser stream" checked={browser} onChange={() => setBrowser(!browser)} />
+      <Switch label="Stream UDP" checked={udp} onChange={() => setUdp(!udp)} />
+      <MenuItem icon="mobile-video" text="UDP clients" />
+      <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
+      <Switch label="RTMP enabled" checked={rtmp} onChange={() => setRtmp(!rtmp)} />
+      <MenuItem icon="mobile-video" text="RTMP URL" />
+      <Switch label="MPEG-TS enabled" checked={mpeg} onChange={() => setMpeg(!mpeg)} />
+      <MenuItem icon="mobile-video" text="MPEG-TS clients" />
+      <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
     </div>
   );
 }
