@@ -4,6 +4,7 @@ import { Button, Overlay, Classes } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
+import CaptivePortal from "./CaptivePortal";
 
 const player = new WSAvcPlayer({ useWorker: false });
 
@@ -29,13 +30,18 @@ function App() {
 
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [captivePortal, setCaptivePortal] = useState(true);
 
   useEffect(() => {
-    if (!videoStarted) {
+    if (!videoStarted && !captivePortal) {
       startVideo();
       setVideoStarted(true);
     }
   }, [videoStarted]);
+
+  if (captivePortal) {
+    return <CaptivePortal />;
+  }
 
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
