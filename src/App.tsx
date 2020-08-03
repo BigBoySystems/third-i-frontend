@@ -30,7 +30,7 @@ function App() {
 
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
-  const [captivePortal, setCaptivePortal] = useState(true);
+  const [captivePortal, setCaptivePortal] = useState(false);
 
   useEffect(() => {
     if (!videoStarted && !captivePortal) {
