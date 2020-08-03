@@ -38,9 +38,9 @@ function App() {
   }, [videoStarted]);
 
   return (
-    <div className="App bp3-dark">
+    <div className="App bp3-dark bp3-large bp3-text-large">
       <Overlay
-        className="bp3-dark"
+        className="bp3-dark bp3-large bp3-text-large"
         isOpen={menubarVisible}
         hasBackdrop={false}
         onClose={() => setMenubarVisibility(false)}

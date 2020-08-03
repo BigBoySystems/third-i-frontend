@@ -2,6 +2,13 @@
   height: 100%;
 }
 
+.Menubar > div {
+  overflow-x: hidden;
+}
+
 .Menubar-content {
+  display: flex;
   padding: 10px;
+  flex-wrap: wrap;
+  flex-direction: column;
 }
