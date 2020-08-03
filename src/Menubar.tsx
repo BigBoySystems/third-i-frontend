@@ -7,7 +7,7 @@ import {
   PanelStack,
   IPanel,
   IPanelProps,
-  Radio, 
+  Radio,
   RadioGroup,
 } from "@blueprintjs/core";
 
@@ -62,22 +62,22 @@ function MenubarSettings({ openPanel }: IPanelProps) {
         icon="square"
         text="Viewing Angle"
         onClick={() =>
-          openPanel({ component: MenubarAngle, title: "Viewing Angle"})
+          openPanel({ component: MenubarAngle, title: "Viewing Angle" })
         }
-        />
+      />
       <MenuItem
         icon="lightbulb"
         text="Lightning"
         onClick={() =>
-          openPanel({ component: MenubarLightning, title: "Lighting"})
+          openPanel({ component: MenubarLightning, title: "Lighting" })
         }
-        />
+      />
       <MenuDivider />
-      <MenuItem 
-        icon="cog" 
+      <MenuItem
+        icon="cog"
         text="Advanced parameters"
         onClick={() =>
-        openPanel({ component : MenuAdvanced, title: "Advanced parameters"})
+          openPanel({ component: MenuAdvanced, title: "Advanced parameters" })
         }
       />
     </Menu>
@@ -91,7 +91,8 @@ function MenubarDisplay() {
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}>
+      selectedValue={radioCheck}
+    >
       <Radio label="3D flat" value="3dFlat" />
       <Radio label="3D distored" value="3dDistored" />
       <Radio label="2D left only" value="2dLeftOnly" />
@@ -110,7 +111,8 @@ function MenubarAngle() {
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}>
+      selectedValue={radioCheck}
+    >
       <Radio label="Extended" value="extended" />
       <Radio label="Square" value="square" />
       <Radio label="Custom" value="custom" />
@@ -125,7 +127,8 @@ function MenubarLightning() {
     <RadioGroup
       label="Display Choice"
       onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}>
+      selectedValue={radioCheck}
+    >
       <Radio label="Night outside" value="nightOutside" />
       <Radio label="Day inside" value="dayInside" />
       <Radio label="Night inside" value="nightInside" />
@@ -143,11 +146,11 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto Standby" />
       <MenuItem icon="time" text="Timer" />
-      <MenuItem 
-        icon="media" 
+      <MenuItem
+        icon="media"
         text="Picture settings"
         onClick={() =>
-        openPanel({ component : MenuPicture, title: "Picture settings"})
+          openPanel({ component: MenuPicture, title: "Picture settings" })
         }
       />
       <MenuItem icon="pulse" text="Bitrate" />
