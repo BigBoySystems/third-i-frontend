@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Button, Drawer } from "@blueprintjs/core";
+import { Button, Overlay, Classes } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
+import classNames from "classnames";
 
 const player = new WSAvcPlayer({ useWorker: false });
 
@@ -24,8 +25,15 @@ function connect() {
 }
 
 function App() {
+  const classes = classNames(
+    Classes.CARD,
+    Classes.ELEVATION_4,
+    "App-container"
+  );
+
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+
   useEffect(() => {
     if (!videoStarted) {
       startVideo();
@@ -35,24 +43,22 @@ function App() {
 
   return (
     <div className="App bp3-dark">
-      <Drawer
+      <Overlay
         className="bp3-dark"
         isOpen={menubarVisible}
-        size="25%"
-        position="left"
         hasBackdrop={false}
-        canOutsideClickClose={true}
         onClose={() => setMenubarVisibility(false)}
       >
-        <MenuBar />
-      </Drawer>
-      <header className="App-header">
-        <div id="video" style={{ width: "1280", height: "720" }} />
-        <Button
-          icon="menu"
-          onClick={() => setMenubarVisibility(!menubarVisible)}
-        />
-      </header>
+        <div className={classes}>
+          <MenuBar />
+        </div>
+      </Overlay>
+      <div id="video" style={{ width: "100vw", height: "*" }} />
+      <Button
+        className="App-menu"
+        icon="menu"
+        onClick={() => setMenubarVisibility(!menubarVisible)}
+      />
     </div>
   );
 }
