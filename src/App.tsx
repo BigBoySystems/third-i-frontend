@@ -25,11 +25,7 @@ function connect() {
 }
 
 function App() {
-  const classes = classNames(
-    Classes.CARD,
-    Classes.ELEVATION_4,
-    "App-container"
-  );
+  const classes = classNames(Classes.CARD, Classes.ELEVATION_4, "App-container");
 
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);

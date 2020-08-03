@@ -9,6 +9,7 @@ import {
   IPanelProps,
   Radio,
   RadioGroup,
+  Switch,
 } from "@blueprintjs/core";
 
 function Menubar() {
@@ -36,9 +37,7 @@ function MenubarRoot({ openPanel }: IPanelProps) {
       <MenuItem
         icon="settings"
         text="Settings..."
-        onClick={() =>
-          openPanel({ component: MenubarSettings, title: "Settings" })
-        }
+        onClick={() => openPanel({ component: MenubarSettings, title: "Settings" })}
       />
     </Menu>
   );
@@ -50,35 +49,27 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       <MenuItem
         icon="desktop"
         text="Display"
-        onClick={() =>
-          openPanel({ component: MenubarDisplay, title: "Display" })
-        }
+        onClick={() => openPanel({ component: MenubarDisplay, title: "Display" })}
       />
       <MenuItem icon="fullscreen" text="Resolution" />
-      <MenuItem icon="camera" text="Photo/Video Mode" />
+      <MenuItem icon="camera" text="Photo/Video mode" />
       <MenuItem icon="mobile-video" text="Streaming settings" />
       <MenuItem icon="headset" text="Audio settings" />
       <MenuItem
         icon="square"
-        text="Viewing Angle"
-        onClick={() =>
-          openPanel({ component: MenubarAngle, title: "Viewing Angle" })
-        }
+        text="Viewing angle"
+        onClick={() => openPanel({ component: MenubarAngle, title: "Viewing angle" })}
       />
       <MenuItem
         icon="lightbulb"
         text="Lightning"
-        onClick={() =>
-          openPanel({ component: MenubarLightning, title: "Lighting" })
-        }
+        onClick={() => openPanel({ component: MenubarLightning, title: "Lighting" })}
       />
       <MenuDivider />
       <MenuItem
         icon="cog"
         text="Advanced parameters"
-        onClick={() =>
-          openPanel({ component: MenuAdvanced, title: "Advanced parameters" })
-        }
+        onClick={() => openPanel({ component: MenuAdvanced, title: "Advanced parameters" })}
       />
     </Menu>
   );
@@ -86,21 +77,24 @@ function MenubarSettings({ openPanel }: IPanelProps) {
 
 function MenubarDisplay() {
   const [radioCheck, setRadioCheck] = useState("3dFlat");
+  const [inverted, setInverted] = useState(false);
+  const [flipped, setFlipped] = useState(false);
 
   return (
-    <RadioGroup
-      label="Display Choice"
-      onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}
-    >
-      <Radio label="3D flat" value="3dFlat" />
-      <Radio label="3D distored" value="3dDistored" />
-      <Radio label="2D left only" value="2dLeftOnly" />
-      <Radio label="2D right only" value="2dRightOnly" />
-      <Radio label="Anaglyph" value="anaglyph" />
-      <Radio label="Inverted" value="inverted" />
-      <Radio label="Flipped" value="flipped" />
-    </RadioGroup>
+    <div className="Menubar-content">
+      <RadioGroup
+        onChange={(event) => setRadioCheck(event.currentTarget.value)}
+        selectedValue={radioCheck}
+      >
+        <Radio label="3D flat" value="3dFlat" />
+        <Radio label="3D distored" value="3dDistored" />
+        <Radio label="2D left only" value="2dLeftOnly" />
+        <Radio label="2D right only" value="2dRightOnly" />
+        <Radio label="Anaglyph" value="anaglyph" />
+      </RadioGroup>
+      <Switch label="Inverted" checked={inverted} onChange={() => setInverted(!inverted)} />
+      <Switch label="Flipped" checked={flipped} onChange={() => setFlipped(!flipped)} />
+    </div>
   );
 }
 
@@ -108,15 +102,15 @@ function MenubarAngle() {
   const [radioCheck, setRadioCheck] = useState("extended");
 
   return (
-    <RadioGroup
-      label="Display Choice"
-      onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}
-    >
-      <Radio label="Extended" value="extended" />
-      <Radio label="Square" value="square" />
-      <Radio label="Custom" value="custom" />
-    </RadioGroup>
+    <div className="Menubar-content">
+      <RadioGroup
+        onChange={(event) => setRadioCheck(event.currentTarget.value)}
+        selectedValue={radioCheck}
+      >
+        <Radio label="Extended" value="extended" />
+        <Radio label="Square" value="square" />
+      </RadioGroup>
+    </div>
   );
 }
 
@@ -124,16 +118,17 @@ function MenubarLightning() {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
 
   return (
-    <RadioGroup
-      label="Display Choice"
-      onChange={(event) => setRadioCheck(event.currentTarget.value)}
-      selectedValue={radioCheck}
-    >
-      <Radio label="Night outside" value="nightOutside" />
-      <Radio label="Day inside" value="dayInside" />
-      <Radio label="Night inside" value="nightInside" />
-      <Radio label="Day outside" value="dayOutside" />
-    </RadioGroup>
+    <div className="Menubar-content">
+      <RadioGroup
+        onChange={(event) => setRadioCheck(event.currentTarget.value)}
+        selectedValue={radioCheck}
+      >
+        <Radio label="Night outside" value="nightOutside" />
+        <Radio label="Day inside" value="dayInside" />
+        <Radio label="Night inside" value="nightInside" />
+        <Radio label="Day outside" value="dayOutside" />
+      </RadioGroup>
+    </div>
   );
 }
 
@@ -144,14 +139,12 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
       <MenuItem icon="dashboard" text="Framerate" />
       <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
-      <MenuItem icon="lock" text="Auto Standby" />
+      <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
       <MenuItem
         icon="media"
         text="Picture settings"
-        onClick={() =>
-          openPanel({ component: MenuPicture, title: "Picture settings" })
-        }
+        onClick={() => openPanel({ component: MenuPicture, title: "Picture settings" })}
       />
       <MenuItem icon="pulse" text="Bitrate" />
       <MenuItem icon="wrench" text="Factory reset" />

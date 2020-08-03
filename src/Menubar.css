@@ -1,3 +1,7 @@
 .Menubar {
   height: 100%;
 }
+
+.Menubar-content {
+  padding: 10px;
+}
