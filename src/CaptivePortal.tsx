@@ -35,8 +35,9 @@ function CaptivePortal() {
       isCloseButtonShown={false}
       isOpen={true}
       className="bp3-dark bp3-large bp3-text-large"
-      title={<div>"Captive Portal FTW"</div>}
+      title={<div>Select network</div>}
       icon="globe-network"
+      hasBackdrop={false}
     >
       <div className="CaptivePortal-content">
         <div className="CaptivePortal-list">
@@ -83,6 +84,7 @@ function PasswordEntry({ onValidate }: PasswordEntryProps) {
               onValidate(ev.currentTarget.value);
             }
           }}
+          autoFocus
         />
       </Label>
     </div>
