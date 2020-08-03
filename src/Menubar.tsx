@@ -152,12 +152,6 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
-      <MenuItem
-        icon="media"
-        text="Picture settings"
-        onClick={() => openPanel({ component: MenuPicture, title: "Picture settings" })}
-      />
-      <MenuItem icon="pulse" text="Bitrate" />
   */
   return (
     <div className="Menubar-content">
@@ -172,6 +166,12 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
           onChange={(x) => setFramerate(x)}
         />
       </Label>
+       <MenuItem
+        icon="media"
+        text="Video settings"
+        onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
+      />
+      <MenuDivider />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>
@@ -179,16 +179,60 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
 }
 
 function MenuPicture() {
+  const [contrast, setContrast] = useState(0);
+  const [sharpness, setSharpness] = useState(0);
+  const [gain, setGain] = useState(0.0);
+  const [bitrate, setBitrate] = useState(5000000);
+  
   return (
     <div className="Menubar-content">
-      <Menu>
         <MenuItem icon="wrench" text="WB" />
         <MenuItem icon="flash" text="Exposure" />
-        <MenuItem icon="contrast" text="Contrast" />
-        <MenuItem icon="delta" text="Sharpness" />
+        <Label>
+          Contrast
+          <Slider 
+            min={-50}
+            max={100}
+            stepSize={1}
+            labelStepSize={10}
+            value={contrast}
+            onChange={(x) => setContrast(x)}
+          />
+        </Label>
+        <Label>
+          Sharpness
+          <Slider 
+            min={-50}
+            max={100}
+            stepSize={1}
+            labelStepSize={10}
+            value={sharpness}
+            onChange={(x) => setSharpness(x)}
+          />
+        </Label>
         <MenuItem icon="pivot-table" text="Stabilization" />
-        <MenuItem icon="cell-tower" text="Av gain" />
-      </Menu>
+        <Label>
+          Digital gain
+          <Slider 
+            min={-5.0}
+            max={10.0}
+            stepSize={1.0}
+            labelStepSize={5.0}
+            value={gain}
+            onChange={(x) => setGain(x)}
+          />
+        </Label>
+        <Label>
+          Bitrate (x100 000)
+          <Slider 
+            min={5}
+            max={100}
+            stepSize={5}
+            labelStepSize={25}
+            value={bitrate}
+            onChange={(x) => setBitrate(x)}
+          />
+        </Label>
     </div>
   );
 }
