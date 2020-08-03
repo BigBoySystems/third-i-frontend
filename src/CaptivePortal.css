@@ -1,0 +1,22 @@
+.CaptivePortal-content {
+  padding: 10px;
+}
+
+.CaptivePortal-list {
+  padding: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.CaptivePortal-buttons {
+  text-align: right;
+  padding-top: 10px;
+}
+
+.CaptivePortal-password {
+  padding: 10px;
+}
+
+.CaptivePortal-popover > span {
+  display: block;
+}
