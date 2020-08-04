@@ -4,11 +4,7 @@
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "^3.30.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
     "@types/classnames": "^2.2.10",
-    "@types/jest": "^24.9.1",
     "@types/node": "^12.12.53",
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
@@ -22,7 +18,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "fmt": "prettier --write ."
   },

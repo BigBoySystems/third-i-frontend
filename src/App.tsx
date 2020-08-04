@@ -37,7 +37,7 @@ function App() {
       startVideo();
       setVideoStarted(true);
     }
-  }, [videoStarted]);
+  }, [videoStarted, captivePortal]);
 
   if (captivePortal) {
     return <CaptivePortal />;
