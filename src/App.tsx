@@ -43,6 +43,10 @@ function App() {
     return <CaptivePortal />;
   }
 
+  if (captivePortal) {
+    return <CaptivePortal />;
+  }
+
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
       <Overlay
