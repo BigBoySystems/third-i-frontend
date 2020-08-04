@@ -5,6 +5,7 @@ import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
 import CaptivePortal from "./CaptivePortal";
+import { isPortal } from "./api";
 
 const player = new WSAvcPlayer({ useWorker: false });
 
@@ -31,6 +32,14 @@ function App() {
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [captivePortal, setCaptivePortal] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    if (!initialized) {
+      isPortal().then((portal) => setCaptivePortal(portal));
+      setInitialized(true);
+    }
+  }, [initialized, captivePortal]);
 
   useEffect(() => {
     if (!videoStarted && !captivePortal) {

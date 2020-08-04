@@ -1,34 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, Menu, MenuItem, Button, Popover, Label } from "@blueprintjs/core";
 import "./CaptivePortal.css";
+import * as api from "./api";
 
 function CaptivePortal() {
-  const [networks, setNetworks] = useState([
-    {
-      essid: "Weyland",
-      password: true,
-    },
-    {
-      essid: "CyberCafeDuCoin",
-      password: false,
-    },
-    {
-      essid: "Weyland",
-      password: true,
-    },
-    {
-      essid: "CyberCafeDuCoin",
-      password: false,
-    },
-    {
-      essid: "Weyland",
-      password: true,
-    },
-    {
-      essid: "CyberCafeDuCoin",
-      password: false,
-    },
-  ]);
+  const [networks, setNetworks] = useState([] as api.Network[]);
+  const [initialized, setInitialized] = useState(false);
+
+  const updateNetworks = () => api.networks().then((x) => setNetworks(x));
+
+  useEffect(() => {
+    if (!initialized) {
+      updateNetworks();
+      setInitialized(true);
+    }
+  }, [initialized, networks]);
 
   return (
     <Dialog
@@ -59,7 +45,7 @@ function CaptivePortal() {
           </Menu>
         </div>
         <div className="CaptivePortal-buttons">
-          <Button text="Refresh" />
+          <Button text="Refresh" onClick={updateNetworks} />
         </div>
       </div>
     </Dialog>
