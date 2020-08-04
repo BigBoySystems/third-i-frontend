@@ -1,4 +1,4 @@
-[*.tsx]
+[*.{tsx,ts}]
 max_line_length=100
 insert_final_newline=true
 trim_trailing_whitespace=true

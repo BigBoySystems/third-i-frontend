@@ -49,7 +49,7 @@ function App() {
   }, [videoStarted, captivePortal]);
 
   if (captivePortal) {
-    return <CaptivePortal />;
+    return <CaptivePortal onConnected={() => setCaptivePortal(false)} />;
   }
 
   return (

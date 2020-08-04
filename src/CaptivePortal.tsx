@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, Menu, MenuItem, Button, Popover, Label } from "@blueprintjs/core";
+import { Dialog, Menu, MenuItem, Button, Popover, Label, Toaster, Intent } from "@blueprintjs/core";
 import "./CaptivePortal.css";
 import * as api from "./api";
 
-function CaptivePortal() {
+interface CaptivePortalProps {
+  onConnected: () => void;
+}
+
+function CaptivePortal({ onConnected }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
 
@@ -32,7 +36,20 @@ function CaptivePortal() {
               password ? (
                 <Popover className="CaptivePortal-popover">
                   <MenuItem icon={password ? "lock" : "unlock"} text={essid} />
-                  <PasswordEntry onValidate={(password) => alert(`${essid} : ${password}`)} />
+                  <PasswordEntry
+                    onValidate={(password) =>
+                      api.connect(essid, password).then((res) => {
+                        if (res.success) {
+                          onConnected();
+                        } else {
+                          CaptivePortalToaster.show({
+                            message: "Could not connect to network.",
+                            intent: Intent.WARNING,
+                          });
+                        }
+                      })
+                    }
+                  />
                 </Popover>
               ) : (
                 <MenuItem
@@ -76,5 +93,7 @@ function PasswordEntry({ onValidate }: PasswordEntryProps) {
     </div>
   );
 }
+
+const CaptivePortalToaster = Toaster.create({});
 
 export default CaptivePortal;
