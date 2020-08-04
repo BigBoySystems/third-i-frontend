@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, Menu, MenuItem, Button, Popover, Label, Toaster, Intent } from "@blueprintjs/core";
+import {
+  Dialog,
+  Menu,
+  MenuItem,
+  Button,
+  Popover,
+  Label,
+  Toaster,
+  Intent,
+  Overlay,
+  Spinner,
+} from "@blueprintjs/core";
 import "./CaptivePortal.css";
 import * as api from "./api";
 
@@ -10,8 +21,32 @@ interface CaptivePortalProps {
 function CaptivePortal({ onConnected }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
+  const [connecting, setConnecting] = useState(false);
 
-  const updateNetworks = () => api.networks().then((x) => setNetworks(x));
+  const updateNetworks = () => {
+    setNetworks([]);
+    api.networks().then((x) => setNetworks(x));
+  };
+
+  const connect = (essid: string, password: string) => {
+    setConnecting(true);
+    setNetworks([]);
+
+    api.connect(essid, password).then((res) => {
+      setConnecting(false);
+
+      if (res.success) {
+        onConnected();
+      } else {
+        CaptivePortalToaster.show({
+          message: `Could not connect to "${essid}".`,
+          intent: Intent.WARNING,
+          timeout: 10000,
+        });
+        updateNetworks();
+      }
+    });
+  };
 
   useEffect(() => {
     if (!initialized) {
@@ -29,30 +64,22 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
       icon="globe-network"
       hasBackdrop={false}
     >
+      <Overlay isOpen={connecting}>
+        <Spinner size={Spinner.SIZE_LARGE} className="CaptivePortal-spinner" />
+      </Overlay>
       <div className="CaptivePortal-content">
         <div className="CaptivePortal-list">
           <Menu>
+            {networks.length === 0 && <MenuItem icon="refresh" text="Loading..." disabled />}
             {networks.map(({ essid, password }) =>
               password ? (
-                <Popover className="CaptivePortal-popover">
+                <Popover className="CaptivePortal-popover" position="left" key={essid}>
                   <MenuItem icon={password ? "lock" : "unlock"} text={essid} />
-                  <PasswordEntry
-                    onValidate={(password) =>
-                      api.connect(essid, password).then((res) => {
-                        if (res.success) {
-                          onConnected();
-                        } else {
-                          CaptivePortalToaster.show({
-                            message: "Could not connect to network.",
-                            intent: Intent.WARNING,
-                          });
-                        }
-                      })
-                    }
-                  />
+                  <PasswordEntry onValidate={(password) => connect(essid, password)} />
                 </Popover>
               ) : (
                 <MenuItem
+                  key={essid}
                   icon={password ? "lock" : "unlock"}
                   text={essid}
                   onClick={() => alert(essid)}
