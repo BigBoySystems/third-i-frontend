@@ -12,3 +12,11 @@
   flex-wrap: wrap;
   flex-direction: column;
 }
+
+.Menubar .bp3-control-group {
+  align-items: center;
+}
+
+.Menubar .bp3-control-group .bp3-switch {
+  margin: 0;
+}

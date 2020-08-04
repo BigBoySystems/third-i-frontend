@@ -14,6 +14,8 @@ import {
   Label,
   Slider,
   Button,
+  InputGroup,
+  ControlGroup,
 } from "@blueprintjs/core";
 
 function Menubar() {
@@ -123,11 +125,21 @@ function MenubarStreaming() {
   return (
     <div className="Menubar-content">
       <Switch label="Browser stream" checked={browser} onChange={() => setBrowser(!browser)} />
-      <Switch label="Stream UDP" checked={udp} onChange={() => setUdp(!udp)} />
-      <MenuItem icon="mobile-video" text="UDP clients" />
+      <Label>
+        Stream UDP
+        <ControlGroup>
+          <Switch checked={udp} onChange={() => setUdp(!udp)} />
+          <InputGroup placeholder="Client addresses" fill />
+        </ControlGroup>
+      </Label>
       <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
-      <Switch label="RTMP enabled" checked={rtmp} onChange={() => setRtmp(!rtmp)} />
-      <MenuItem icon="mobile-video" text="RTMP URL" />
+      <Label>
+        RTMP
+        <ControlGroup>
+          <Switch checked={rtmp} onChange={() => setRtmp(!rtmp)} />
+          <InputGroup placeholder="URL" fill />
+        </ControlGroup>
+      </Label>
       <Switch label="MPEG-TS enabled" checked={mpeg} onChange={() => setMpeg(!mpeg)} />
       <MenuItem icon="mobile-video" text="MPEG-TS clients" />
       <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
