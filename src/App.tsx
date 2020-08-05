@@ -31,7 +31,7 @@ function App() {
 
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
-  const [captivePortal, setCaptivePortal] = useState(false);
+  const [captivePortal, setCaptivePortal] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -48,12 +48,9 @@ function App() {
     }
   }, [videoStarted, captivePortal]);
 
-  if (captivePortal) {
-    return <CaptivePortal dialogOpen={captivePortal} onConnected={() => setCaptivePortal(false)} />;
-  }
-
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
+      <CaptivePortal dialogOpen={captivePortal} setDialogOpen={setCaptivePortal} onConnected={() => setCaptivePortal(false)} />;
       <Overlay
         className="bp3-dark bp3-large bp3-text-large"
         isOpen={menubarVisible}
