@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Menubar.css";
+import CaptivePortal from "./CaptivePortal";
 import {
   Menu,
   MenuItem,
@@ -140,8 +141,13 @@ function MenubarStreaming() {
           <InputGroup placeholder="URL" fill />
         </ControlGroup>
       </Label>
-      <Switch label="MPEG-TS enabled" checked={mpeg} onChange={() => setMpeg(!mpeg)} />
-      <MenuItem icon="mobile-video" text="MPEG-TS clients" />
+      <Label>
+        MPEG-TS
+        <ControlGroup>
+          <Switch checked={mpeg} onChange={() => setMpeg(!mpeg)} />
+          <InputGroup placeholder="Clients addresses" fill />
+        </ControlGroup>
+      </Label>
       <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
     </div>
   );
@@ -183,7 +189,7 @@ function MenubarLightning() {
 
 function MenuAdvanced({ openPanel }: IPanelProps) {
   const [framerate, setFramerate] = useState(30);
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   /*
       <MenuItem icon="refresh" text="Loop record" />
 
@@ -206,12 +212,22 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
           onChange={(x) => setFramerate(x)}
         />
       </Label>
-      <MenuItem
-        icon="media"
-        text="Video settings"
-        onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
-      />
+      <Menu>
+        <MenuItem
+          icon="media"
+          text="Video settings"
+          onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
+        />
+      </Menu>
       <MenuDivider />
+      <Button 
+        icon="globe-network" 
+        text="Wifi-settings" 
+        fill 
+        onClick={() => setDialogOpen(true)} />
+      <CaptivePortal  
+        onConnected={() => console.log("ok")} 
+        dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>
