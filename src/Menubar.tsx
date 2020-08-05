@@ -140,8 +140,13 @@ function MenubarStreaming() {
           <InputGroup placeholder="URL" fill />
         </ControlGroup>
       </Label>
-      <Switch label="MPEG-TS enabled" checked={mpeg} onChange={() => setMpeg(!mpeg)} />
-      <MenuItem icon="mobile-video" text="MPEG-TS clients" />
+      <Label>
+        MPEG-TS
+        <ControlGroup>
+          <Switch checked={mpeg} onChange={() => setMpeg(!mpeg)} />
+          <InputGroup placeholder="Clients addresses" fill />
+        </ControlGroup>
+      </Label>
       <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
     </div>
   );
