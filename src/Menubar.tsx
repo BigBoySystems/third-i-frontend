@@ -189,7 +189,7 @@ function MenubarLightning() {
 
 function MenuAdvanced({ openPanel }: IPanelProps) {
   const [framerate, setFramerate] = useState(30);
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   /*
       <MenuItem icon="refresh" text="Loop record" />
 
@@ -218,23 +218,12 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
           text="Video settings"
           onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
         />
-        <MenuItem
-          icon="globe-network"
-          text="Wifi settings"
-          onClick={() => openPanel({ component: MenuWifi, title: "Wifi settings" })}
-          />
       </Menu>
       <MenuDivider />
+      <Button icon="globe-network" text="Wifi-settings" fill onClick={() => setDialogOpen(true)} />
+      <CaptivePortal  onConnected={() => console.log("ok")} dialogOpen={dialogOpen} />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
-    </div>
-  );
-}
-
-function MenuWifi() {
-  return (
-    <div className="Menubar-content">
-      <CaptivePortal  onConnected={() => console.log("ok")} />
     </div>
   );
 }

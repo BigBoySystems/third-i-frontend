@@ -16,13 +16,13 @@ import * as api from "./api";
 
 interface CaptivePortalProps {
   onConnected: () => void;
+  dialogOpen: boolean;
 }
 
-function CaptivePortal({ onConnected }: CaptivePortalProps) {
+function CaptivePortal({ onConnected, dialogOpen }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(true);
   
   const updateNetworks = () => {
     setNetworks([]);
@@ -59,7 +59,6 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
   return (
     <Dialog
       isOpen={dialogOpen}
-      onClose={dialogOpen => setDialogOpen(false)}
       className="bp3-dark bp3-large bp3-text-large"
       title={<div>Select network</div>}
       icon="globe-network"
