@@ -21,7 +21,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# text_editor
-src/third-i.sublime-project
-src/third-i.sublime-workspace
