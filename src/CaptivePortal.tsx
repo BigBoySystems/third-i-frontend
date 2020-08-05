@@ -22,7 +22,8 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
-
+  const [dialogOpen, setDialogOpen] = useState(true);
+  
   const updateNetworks = () => {
     setNetworks([]);
     api.networks().then((x) => setNetworks(x));
@@ -57,8 +58,8 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
 
   return (
     <Dialog
-      isCloseButtonShown={false}
-      isOpen={true}
+      isOpen={dialogOpen}
+      onClose={dialogOpen => setDialogOpen(false)}
       className="bp3-dark bp3-large bp3-text-large"
       title={<div>Select network</div>}
       icon="globe-network"
