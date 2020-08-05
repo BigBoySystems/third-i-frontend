@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Menubar.css";
+import CaptivePortal from "./CaptivePortal";
 import {
   Menu,
   MenuItem,
@@ -191,6 +192,8 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
 
   /*
       <MenuItem icon="refresh" text="Loop record" />
+
+      <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
@@ -209,15 +212,29 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
           onChange={(x) => setFramerate(x)}
         />
       </Label>
-      <MenuItem
-        icon="media"
-        text="Video settings"
-        onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
-      />
+      <Menu>
+        <MenuItem
+          icon="media"
+          text="Video settings"
+          onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
+        />
+        <MenuItem
+          icon="globe-network"
+          text="Wifi settings"
+          onClick={() => openPanel({ component: MenuWifi, title: "Wifi settings" })}
+          />
+      </Menu>
       <MenuDivider />
-      <Button icon="globe-network" text="Wifi settings" fill />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
+    </div>
+  );
+}
+
+function MenuWifi() {
+  return (
+    <div className="Menubar-content">
+      <CaptivePortal  onConnected={() => console.log("ok")} />
     </div>
   );
 }
