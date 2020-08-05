@@ -191,8 +191,6 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
 
   /*
       <MenuItem icon="refresh" text="Loop record" />
-
-      <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
@@ -217,6 +215,7 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
         onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
       />
       <MenuDivider />
+      <Button icon="globe-network" text="Wifi settings" fill />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>
