@@ -24,30 +24,47 @@ function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortal
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState(false);
 
   const updateNetworks = () => {
     setNetworks([]);
-    api.networks().then((x) => setNetworks(x));
+    setError(false);
+    api
+      .networks()
+      .then((x) => setNetworks(x))
+      .catch((err) => {
+        console.log(err);
+        setError(true);
+      });
   };
 
   const connect = (essid: string, password: string) => {
     setConnecting(true);
+    setError(false);
     setNetworks([]);
 
-    api.connect(essid, password).then((res) => {
-      setConnecting(false);
+    api
+      .connect(essid, password)
+      .then((res) => {
+        setConnecting(false);
 
-      if (res.success) {
-        onConnected();
-      } else {
-        CaptivePortalToaster.show({
-          message: `Could not connect to "${essid}".`,
-          intent: Intent.WARNING,
-          timeout: 10000,
-        });
-        updateNetworks();
-      }
-    });
+        if (res.success) {
+          onConnected();
+          setDialogOpen(false);
+        } else {
+          CaptivePortalToaster.show({
+            message: `Could not connect to "${essid}".`,
+            intent: Intent.WARNING,
+            timeout: 10000,
+          });
+          updateNetworks();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(true);
+        setConnecting(false);
+      });
   };
 
   useEffect(() => {
@@ -72,7 +89,9 @@ function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortal
       <div className="CaptivePortal-content">
         <div className="CaptivePortal-list">
           <Menu>
-            {networks.length === 0 && <MenuItem icon="refresh" text="Loading..." disabled />}
+            {networks.length === 0 && (
+              <MenuItem icon="refresh" text={error ? "An error occurred" : "Loading..."} disabled />
+            )}
             {networks.map(({ essid, password }) =>
               password ? (
                 <Popover className="CaptivePortal-popover" position="left" key={essid}>
