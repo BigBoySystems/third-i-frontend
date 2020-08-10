@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Dialog,
   Menu,
   MenuItem,
   Button,
@@ -16,11 +15,9 @@ import * as api from "./api";
 
 interface CaptivePortalProps {
   onConnected: () => void;
-  dialogOpen: boolean;
-  setDialogOpen: (value: boolean) => void;
 }
 
-function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortalProps) {
+function CaptivePortal({ onConnected }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -50,7 +47,6 @@ function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortal
 
         if (res.success) {
           onConnected();
-          setDialogOpen(false);
         } else {
           CaptivePortalToaster.show({
             message: `Could not connect to "${essid}".`,
@@ -75,45 +71,36 @@ function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortal
   }, [initialized, networks]);
 
   return (
-    <Dialog
-      isOpen={dialogOpen}
-      onClose={(dialogOpen) => setDialogOpen(false)}
-      className="bp3-dark bp3-large bp3-text-large"
-      title={<div>Select network</div>}
-      icon="globe-network"
-      hasBackdrop={false}
-    >
+    <div className="CaptivePortal-content">
       <Overlay isOpen={connecting}>
         <Spinner size={Spinner.SIZE_LARGE} className="CaptivePortal-spinner" />
       </Overlay>
-      <div className="CaptivePortal-content">
-        <div className="CaptivePortal-list">
-          <Menu>
-            {networks.length === 0 && (
-              <MenuItem icon="refresh" text={error ? "An error occurred" : "Loading..."} disabled />
-            )}
-            {networks.map(({ essid, password }) =>
-              password ? (
-                <Popover className="CaptivePortal-popover" position="left" key={essid}>
-                  <MenuItem icon={password ? "lock" : "unlock"} text={essid} />
-                  <PasswordEntry onValidate={(password) => connect(essid, password)} />
-                </Popover>
-              ) : (
-                <MenuItem
-                  key={essid}
-                  icon={password ? "lock" : "unlock"}
-                  text={essid}
-                  onClick={() => alert(essid)}
-                />
-              )
-            )}
-          </Menu>
-        </div>
-        <div className="CaptivePortal-buttons">
-          <Button text="Refresh" onClick={updateNetworks} />
-        </div>
+      <div className="CaptivePortal-list">
+        <Menu>
+          {networks.length === 0 && (
+            <MenuItem icon="refresh" text={error ? "An error occurred" : "Loading..."} disabled />
+          )}
+          {networks.map(({ essid, password }) =>
+            password ? (
+              <Popover className="CaptivePortal-popover" position="left" key={essid}>
+                <MenuItem icon={password ? "lock" : "unlock"} text={essid} />
+                <PasswordEntry onValidate={(password) => connect(essid, password)} />
+              </Popover>
+            ) : (
+              <MenuItem
+                key={essid}
+                icon={password ? "lock" : "unlock"}
+                text={essid}
+                onClick={() => alert(essid)}
+              />
+            )
+          )}
+        </Menu>
       </div>
-    </Dialog>
+      <div className="CaptivePortal-buttons">
+        <Button text="Refresh" onClick={updateNetworks} />
+      </div>
+    </div>
   );
 }
 

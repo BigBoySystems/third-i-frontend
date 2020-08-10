@@ -175,7 +175,6 @@ function Lightning() {
 
 function Advanced({ openPanel }: IPanelProps) {
   const [framerate, setFramerate] = useState(30);
-  const [dialogOpen, setDialogOpen] = useState(false);
   /*
       <MenuItem icon="refresh" text="Loop record" />
 
@@ -206,11 +205,11 @@ function Advanced({ openPanel }: IPanelProps) {
         />
       </Menu>
       <MenuDivider />
-      <Button icon="globe-network" text="Wifi-settings" fill onClick={() => setDialogOpen(true)} />
-      <CaptivePortal
-        onConnected={() => console.log("ok")}
-        dialogOpen={dialogOpen}
-        setDialogOpen={setDialogOpen}
+      <Button
+        icon="globe-network"
+        text="Wifi-settings"
+        fill
+        onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
       />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
@@ -281,6 +280,10 @@ function Picture() {
       </Menu>
     </div>
   );
+}
+
+function SelectNetwork({ closePanel }: IPanelProps) {
+  return <CaptivePortal onConnected={() => closePanel()} />;
 }
 
 export default Menubar;
