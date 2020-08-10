@@ -16,6 +16,10 @@ export interface PhotoMode {
   setPhotoMode: (value: boolean) => void;
 }
 
+export interface Network {
+  setNetwork: (value: string) => void;
+}
+
 function startVideo() {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
@@ -82,6 +86,7 @@ function App() {
           <MenuBar
             photoMode={photoMode}
             setPhotoMode={setPhotoMode}
+            setNetwork={setNetwork}
             // We need this custom key because the props of the Settings component is in the state
             // of the Menubar component (which makes the Settings not re-render)
             key={`${photoMode}`}

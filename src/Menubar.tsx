@@ -18,16 +18,16 @@ import {
   InputGroup,
   ControlGroup,
 } from "@blueprintjs/core";
-import { PhotoMode } from "./App";
+import { PhotoMode, Network } from "./App";
 
-function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
-  const [panels, setPanels] = useState<(IPanel<PhotoMode> | IPanel)[]>([
+type MenubarProps = PhotoMode & Network;
+type PanelProps = IPanelProps & PhotoMode & Network;
+
+function Menubar(props: MenubarProps) {
+  const [panels, setPanels] = useState<(IPanel<MenubarProps> | IPanel<{}>)[]>([
     {
       component: Settings,
-      props: {
-        photoMode,
-        setPhotoMode,
-      },
+      props,
       title: "Settings",
     },
   ]);
@@ -42,7 +42,8 @@ function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
   );
 }
 
-function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMode) {
+function Settings({ openPanel, closePanel, ...props }: PanelProps) {
+  const { photoMode, setPhotoMode } = props;
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
   return (
@@ -50,7 +51,7 @@ function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMod
       <MenuItem
         icon="desktop"
         text="Display"
-        onClick={() => openPanel({ component: Display, title: "Display" })}
+        onClick={() => openPanel({ component: Display, props, title: "Display" })}
       />
       <MenuItem
         icon="camera"
@@ -61,7 +62,7 @@ function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMod
       <MenuItem
         icon="mobile-video"
         text="Streaming settings"
-        onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
+        onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
       />
       <MenuItem icon="headset" text="Audio settings" />
       <MenuItem
@@ -73,13 +74,13 @@ function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMod
       <MenuItem
         icon="lightbulb"
         text="Lighting"
-        onClick={() => openPanel({ component: Lightning, title: "Lighting" })}
+        onClick={() => openPanel({ component: Lightning, props, title: "Lighting" })}
       />
       <MenuDivider />
       <MenuItem
         icon="cog"
         text="Advanced parameters"
-        onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
+        onClick={() => openPanel({ component: Advanced, props, title: "Advanced parameters" })}
       />
     </Menu>
   );
@@ -167,25 +168,19 @@ function Lightning() {
   );
 }
 
-function Advanced({ openPanel }: IPanelProps) {
-  /*
-      <MenuItem icon="refresh" text="Loop record" />
-      <MenuItem icon="power" text="Auto shut off" />
-      <MenuItem icon="lock" text="Auto standby" />
-      <MenuItem icon="time" text="Timer" />
-  */
+function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
   return (
     <div className="Menubar-content">
       <Menu>
         <MenuItem
           icon="media"
           text="Video settings"
-          onClick={() => openPanel({ component: Picture, title: "Video settings" })}
+          onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
         />
         <MenuItem
           icon="globe-network"
           text="Wifi-settings"
-          onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
+          onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
         />
       </Menu>
       <MenuDivider />
@@ -304,8 +299,15 @@ function Picture() {
   );
 }
 
-function SelectNetwork({ closePanel }: IPanelProps) {
-  return <CaptivePortal onConnected={() => closePanel()} />;
+function SelectNetwork({ closePanel, setNetwork }: PanelProps) {
+  return (
+    <CaptivePortal
+      onConnected={(essid) => {
+        closePanel();
+        setNetwork(essid);
+      }}
+    />
+  );
 }
 
 export default Menubar;
