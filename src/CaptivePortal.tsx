@@ -14,7 +14,7 @@ import "./CaptivePortal.css";
 import * as api from "./api";
 
 interface CaptivePortalProps {
-  onConnected: () => void;
+  onConnected: (essid: string) => void;
 }
 
 function CaptivePortal({ onConnected }: CaptivePortalProps) {
@@ -46,7 +46,7 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
         setConnecting(false);
 
         if (res.success) {
-          onConnected();
+          onConnected(essid);
         } else {
           CaptivePortalToaster.show({
             message: `Could not connect to "${essid}".`,

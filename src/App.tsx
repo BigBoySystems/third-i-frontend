@@ -39,6 +39,7 @@ function App() {
   const [captivePortal, setCaptivePortal] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
+  const [network, setNetwork] = useState("Access Point");
 
   useEffect(() => {
     if (!initialized) {
@@ -64,7 +65,12 @@ function App() {
         icon="globe-network"
         hasBackdrop={false}
       >
-        <CaptivePortal onConnected={() => setCaptivePortal(false)} />
+        <CaptivePortal
+          onConnected={(essid) => {
+            setCaptivePortal(false);
+            setNetwork(essid);
+          }}
+        />
       </Dialog>
       <Overlay
         className="bp3-dark bp3-large bp3-text-large"
@@ -101,7 +107,10 @@ function App() {
         <div className="App-timestamp">01:14:56</div>
       </div>
       <div className="App-bottom-right">
-        <Icon icon="globe-network" iconSize={iconSize} />
+        <div>
+          <Icon icon="globe-network" iconSize={iconSize} />
+          {network}
+        </div>
       </div>
     </div>
   );
