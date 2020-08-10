@@ -20,3 +20,8 @@
 .Menubar .bp3-control-group .bp3-switch {
   margin: 0;
 }
+
+.Menubar select {
+  display: block;
+  width: 100%;
+}

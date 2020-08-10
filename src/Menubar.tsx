@@ -226,8 +226,39 @@ function Picture() {
   return (
     <div className="Menubar-content">
       <Menu>
-        <MenuItem icon="wrench" text="WB" />
-        <MenuItem icon="flash" text="Exposure" />
+        <Label>
+          White balance
+          <select>
+            <option>Off</option>
+            <option>Auto</option>
+            <option>Sun</option>
+            <option>Cloud</option>
+            <option>Shade</option>
+            <option>Tungsten</option>
+            <option>Fluorescent</option>
+            <option>Incandescent</option>
+            <option>Flash</option>
+            <option>Horizon</option>
+          </select>
+        </Label>
+        <Label>
+          Exposure
+          <select>
+            <option>Off</option>
+            <option>Auto</option>
+            <option>Night</option>
+            <option>Nightpreview</option>
+            <option>Backlight</option>
+            <option>Spotlight</option>
+            <option>Sports</option>
+            <option>Snow</option>
+            <option>Beach</option>
+            <option>Verylong</option>
+            <option>Fixedfps</option>
+            <option>Antishake</option>
+            <option>Fireworks</option>
+          </select>
+        </Label>
         <Label>
           Contrast
           <Slider
