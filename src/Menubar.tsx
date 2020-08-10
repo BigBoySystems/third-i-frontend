@@ -42,7 +42,6 @@ function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
   );
 }
 
-
 function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMode) {
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
@@ -289,17 +288,17 @@ function Picture() {
           />
         </Label>
         <Label>
-        Framerate
-        <Slider
-          min={25}
-          max={60}
-          stepSize={1}
-          labelStepSize={5}
-          value={framerate}
-          showTrackFill={false}
-          onChange={(x) => setFramerate(x)}
-        />
-      </Label>
+          Framerate
+          <Slider
+            min={25}
+            max={60}
+            stepSize={1}
+            labelStepSize={5}
+            value={framerate}
+            showTrackFill={false}
+            onChange={(x) => setFramerate(x)}
+          />
+        </Label>
       </Menu>
     </div>
   );
