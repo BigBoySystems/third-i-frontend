@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Button, Overlay, Classes, Dialog } from "@blueprintjs/core";
+import { Button, Overlay, Classes, Dialog, Icon } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
@@ -8,14 +8,15 @@ import CaptivePortal from "./CaptivePortal";
 import { isPortal } from "./api";
 
 const player = new WSAvcPlayer({ useWorker: false });
-const retry_interval = 3000;
+const retryInterval = 3000;
+const iconSize = 64;
 
 function startVideo() {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
   player.on("disconnected", () => console.log("WS disconnected"));
   player.on("connected", () => console.log("WS connected"));
-  player.on("disconnected", () => setTimeout(connect, retry_interval));
+  player.on("disconnected", () => setTimeout(connect, retryInterval));
   connect();
 }
 
@@ -70,11 +71,16 @@ function App() {
         </div>
       </Overlay>
       <div id="video" style={{ width: "100vw", height: "*" }} />
-      <Button
-        className="App-menu"
-        icon="menu"
-        onClick={() => setMenubarVisibility(!menubarVisible)}
-      />
+      <div className="App-top-center">
+        <Icon
+          icon="cog"
+          iconSize={iconSize}
+          onClick={() => setMenubarVisibility(!menubarVisible)}
+        />
+      </div>
+      <div className="App-bottom-center">
+        <Icon icon="camera" iconSize={iconSize} />
+      </div>
     </div>
   );
 }
