@@ -13,11 +13,66 @@
   outline: none;
 }
 
-.App-menu {
+.App-top-center {
   position: fixed;
   top: 0;
-  left: calc(50vw - 20px);
-  width: 40px;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  /* flex-direction: column; TODO */
+}
+
+.App-top-left {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
+  /* flex-direction: column; TODO */
+}
+
+.App-top-right {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  /* flex-direction: column; TODO */
+}
+
+.App-bottom-center {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  /* flex-direction: column-reverse; TODO */
+}
+
+.App-bottom-left {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
+  /* flex-direction: column-reverse; TODO */
+}
+
+.App-bottom-right {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  /* flex-direction: column-reverse; TODO */
 }
 
 #video {

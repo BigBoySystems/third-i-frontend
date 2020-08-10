@@ -18,13 +18,17 @@ import {
   InputGroup,
   ControlGroup,
 } from "@blueprintjs/core";
+import { PhotoMode } from "./App";
 
-function Menubar() {
-  const [panels, setPanels] = useState<IPanel[]>([
+function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
+  const [panels, setPanels] = useState<(IPanel<PhotoMode> | IPanel)[]>([
     {
       component: Settings,
-      props: {},
-      title: "Menu",
+      props: {
+        photoMode,
+        setPhotoMode,
+      },
+      title: "Settings",
     },
   ]);
 
@@ -38,8 +42,8 @@ function Menubar() {
   );
 }
 
-function Settings({ openPanel }: IPanelProps) {
-  const [photoMode, setPhotoMode] = useState(false);
+
+function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMode) {
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
   return (
@@ -94,7 +98,7 @@ function Display() {
         selectedValue={radioCheck}
       >
         <Radio label="3D flat" value="3dFlat" />
-        <Radio label="3D distored" value="3dDistored" />
+        <Radio label="3D distorted" value="3dDistorted" />
         <Radio label="2D left only" value="2dLeftOnly" />
         <Radio label="2D right only" value="2dRightOnly" />
         <Radio label="Anaglyph" value="anaglyph" />

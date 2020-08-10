@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Button, Overlay, Classes, Dialog } from "@blueprintjs/core";
+import { Overlay, Classes, Dialog, Icon } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
@@ -8,14 +8,20 @@ import CaptivePortal from "./CaptivePortal";
 import { isPortal } from "./api";
 
 const player = new WSAvcPlayer({ useWorker: false });
-const retry_interval = 3000;
+const retryInterval = 3000;
+const iconSize = 64;
+
+export interface PhotoMode {
+  photoMode: boolean;
+  setPhotoMode: (value: boolean) => void;
+}
 
 function startVideo() {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
   player.on("disconnected", () => console.log("WS disconnected"));
   player.on("connected", () => console.log("WS connected"));
-  player.on("disconnected", () => setTimeout(connect, retry_interval));
+  player.on("disconnected", () => setTimeout(connect, retryInterval));
   connect();
 }
 
@@ -32,6 +38,7 @@ function App() {
   const [videoStarted, setVideoStarted] = useState(false);
   const [captivePortal, setCaptivePortal] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [photoMode, setPhotoMode] = useState(false);
 
   useEffect(() => {
     if (!initialized) {
@@ -66,15 +73,36 @@ function App() {
         onClose={() => setMenubarVisibility(false)}
       >
         <div className={classes}>
-          <MenuBar />
+          <MenuBar
+            photoMode={photoMode}
+            setPhotoMode={setPhotoMode}
+            // We need this custom key because the props of the Settings component is in the state
+            // of the Menubar component (which makes the Settings not re-render)
+            key={`${photoMode}`}
+          />
         </div>
       </Overlay>
       <div id="video" style={{ width: "100vw", height: "*" }} />
-      <Button
-        className="App-menu"
-        icon="menu"
-        onClick={() => setMenubarVisibility(!menubarVisible)}
-      />
+      <div className="App-top-left">
+        <Icon icon="folder-close" iconSize={iconSize} />
+      </div>
+      <div className="App-top-center">
+        <Icon
+          icon="cog"
+          iconSize={iconSize}
+          onClick={() => setMenubarVisibility(!menubarVisible)}
+        />
+      </div>
+      <div className="App-bottom-left">
+        <Icon icon="database" iconSize={iconSize} />
+      </div>
+      <div className="App-bottom-center">
+        <Icon icon={photoMode ? "camera" : "mobile-video"} iconSize={iconSize} />
+        <div className="App-timestamp">01:14:56</div>
+      </div>
+      <div className="App-bottom-right">
+        <Icon icon="globe-network" iconSize={iconSize} />
+      </div>
     </div>
   );
 }
