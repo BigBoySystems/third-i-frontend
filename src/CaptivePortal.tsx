@@ -49,7 +49,7 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
           onConnected();
         } else {
           CaptivePortalToaster.show({
-            message: `Could not connect to "${essid}".`,
+            message: `Could not connect to "${essid}". You should check your password, if the problem can't be fixed please call you network manager`,
             intent: Intent.WARNING,
             timeout: 10000,
           });
