@@ -26,6 +26,14 @@
   left: 0;
 }
 
-#video > canvas {
-  height: 100vh;
+@media (min-aspect-ratio: 16/9) {
+  #video > canvas {
+    height: 100vh;
+  }
+}
+
+@media (max-aspect-ratio: 16/9) {
+  #video > canvas {
+    width: 100vw;
+  }
 }
