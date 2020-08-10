@@ -98,6 +98,7 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
+        <Button text="Use access point" />
         <Button text="Refresh" onClick={updateNetworks} />
       </div>
     </div>
