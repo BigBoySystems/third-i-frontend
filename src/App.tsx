@@ -89,6 +89,8 @@ function App() {
             setNetwork={setNetwork}
             // We need this custom key because the props of the Settings component is in the state
             // of the Menubar component (which makes the Settings not re-render)
+            //
+            // https://github.com/palantir/blueprint/issues/3173
             key={`${photoMode}`}
           />
         </div>

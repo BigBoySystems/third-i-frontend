@@ -24,7 +24,7 @@ type MenubarProps = PhotoMode & Network;
 type PanelProps = IPanelProps & PhotoMode & Network;
 
 function Menubar(props: MenubarProps) {
-  const [panels, setPanels] = useState<(IPanel<MenubarProps> | IPanel<{}>)[]>([
+  const [panels, setPanels] = useState<IPanel<MenubarProps>[]>([
     {
       component: Settings,
       props,
@@ -36,7 +36,7 @@ function Menubar(props: MenubarProps) {
     <PanelStack
       className="Menubar"
       initialPanel={panels[0]}
-      onOpen={(new_) => setPanels([new_, ...panels])}
+      onOpen={(new_) => setPanels([new_ as IPanel<MenubarProps>, ...panels])}
       onClose={() => setPanels(panels.slice(1))}
     />
   );
