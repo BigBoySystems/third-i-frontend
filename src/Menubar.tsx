@@ -22,7 +22,7 @@ import {
 function Menubar() {
   const [panels, setPanels] = useState<IPanel[]>([
     {
-      component: Root,
+      component: Settings,
       props: {},
       title: "Menu",
     },
@@ -35,18 +35,6 @@ function Menubar() {
       onOpen={(new_) => setPanels([new_, ...panels])}
       onClose={() => setPanels(panels.slice(1))}
     />
-  );
-}
-
-function Root({ openPanel }: IPanelProps) {
-  return (
-    <Menu>
-      <MenuItem
-        icon="settings"
-        text="Settings..."
-        onClick={() => openPanel({ component: Settings, title: "Settings" })}
-      />
-    </Menu>
   );
 }
 
@@ -125,6 +113,10 @@ function Streaming() {
   const [mpeg, setMpeg] = useState(false);
   const [rtsp, setRtsp] = useState(false);
 
+  /*
+    <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
+  */
+
   return (
     <div className="Menubar-content">
       <Switch label="Browser stream" checked={browser} onChange={() => setBrowser(!browser)} />
@@ -135,7 +127,6 @@ function Streaming() {
           <InputGroup placeholder="Client addresses" fill />
         </ControlGroup>
       </Label>
-      <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
       <Label>
         RTMP
         <ControlGroup>
@@ -174,29 +165,14 @@ function Lightning() {
 }
 
 function Advanced({ openPanel }: IPanelProps) {
-  const [framerate, setFramerate] = useState(30);
   /*
       <MenuItem icon="refresh" text="Loop record" />
-
-      <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
   */
   return (
     <div className="Menubar-content">
-      <Label>
-        Framerate
-        <Slider
-          min={25}
-          max={60}
-          stepSize={1}
-          labelStepSize={5}
-          value={framerate}
-          showTrackFill={false}
-          onChange={(x) => setFramerate(x)}
-        />
-      </Label>
       <Menu>
         <MenuItem
           icon="media"
@@ -222,6 +198,7 @@ function Picture() {
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
   const [bitrate, setBitrate] = useState(3000000);
+  const [framerate, setFramerate] = useState(30);
 
   return (
     <div className="Menubar-content">
@@ -263,7 +240,7 @@ function Picture() {
           Contrast
           <Slider
             min={-50}
-            max={100}
+            max={50}
             stepSize={1}
             labelStepSize={10}
             value={contrast}
@@ -275,7 +252,7 @@ function Picture() {
           Sharpness
           <Slider
             min={-50}
-            max={100}
+            max={50}
             stepSize={1}
             labelStepSize={10}
             value={sharpness}
@@ -308,6 +285,18 @@ function Picture() {
             onChange={(x) => setBitrate(x * 100000)}
           />
         </Label>
+        <Label>
+        Framerate
+        <Slider
+          min={25}
+          max={60}
+          stepSize={1}
+          labelStepSize={5}
+          value={framerate}
+          showTrackFill={false}
+          onChange={(x) => setFramerate(x)}
+        />
+      </Label>
       </Menu>
     </div>
   );
