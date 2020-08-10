@@ -206,14 +206,12 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
         />
       </Menu>
       <MenuDivider />
-      <Button 
-        icon="globe-network" 
-        text="Wifi-settings" 
-        fill 
-        onClick={() => setDialogOpen(true)} />
-      <CaptivePortal  
-        onConnected={() => console.log("ok")} 
-        dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
+      <Button icon="globe-network" text="Wifi-settings" fill onClick={() => setDialogOpen(true)} />
+      <CaptivePortal
+        onConnected={() => console.log("ok")}
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+      />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>

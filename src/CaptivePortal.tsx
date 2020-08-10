@@ -24,7 +24,7 @@ function CaptivePortal({ onConnected, dialogOpen, setDialogOpen }: CaptivePortal
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  
+
   const updateNetworks = () => {
     setNetworks([]);
     api.networks().then((x) => setNetworks(x));

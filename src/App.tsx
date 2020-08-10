@@ -50,7 +50,12 @@ function App() {
 
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
-      <CaptivePortal dialogOpen={captivePortal} setDialogOpen={setCaptivePortal} onConnected={() => setCaptivePortal(false)} />;
+      <CaptivePortal
+        dialogOpen={captivePortal}
+        setDialogOpen={setCaptivePortal}
+        onConnected={() => setCaptivePortal(false)}
+      />
+      ;
       <Overlay
         className="bp3-dark bp3-large bp3-text-large"
         isOpen={menubarVisible}
