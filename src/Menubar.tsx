@@ -42,6 +42,7 @@ function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
   );
 }
 
+
 function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMode) {
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
@@ -111,10 +112,14 @@ function Display() {
 function Streaming() {
   const [browser, setBrowser] = useState(false);
   const [udp, setUdp] = useState(false);
-  const [usb, setUsb] = useState(false);
   const [rtmp, setRtmp] = useState(false);
   const [mpeg, setMpeg] = useState(false);
   const [rtsp, setRtsp] = useState(false);
+
+  /*
+    const [usb, setUsb] = useState(false);
+    <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
+  */
 
   return (
     <div className="Menubar-content">
@@ -126,7 +131,6 @@ function Streaming() {
           <InputGroup placeholder="Client addresses" fill />
         </ControlGroup>
       </Label>
-      <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
       <Label>
         RTMP
         <ControlGroup>
@@ -165,43 +169,27 @@ function Lightning() {
 }
 
 function Advanced({ openPanel }: IPanelProps) {
-  const [framerate, setFramerate] = useState(30);
   /*
       <MenuItem icon="refresh" text="Loop record" />
-
-      <MenuItem icon="globe-network" text="Wifi settings" />
       <MenuItem icon="power" text="Auto shut off" />
       <MenuItem icon="lock" text="Auto standby" />
       <MenuItem icon="time" text="Timer" />
   */
   return (
     <div className="Menubar-content">
-      <Label>
-        Framerate
-        <Slider
-          min={25}
-          max={60}
-          stepSize={1}
-          labelStepSize={5}
-          value={framerate}
-          showTrackFill={false}
-          onChange={(x) => setFramerate(x)}
-        />
-      </Label>
       <Menu>
         <MenuItem
           icon="media"
           text="Video settings"
           onClick={() => openPanel({ component: Picture, title: "Video settings" })}
         />
+        <MenuItem
+          icon="globe-network"
+          text="Wifi-settings"
+          onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
+        />
       </Menu>
       <MenuDivider />
-      <Button
-        icon="globe-network"
-        text="Wifi-settings"
-        fill
-        onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
-      />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>
@@ -213,6 +201,7 @@ function Picture() {
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
   const [bitrate, setBitrate] = useState(3000000);
+  const [framerate, setFramerate] = useState(30);
 
   return (
     <div className="Menubar-content">
@@ -254,7 +243,7 @@ function Picture() {
           Contrast
           <Slider
             min={-50}
-            max={100}
+            max={50}
             stepSize={1}
             labelStepSize={10}
             value={contrast}
@@ -266,7 +255,7 @@ function Picture() {
           Sharpness
           <Slider
             min={-50}
-            max={100}
+            max={50}
             stepSize={1}
             labelStepSize={10}
             value={sharpness}
@@ -299,6 +288,18 @@ function Picture() {
             onChange={(x) => setBitrate(x * 100000)}
           />
         </Label>
+        <Label>
+        Framerate
+        <Slider
+          min={25}
+          max={60}
+          stepSize={1}
+          labelStepSize={5}
+          value={framerate}
+          showTrackFill={false}
+          onChange={(x) => setFramerate(x)}
+        />
+      </Label>
       </Menu>
     </div>
   );
