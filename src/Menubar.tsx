@@ -108,12 +108,12 @@ function Display() {
 function Streaming() {
   const [browser, setBrowser] = useState(false);
   const [udp, setUdp] = useState(false);
-  const [usb, setUsb] = useState(false);
   const [rtmp, setRtmp] = useState(false);
   const [mpeg, setMpeg] = useState(false);
   const [rtsp, setRtsp] = useState(false);
 
   /*
+    const [usb, setUsb] = useState(false);
     <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
   */
 
@@ -179,14 +179,13 @@ function Advanced({ openPanel }: IPanelProps) {
           text="Video settings"
           onClick={() => openPanel({ component: Picture, title: "Video settings" })}
         />
+        <MenuItem
+          icon="globe-network"
+          text="Wifi-settings"
+          onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
+        />
       </Menu>
       <MenuDivider />
-      <Button
-        icon="globe-network"
-        text="Wifi-settings"
-        fill
-        onClick={() => openPanel({ component: SelectNetwork, title: "Wifi settings" })}
-      />
       <Button icon="wrench" text="Factory reset" fill />
       <Button icon="updated" text="Update" fill />
     </div>
