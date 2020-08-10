@@ -106,7 +106,7 @@ function Display() {
         selectedValue={radioCheck}
       >
         <Radio label="3D flat" value="3dFlat" />
-        <Radio label="3D distored" value="3dDistored" />
+        <Radio label="3D distorted" value="3dDistorted" />
         <Radio label="2D left only" value="2dLeftOnly" />
         <Radio label="2D right only" value="2dRightOnly" />
         <Radio label="Anaglyph" value="anaglyph" />
