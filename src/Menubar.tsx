@@ -52,6 +52,7 @@ function MenubarRoot({ openPanel }: IPanelProps) {
 
 function MenubarSettings({ openPanel }: IPanelProps) {
   const [photoMode, setPhotoMode] = useState(false);
+  const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
   return (
     <Menu>
@@ -75,7 +76,8 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       <MenuItem
         icon="square"
         text="Viewing angle"
-        onClick={() => openPanel({ component: MenubarAngle, title: "Viewing angle" })}
+        labelElement={viewAngleSquare ? "Square" : "Extended"}
+        onClick={() => setViewAngleSquare(!viewAngleSquare)}
       />
       <MenuItem
         icon="lightbulb"
@@ -149,22 +151,6 @@ function MenubarStreaming() {
         </ControlGroup>
       </Label>
       <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
-    </div>
-  );
-}
-
-function MenubarAngle() {
-  const [radioCheck, setRadioCheck] = useState("extended");
-
-  return (
-    <div className="Menubar-content">
-      <RadioGroup
-        onChange={(event) => setRadioCheck(event.currentTarget.value)}
-        selectedValue={radioCheck}
-      >
-        <Radio label="Extended" value="extended" />
-        <Radio label="Square" value="square" />
-      </RadioGroup>
     </div>
   );
 }
