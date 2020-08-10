@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Button, Overlay, Classes, Dialog, Icon } from "@blueprintjs/core";
+import { Overlay, Classes, Dialog, Icon } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
@@ -10,6 +10,11 @@ import { isPortal } from "./api";
 const player = new WSAvcPlayer({ useWorker: false });
 const retryInterval = 3000;
 const iconSize = 64;
+
+export interface PhotoMode {
+  photoMode: boolean;
+  setPhotoMode: (value: boolean) => void;
+}
 
 function startVideo() {
   const video = document.getElementById("video");
@@ -33,6 +38,7 @@ function App() {
   const [videoStarted, setVideoStarted] = useState(false);
   const [captivePortal, setCaptivePortal] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [photoMode, setPhotoMode] = useState(false);
 
   useEffect(() => {
     if (!initialized) {
@@ -67,10 +73,19 @@ function App() {
         onClose={() => setMenubarVisibility(false)}
       >
         <div className={classes}>
-          <MenuBar />
+          <MenuBar
+            photoMode={photoMode}
+            setPhotoMode={setPhotoMode}
+            // We need this custom key because the props of the Settings component is in the state
+            // of the Menubar component (which makes the Settings not re-render)
+            key={`${photoMode}`}
+          />
         </div>
       </Overlay>
       <div id="video" style={{ width: "100vw", height: "*" }} />
+      <div className="App-top-left">
+        <Icon icon="folder-close" iconSize={iconSize} />
+      </div>
       <div className="App-top-center">
         <Icon
           icon="cog"
@@ -78,8 +93,15 @@ function App() {
           onClick={() => setMenubarVisibility(!menubarVisible)}
         />
       </div>
+      <div className="App-bottom-left">
+        <Icon icon="database" iconSize={iconSize} />
+      </div>
       <div className="App-bottom-center">
-        <Icon icon="camera" iconSize={iconSize} />
+        <Icon icon={photoMode ? "camera" : "mobile-video"} iconSize={iconSize} />
+        <div className="App-timestamp">01:14:56</div>
+      </div>
+      <div className="App-bottom-right">
+        <Icon icon="globe-network" iconSize={iconSize} />
       </div>
     </div>
   );

@@ -18,13 +18,17 @@ import {
   InputGroup,
   ControlGroup,
 } from "@blueprintjs/core";
+import { PhotoMode } from "./App";
 
-function Menubar() {
-  const [panels, setPanels] = useState<IPanel[]>([
+function Menubar({ setPhotoMode, photoMode }: PhotoMode) {
+  const [panels, setPanels] = useState<(IPanel<PhotoMode> | IPanel)[]>([
     {
-      component: Root,
-      props: {},
-      title: "Menu",
+      component: Settings,
+      props: {
+        photoMode,
+        setPhotoMode,
+      },
+      title: "Settings",
     },
   ]);
 
@@ -38,20 +42,7 @@ function Menubar() {
   );
 }
 
-function Root({ openPanel }: IPanelProps) {
-  return (
-    <Menu>
-      <MenuItem
-        icon="settings"
-        text="Settings..."
-        onClick={() => openPanel({ component: Settings, title: "Settings" })}
-      />
-    </Menu>
-  );
-}
-
-function Settings({ openPanel }: IPanelProps) {
-  const [photoMode, setPhotoMode] = useState(false);
+function Settings({ openPanel, photoMode, setPhotoMode }: IPanelProps & PhotoMode) {
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
   return (
