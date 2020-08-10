@@ -22,7 +22,7 @@ import {
 function Menubar() {
   const [panels, setPanels] = useState<IPanel[]>([
     {
-      component: MenubarRoot,
+      component: Root,
       props: {},
       title: "Menu",
     },
@@ -38,19 +38,19 @@ function Menubar() {
   );
 }
 
-function MenubarRoot({ openPanel }: IPanelProps) {
+function Root({ openPanel }: IPanelProps) {
   return (
     <Menu>
       <MenuItem
         icon="settings"
         text="Settings..."
-        onClick={() => openPanel({ component: MenubarSettings, title: "Settings" })}
+        onClick={() => openPanel({ component: Settings, title: "Settings" })}
       />
     </Menu>
   );
 }
 
-function MenubarSettings({ openPanel }: IPanelProps) {
+function Settings({ openPanel }: IPanelProps) {
   const [photoMode, setPhotoMode] = useState(false);
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
 
@@ -59,7 +59,7 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       <MenuItem
         icon="desktop"
         text="Display"
-        onClick={() => openPanel({ component: MenubarDisplay, title: "Display" })}
+        onClick={() => openPanel({ component: Display, title: "Display" })}
       />
       <MenuItem
         icon="camera"
@@ -70,7 +70,7 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       <MenuItem
         icon="mobile-video"
         text="Streaming settings"
-        onClick={() => openPanel({ component: MenubarStreaming, title: "Streaming settings" })}
+        onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
       />
       <MenuItem icon="headset" text="Audio settings" />
       <MenuItem
@@ -82,19 +82,19 @@ function MenubarSettings({ openPanel }: IPanelProps) {
       <MenuItem
         icon="lightbulb"
         text="Lighting"
-        onClick={() => openPanel({ component: MenubarLightning, title: "Lighting" })}
+        onClick={() => openPanel({ component: Lightning, title: "Lighting" })}
       />
       <MenuDivider />
       <MenuItem
         icon="cog"
         text="Advanced parameters"
-        onClick={() => openPanel({ component: MenuAdvanced, title: "Advanced parameters" })}
+        onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
       />
     </Menu>
   );
 }
 
-function MenubarDisplay() {
+function Display() {
   const [radioCheck, setRadioCheck] = useState("3dFlat");
   const [inverted, setInverted] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -117,7 +117,7 @@ function MenubarDisplay() {
   );
 }
 
-function MenubarStreaming() {
+function Streaming() {
   const [browser, setBrowser] = useState(false);
   const [udp, setUdp] = useState(false);
   const [usb, setUsb] = useState(false);
@@ -155,7 +155,7 @@ function MenubarStreaming() {
   );
 }
 
-function MenubarLightning() {
+function Lightning() {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
 
   return (
@@ -173,7 +173,7 @@ function MenubarLightning() {
   );
 }
 
-function MenuAdvanced({ openPanel }: IPanelProps) {
+function Advanced({ openPanel }: IPanelProps) {
   const [framerate, setFramerate] = useState(30);
   const [dialogOpen, setDialogOpen] = useState(false);
   /*
@@ -202,7 +202,7 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
         <MenuItem
           icon="media"
           text="Video settings"
-          onClick={() => openPanel({ component: MenuPicture, title: "Video settings" })}
+          onClick={() => openPanel({ component: Picture, title: "Video settings" })}
         />
       </Menu>
       <MenuDivider />
@@ -218,7 +218,7 @@ function MenuAdvanced({ openPanel }: IPanelProps) {
   );
 }
 
-function MenuPicture() {
+function Picture() {
   const [contrast, setContrast] = useState(0);
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
