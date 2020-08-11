@@ -24,29 +24,21 @@ const LIGHTING: any = {
     contrast: 0,
     sharpness: 0,
     gain: 0,
-    bitrate: 30,
-    framerate: 30,
   },
   dayInside: {
     contrast: 1,
     sharpness: 1,
     gain: 1,
-    bitrate: 31,
-    framerate: 31,
   },
   nightInside: {
     contrast: 2,
     sharpness: 2,
     gain: 2,
-    bitrate: 32,
-    framerate: 32,
   },
   dayOutside: {
     contrast: 3,
     sharpness: 3,
     gain: 3,
-    bitrate: 33,
-    framerate: 33,
   },
 };
 
@@ -60,10 +52,6 @@ interface PictureProps {
   setSharpness?: React.Dispatch<React.SetStateAction<number>>;
   gain: number;
   setGain?: React.Dispatch<React.SetStateAction<number>>;
-  bitrate: number;
-  setBitrate?: React.Dispatch<React.SetStateAction<number>>;
-  framerate: number;
-  setFramerate?: React.Dispatch<React.SetStateAction<number>>;
   disabled?: boolean;
 }
 
@@ -204,8 +192,6 @@ function Lighting() {
   const [contrast, setContrast] = useState(0);
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
-  const [bitrate, setBitrate] = useState(30);
-  const [framerate, setFramerate] = useState(30);
 
   return (
     <div className="Menubar-content">
@@ -218,8 +204,6 @@ function Lighting() {
           setContrast(settings.contrast);
           setSharpness(settings.sharpness);
           setGain(settings.gain);
-          setBitrate(settings.bitrate);
-          setFramerate(settings.framerate);
         }}
         selectedValue={radioCheck}
       >
@@ -232,8 +216,6 @@ function Lighting() {
         contrast={contrast}
         sharpness={sharpness}
         gain={gain}
-        bitrate={bitrate}
-        framerate={framerate}
         disabled
       />
     </div>
@@ -278,11 +260,31 @@ function Picture() {
         setSharpness={setSharpness}
         gain={gain}
         setGain={setGain}
-        bitrate={bitrate}
-        setBitrate={setBitrate}
-        framerate={framerate}
-        setFramerate={setFramerate}
       />
+      <Label>
+        Bitrate (Mbps)
+        <Slider
+          min={5}
+          max={100}
+          stepSize={5}
+          labelStepSize={25}
+          value={bitrate}
+          showTrackFill={false}
+          onChange={setBitrate}
+        />
+      </Label>
+      <Label>
+        Framerate
+        <Slider
+          min={25}
+          max={60}
+          stepSize={1}
+          labelStepSize={5}
+          value={framerate}
+          showTrackFill={false}
+          onChange={setFramerate}
+        />
+      </Label>
     </div>
   );
 }
@@ -294,115 +296,86 @@ function PictureInner({
   setSharpness,
   gain,
   setGain,
-  bitrate,
-  setBitrate,
-  framerate,
-  setFramerate,
   disabled,
 }: PictureProps) {
   return (
     <div className="Menubar-content">
-      <Menu>
-        <Label>
-          White balance
-          <select>
-            <option>Off</option>
-            <option>Auto</option>
-            <option>Sun</option>
-            <option>Cloud</option>
-            <option>Shade</option>
-            <option>Tungsten</option>
-            <option>Fluorescent</option>
-            <option>Incandescent</option>
-            <option>Flash</option>
-            <option>Horizon</option>
-          </select>
-        </Label>
-        <Label>
-          Exposure
-          <select>
-            <option>Off</option>
-            <option>Auto</option>
-            <option>Night</option>
-            <option>Nightpreview</option>
-            <option>Backlight</option>
-            <option>Spotlight</option>
-            <option>Sports</option>
-            <option>Snow</option>
-            <option>Beach</option>
-            <option>Verylong</option>
-            <option>Fixedfps</option>
-            <option>Antishake</option>
-            <option>Fireworks</option>
-          </select>
-        </Label>
-        <Label>
-          Contrast
-          <Slider
-            min={-50}
-            max={50}
-            stepSize={1}
-            labelStepSize={10}
-            value={contrast}
-            showTrackFill={false}
-            onChange={setContrast}
-            disabled={disabled}
-          />
-        </Label>
-        <Label>
-          Sharpness
-          <Slider
-            min={-50}
-            max={50}
-            stepSize={1}
-            labelStepSize={10}
-            value={sharpness}
-            showTrackFill={false}
-            onChange={setSharpness}
-            disabled={disabled}
-          />
-        </Label>
-        <MenuItem icon="pivot-table" text="Stabilization" />
-        <Label>
-          Digital gain
-          <Slider
-            min={-5.0}
-            max={10.0}
-            stepSize={1.0}
-            labelStepSize={5.0}
-            value={gain}
-            showTrackFill={false}
-            onChange={setGain}
-            disabled={disabled}
-          />
-        </Label>
-        <Label>
-          Bitrate (Mbps)
-          <Slider
-            min={5}
-            max={100}
-            stepSize={5}
-            labelStepSize={25}
-            value={bitrate}
-            showTrackFill={false}
-            onChange={setBitrate}
-            disabled={disabled}
-          />
-        </Label>
-        <Label>
-          Framerate
-          <Slider
-            min={25}
-            max={60}
-            stepSize={1}
-            labelStepSize={5}
-            value={framerate}
-            showTrackFill={false}
-            onChange={setFramerate}
-            disabled={disabled}
-          />
-        </Label>
-      </Menu>
+      <Label>
+        White balance
+        <select>
+          <option>Off</option>
+          <option>Auto</option>
+          <option>Sun</option>
+          <option>Cloud</option>
+          <option>Shade</option>
+          <option>Tungsten</option>
+          <option>Fluorescent</option>
+          <option>Incandescent</option>
+          <option>Flash</option>
+          <option>Horizon</option>
+        </select>
+      </Label>
+      <Label>
+        Exposure
+        <select>
+          <option>Off</option>
+          <option>Auto</option>
+          <option>Night</option>
+          <option>Nightpreview</option>
+          <option>Backlight</option>
+          <option>Spotlight</option>
+          <option>Sports</option>
+          <option>Snow</option>
+          <option>Beach</option>
+          <option>Verylong</option>
+          <option>Fixedfps</option>
+          <option>Antishake</option>
+          <option>Fireworks</option>
+        </select>
+      </Label>
+      <Label>
+        Contrast
+        <Slider
+          min={-50}
+          max={50}
+          stepSize={1}
+          labelStepSize={10}
+          value={contrast}
+          showTrackFill={false}
+          onChange={setContrast}
+          disabled={disabled}
+        />
+      </Label>
+      <Label>
+        Sharpness
+        <Slider
+          min={-50}
+          max={50}
+          stepSize={1}
+          labelStepSize={10}
+          value={sharpness}
+          showTrackFill={false}
+          onChange={setSharpness}
+          disabled={disabled}
+        />
+      </Label>
+      <Label>
+        <Icon icon="pivot-table" />
+        Stabilization
+      </Label>
+      <Label>
+        Digital gain
+        <Slider
+          min={-5.0}
+          max={10.0}
+          stepSize={1.0}
+          labelStepSize={5.0}
+          value={gain}
+          showTrackFill={false}
+          onChange={setGain}
+          disabled={disabled}
+        />
+      </Label>
     </div>
   );
 }
