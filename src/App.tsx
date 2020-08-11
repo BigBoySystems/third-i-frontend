@@ -143,11 +143,12 @@ function App() {
           onClick={() => setMenubarVisibility(!menubarVisible)}
         />
       </div>
-      <div className="App-bottom-left">
+      <div className="App-bottom">
+        <div>
         <Icon icon="database" iconSize={iconSize} />
         {storageInfo}
-      </div>
-      <div className="App-bottom-center">
+        </div>
+        <div>
         <Icon
           icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
           iconSize={iconSize}
@@ -161,8 +162,7 @@ function App() {
           }}
         />
         <div className="App-timestamp">01:14:56</div>
-      </div>
-      <div className="App-bottom-right">
+        </div>
         <div>
           <Icon icon="globe-network" iconSize={iconSize} />
           {network || "Access Point"}
