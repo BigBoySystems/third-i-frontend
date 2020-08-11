@@ -53,11 +53,11 @@ function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
           CaptivePortalToaster.show({
             message: (
               <div>
-                Could not connect to "{essid}".
-                <br />
-                <br />
-                Please check that the password is correct. If the problem persists, please contact
-                the network administrator.
+                <p>Could not connect to "{essid}".</p>
+                <p>
+                  Please check that the password is correct. If the problem persists, please contact
+                  the network administrator.
+                </p>
               </div>
             ),
             intent: Intent.WARNING,
