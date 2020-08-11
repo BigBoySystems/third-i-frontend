@@ -9,6 +9,7 @@ import {
   Intent,
   Overlay,
   Spinner,
+  ButtonGroup,
 } from "@blueprintjs/core";
 import "./CaptivePortal.css";
 import * as api from "./api";
@@ -107,14 +108,16 @@ function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
-        <Button
-          text="Use access point"
-          onClick={() => {
-            api.startAp();
-            onAP();
-          }}
-        />
-        <Button text="Refresh" onClick={updateNetworks} />
+        <ButtonGroup>
+          <Button
+            text="Use access point"
+            onClick={() => {
+              api.startAp();
+              onAP();
+            }}
+          />
+          <Button text="Refresh" onClick={updateNetworks} />
+        </ButtonGroup>
       </div>
     </div>
   );
