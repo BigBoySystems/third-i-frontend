@@ -49,7 +49,7 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
           onConnected(essid);
         } else {
           CaptivePortalToaster.show({
-            message: `Could not connect to "${essid}".`,
+            message: `Could not connect to "${essid}". Please check that the password is correct. If the problem persists, please contact the network administrator.`,
             intent: Intent.WARNING,
             timeout: 10000,
           });
@@ -98,6 +98,7 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
+        <Button text="Use access point" />
         <Button text="Refresh" onClick={updateNetworks} />
       </div>
     </div>
