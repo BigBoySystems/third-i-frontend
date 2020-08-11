@@ -109,6 +109,10 @@ function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
       </div>
       <div className="CaptivePortal-buttons">
         <ButtonGroup>
+          <Popover className="CaptivePortal-popover" position="left">
+            <Button text="Hidden network..." />
+            <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
+          </Popover>
           <Button
             text="Use access point"
             onClick={() => {
@@ -141,7 +145,50 @@ function PasswordEntry({ onValidate }: PasswordEntryProps) {
               onValidate(ev.currentTarget.value);
             }
           }}
+        />
+      </Label>
+    </div>
+  );
+}
+
+interface HiddenNetworkProps {
+  onValidate: (essid: string, password: string) => void;
+}
+
+function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
+  const [essid, setEssid] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className="CaptivePortal-password bp3-large bp3-text-large">
+      <Label>
+        ESSID:
+        <input
+          className="bp3-input"
+          placeholder="Type ENTER to validate"
+          value={essid}
+          onChange={(ev) => setEssid(ev.currentTarget.value)}
+          onKeyUp={(ev) => {
+            if (ev.key === "Enter") {
+              onValidate(ev.currentTarget.value, password as string);
+            }
+          }}
           autoFocus
+        />
+      </Label>
+      <Label>
+        Password:
+        <input
+          className="bp3-input"
+          type="password"
+          placeholder="Type ENTER to validate"
+          value={password}
+          onChange={(ev) => setPassword(ev.currentTarget.value)}
+          onKeyUp={(ev) => {
+            if (ev.key === "Enter") {
+              onValidate(essid, ev.currentTarget.value);
+            }
+          }}
         />
       </Label>
     </div>
