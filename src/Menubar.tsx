@@ -11,7 +11,6 @@ import {
   Radio,
   RadioGroup,
   Switch,
-  Icon,
   Label,
   Slider,
   Button,
@@ -20,8 +19,53 @@ import {
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 
+const LIGHTING: any = {
+  nightOutside: {
+    contrast: 0,
+    sharpness: 0,
+    gain: 0,
+    bitrate: 30,
+    framerate: 30,
+  },
+  dayInside: {
+    contrast: 1,
+    sharpness: 1,
+    gain: 1,
+    bitrate: 31,
+    framerate: 31,
+  },
+  nightInside: {
+    contrast: 2,
+    sharpness: 2,
+    gain: 2,
+    bitrate: 32,
+    framerate: 32,
+  },
+  dayOutside: {
+    contrast: 3,
+    sharpness: 3,
+    gain: 3,
+    bitrate: 33,
+    framerate: 33,
+  },
+};
+
 type MenubarProps = PhotoMode & Network;
 type PanelProps = IPanelProps & PhotoMode & Network;
+
+interface PictureProps {
+  contrast: number;
+  setContrast?: React.Dispatch<React.SetStateAction<number>>;
+  sharpness: number;
+  setSharpness?: React.Dispatch<React.SetStateAction<number>>;
+  gain: number;
+  setGain?: React.Dispatch<React.SetStateAction<number>>;
+  bitrate: number;
+  setBitrate?: React.Dispatch<React.SetStateAction<number>>;
+  framerate: number;
+  setFramerate?: React.Dispatch<React.SetStateAction<number>>;
+  disabled?: boolean;
+}
 
 function Menubar(props: MenubarProps) {
   const [panels, setPanels] = useState<IPanel<MenubarProps>[]>([
@@ -54,9 +98,9 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
         onClick={() => openPanel({ component: Display, props, title: "Display" })}
       />
       <MenuItem
-        icon="camera"
+        icon={photoMode ? "camera" : "mobile-video"}
         text="Photo/Video mode"
-        labelElement={<Icon icon={photoMode ? "media" : "mobile-video"} />}
+        labelElement={photoMode ? "Photo" : "Video"}
         onClick={() => setPhotoMode(!photoMode)}
       />
       <MenuItem
@@ -74,7 +118,7 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
       <MenuItem
         icon="lightbulb"
         text="Lighting"
-        onClick={() => openPanel({ component: Lightning, props, title: "Lighting" })}
+        onClick={() => openPanel({ component: Lighting, props, title: "Lighting" })}
       />
       <MenuDivider />
       <MenuItem
@@ -98,13 +142,18 @@ function Display() {
         selectedValue={radioCheck}
       >
         <Radio label="3D flat" value="3dFlat" />
-        <Radio label="3D distorted" value="3dDistorted" />
+        <Radio label="3D distorted" value="3dDistorted" disabled />
         <Radio label="2D left only" value="2dLeftOnly" />
         <Radio label="2D right only" value="2dRightOnly" />
-        <Radio label="Anaglyph" value="anaglyph" />
+        <Radio label="Anaglyph" value="anaglyph" disabled />
       </RadioGroup>
-      <Switch label="Inverted" checked={inverted} onChange={() => setInverted(!inverted)} />
-      <Switch label="Flipped" checked={flipped} onChange={() => setFlipped(!flipped)} />
+      <Switch
+        label="Inverted"
+        checked={inverted}
+        onChange={() => setInverted(!inverted)}
+        disabled
+      />
+      <Switch label="Flipped" checked={flipped} onChange={() => setFlipped(!flipped)} disabled />
     </div>
   );
 }
@@ -150,13 +199,28 @@ function Streaming() {
   );
 }
 
-function Lightning() {
+function Lighting() {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
+  const [contrast, setContrast] = useState(0);
+  const [sharpness, setSharpness] = useState(0);
+  const [gain, setGain] = useState(0.0);
+  const [bitrate, setBitrate] = useState(30);
+  const [framerate, setFramerate] = useState(30);
 
   return (
     <div className="Menubar-content">
       <RadioGroup
-        onChange={(event) => setRadioCheck(event.currentTarget.value)}
+        onChange={(event) => {
+          const value = event.currentTarget.value;
+          const settings = LIGHTING[value];
+
+          setRadioCheck(value);
+          setContrast(settings.contrast);
+          setSharpness(settings.sharpness);
+          setGain(settings.gain);
+          setBitrate(settings.bitrate);
+          setFramerate(settings.framerate);
+        }}
         selectedValue={radioCheck}
       >
         <Radio label="Night outside" value="nightOutside" />
@@ -164,6 +228,14 @@ function Lightning() {
         <Radio label="Night inside" value="nightInside" />
         <Radio label="Day outside" value="dayOutside" />
       </RadioGroup>
+      <PictureInner
+        contrast={contrast}
+        sharpness={sharpness}
+        gain={gain}
+        bitrate={bitrate}
+        framerate={framerate}
+        disabled
+      />
     </div>
   );
 }
@@ -194,9 +266,40 @@ function Picture() {
   const [contrast, setContrast] = useState(0);
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
-  const [bitrate, setBitrate] = useState(3000000);
+  const [bitrate, setBitrate] = useState(30);
   const [framerate, setFramerate] = useState(30);
 
+  return (
+    <div className="Menubar-content">
+      <PictureInner
+        contrast={contrast}
+        setContrast={setContrast}
+        sharpness={sharpness}
+        setSharpness={setSharpness}
+        gain={gain}
+        setGain={setGain}
+        bitrate={bitrate}
+        setBitrate={setBitrate}
+        framerate={framerate}
+        setFramerate={setFramerate}
+      />
+    </div>
+  );
+}
+
+function PictureInner({
+  contrast,
+  setContrast,
+  sharpness,
+  setSharpness,
+  gain,
+  setGain,
+  bitrate,
+  setBitrate,
+  framerate,
+  setFramerate,
+  disabled,
+}: PictureProps) {
   return (
     <div className="Menubar-content">
       <Menu>
@@ -242,7 +345,8 @@ function Picture() {
             labelStepSize={10}
             value={contrast}
             showTrackFill={false}
-            onChange={(x) => setContrast(x)}
+            onChange={setContrast}
+            disabled={disabled}
           />
         </Label>
         <Label>
@@ -254,7 +358,8 @@ function Picture() {
             labelStepSize={10}
             value={sharpness}
             showTrackFill={false}
-            onChange={(x) => setSharpness(x)}
+            onChange={setSharpness}
+            disabled={disabled}
           />
         </Label>
         <MenuItem icon="pivot-table" text="Stabilization" />
@@ -267,7 +372,8 @@ function Picture() {
             labelStepSize={5.0}
             value={gain}
             showTrackFill={false}
-            onChange={(x) => setGain(x)}
+            onChange={setGain}
+            disabled={disabled}
           />
         </Label>
         <Label>
@@ -277,9 +383,10 @@ function Picture() {
             max={100}
             stepSize={5}
             labelStepSize={25}
-            value={bitrate / 100000}
+            value={bitrate}
             showTrackFill={false}
-            onChange={(x) => setBitrate(x * 100000)}
+            onChange={setBitrate}
+            disabled={disabled}
           />
         </Label>
         <Label>
@@ -291,7 +398,8 @@ function Picture() {
             labelStepSize={5}
             value={framerate}
             showTrackFill={false}
-            onChange={(x) => setFramerate(x)}
+            onChange={setFramerate}
+            disabled={disabled}
           />
         </Label>
       </Menu>
