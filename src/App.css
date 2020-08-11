@@ -20,6 +20,10 @@
   height: 100vh;
 }
 
+.App-filemanager:focus {
+  outline: none;
+}
+
 .App-top-center {
   position: fixed;
   top: 0;
