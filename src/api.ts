@@ -16,6 +16,16 @@ export interface Storage {
   total: number;
 }
 
+export interface File {
+  name: string;
+  preview?: string;
+  download?: string;
+  rename?: string;
+  delete?: string;
+  directory: boolean;
+  children: File[];
+}
+
 export function isPortal() {
   return fetch("/portal")
     .then((resp) => resp.json())

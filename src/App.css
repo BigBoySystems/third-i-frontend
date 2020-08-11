@@ -16,46 +16,34 @@
   height: 100vh;
 }
 
-.App-top-center {
+.App-filemanager:focus {
+  outline: none;
+}
+
+.App-top {
   position: fixed;
   top: 0;
-  width: 33vw;
-  left: 33vw;
+  width: 100vw;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   padding: 10px;
-  /* flex-direction: column; TODO */
+  align-items: flex-start;
+}
+
+.App-top > div {
+  width: 33.333vw;
 }
 
 .App-top-left {
-  position: fixed;
-  top: 0;
-  width: 33vw;
-  display: flex;
-  justify-content: flex-start;
-  padding: 10px;
-  /* flex-direction: column; TODO */
+  text-align: left;
+}
+
+.App-top-center {
+  text-align: center;
 }
 
 .App-top-right {
-  position: fixed;
-  top: 0;
-  width: 33vw;
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px;
-  /* flex-direction: column; TODO */
-}
-
-.App-bottom-center {
-  position: fixed;
-  bottom: 0;
-  width: 33vw;
-  left: 33vw;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  /* flex-direction: column-reverse; TODO */
+  text-align: right;
 }
 
 .App-bottom {
@@ -66,7 +54,23 @@
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  /* flex-direction: column-reverse; TODO */
+  align-items: flex-end;
+}
+
+.App-bottom > div {
+  width: 33.333vw;
+}
+
+.App-bottom-left {
+  text-align: left;
+}
+
+.App-bottom-center {
+  text-align: center;
+}
+
+.App-bottom-right {
+  text-align: right;
 }
 
 #video {
