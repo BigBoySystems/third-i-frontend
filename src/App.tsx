@@ -70,6 +70,9 @@ function App() {
         title={<div>Select network</div>}
         icon="globe-network"
         hasBackdrop={false}
+        canEscapeKeyClose={false}
+        canOutsideClickClose={false}
+        isCloseButtonShown={false}
       >
         <CaptivePortal
           onConnected={(essid) => {
