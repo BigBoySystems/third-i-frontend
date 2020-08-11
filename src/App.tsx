@@ -129,42 +129,47 @@ function App() {
         </div>
       </Overlay>
       <div id="video" style={{ width: "100vw", height: "*" }} />
-      <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
-        <Icon
-          icon="folder-close"
-          iconSize={iconSize}
-          onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
-        />
+      <div className="App-top">
+        <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
+          <Icon
+            icon="folder-close"
+            iconSize={iconSize}
+            onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
+          />
+        </div>
+        <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
+          <Icon
+            icon="cog"
+            iconSize={iconSize}
+            onClick={() => setMenubarVisibility(!menubarVisible)}
+          />
+        </div>
+        <div className="App-top-right" style={{ fontSize: `${iconSize}px` }}></div>
       </div>
-      <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
-        <Icon
-          icon="cog"
-          iconSize={iconSize}
-          onClick={() => setMenubarVisibility(!menubarVisible)}
-        />
-      </div>
-      <div className="App-bottom-left" style={{ fontSize: `${iconSize}px` }}>
-        <Icon icon="database" iconSize={iconSize} />
-        {storageInfo}
-      </div>
-      <div className="App-bottom-center" style={{ fontSize: `${iconSize}px` }}>
-        <Icon
-          icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
-          iconSize={iconSize}
-          onClick={() => {
-            if (photoMode) {
-              setShutter(true);
-              setTimeout(() => setShutter(false), 1000);
-            } else {
-              setRecording(!recording);
-            }
-          }}
-        />
-        <div className="App-timestamp">01:14:56</div>
-      </div>
-      <div className="App-bottom-right" style={{ fontSize: `${iconSize}px` }}>
-        <Icon icon="globe-network" iconSize={iconSize} />
-        {network || "Access Point"}
+      <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
+        <div className="App-bottom-left">
+          <Icon icon="database" iconSize={iconSize} />
+          {storageInfo}
+        </div>
+        <div className="App-bottom-center">
+          <Icon
+            icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
+            iconSize={iconSize}
+            onClick={() => {
+              if (photoMode) {
+                setShutter(true);
+                setTimeout(() => setShutter(false), 1000);
+              } else {
+                setRecording(!recording);
+              }
+            }}
+          />
+          <div className="App-timestamp">01:14:56</div>
+        </div>
+        <div className="App-bottom-right">
+          <Icon icon="globe-network" iconSize={iconSize} />
+          {network || "Access Point"}
+        </div>
       </div>
       {recording && <div className="App-recording-frame" />}
       {shutter && <div className="App-shutter" />}
