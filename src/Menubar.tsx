@@ -190,7 +190,7 @@ function Advanced({ openPanel }: IPanelProps) {
       </Menu>
       <MenuDivider />
       <Button icon="wrench" text="Factory reset" fill />
-      <Button icon="updated" text="Update" fill disabled={true} />
+      <Button icon="updated" text="Update" fill disabled />
     </div>
   );
 }
