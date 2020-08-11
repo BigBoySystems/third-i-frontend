@@ -90,6 +90,27 @@
   left: 0;
 }
 
+.App-recording-frame {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  border: 5px solid red;
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+  animation-direction: alternate;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @media (min-aspect-ratio: 16/9) {
   #video > canvas {
     height: 100vh;

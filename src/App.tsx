@@ -51,6 +51,7 @@ function App() {
     used: 300000000,
     total: 16000000000,
   } as api.Storage);
+  const [recording, setRecording] = useState(false);
 
   useEffect(() => {
     if (!initialized) {
@@ -146,7 +147,11 @@ function App() {
         {storageInfo}
       </div>
       <div className="App-bottom-center">
-        <Icon icon={photoMode ? "camera" : "mobile-video"} iconSize={iconSize} />
+        <Icon
+          icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
+          iconSize={iconSize}
+          onClick={() => setRecording(!recording)}
+        />
         <div className="App-timestamp">01:14:56</div>
       </div>
       <div className="App-bottom-right">
@@ -155,6 +160,7 @@ function App() {
           {network || "Access Point"}
         </div>
       </div>
+      {recording && <div className="App-recording-frame" />}
     </div>
   );
 }
