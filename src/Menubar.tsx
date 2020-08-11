@@ -306,6 +306,10 @@ function SelectNetwork({ closePanel, setNetwork }: PanelProps) {
         closePanel();
         setNetwork(essid);
       }}
+      onAP={() => {
+        closePanel();
+        setNetwork("");
+      }}
     />
   );
 }

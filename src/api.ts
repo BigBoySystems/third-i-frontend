@@ -35,3 +35,15 @@ export function connect(essid: string, password?: string): Promise<Connect> {
     body: JSON.stringify(data),
   }).then((resp) => resp.json());
 }
+
+export function startAp(): Promise<any> {
+  const data = {};
+
+  return fetch("/start-ap", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify(data),
+  });
+}

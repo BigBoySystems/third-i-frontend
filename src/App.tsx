@@ -5,7 +5,7 @@ import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
 import CaptivePortal from "./CaptivePortal";
-import { isPortal } from "./api";
+import * as api from "./api";
 import Filemanager from "./Filemanager";
 
 const player = new WSAvcPlayer({ useWorker: false });
@@ -42,30 +42,30 @@ function App() {
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
-  const [captivePortal, setCaptivePortal] = useState(false);
+  const [networkDialog, setNetworkDialog] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
-  const [network, setNetwork] = useState("Access Point");
+  const [network, setNetwork] = useState("");
 
   useEffect(() => {
     if (!initialized) {
-      isPortal().then((portal) => setCaptivePortal(portal));
+      api.isPortal().then((portal) => setNetworkDialog(portal));
       setInitialized(true);
     }
-  }, [initialized, captivePortal]);
+  }, [initialized, networkDialog]);
 
   useEffect(() => {
-    if (!videoStarted && !captivePortal) {
+    if (!videoStarted) {
       startVideo();
       setVideoStarted(true);
     }
-  }, [videoStarted, captivePortal]);
+  }, [videoStarted]);
 
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
       <Dialog
-        isOpen={captivePortal}
-        onClose={() => setCaptivePortal(false)}
+        isOpen={networkDialog}
+        onClose={() => setNetworkDialog(false)}
         className="bp3-dark bp3-large bp3-text-large"
         title={<div>Select network</div>}
         icon="globe-network"
@@ -73,8 +73,12 @@ function App() {
       >
         <CaptivePortal
           onConnected={(essid) => {
-            setCaptivePortal(false);
+            setNetworkDialog(false);
             setNetwork(essid);
+          }}
+          onAP={() => {
+            setNetworkDialog(false);
+            setNetwork("");
           }}
         />
       </Dialog>
@@ -134,7 +138,7 @@ function App() {
       <div className="App-bottom-right">
         <div>
           <Icon icon="globe-network" iconSize={iconSize} />
-          {network}
+          {network || "Access Point"}
         </div>
       </div>
     </div>

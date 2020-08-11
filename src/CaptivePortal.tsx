@@ -15,9 +15,10 @@ import * as api from "./api";
 
 interface CaptivePortalProps {
   onConnected: (essid: string) => void;
+  onAP: () => void;
 }
 
-function CaptivePortal({ onConnected }: CaptivePortalProps) {
+function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -106,7 +107,13 @@ function CaptivePortal({ onConnected }: CaptivePortalProps) {
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
-        <Button text="Use access point" />
+        <Button
+          text="Use access point"
+          onClick={() => {
+            api.startAp();
+            onAP();
+          }}
+        />
         <Button text="Refresh" onClick={updateNetworks} />
       </div>
     </div>
