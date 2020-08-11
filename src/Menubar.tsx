@@ -16,6 +16,7 @@ import {
   Button,
   InputGroup,
   ControlGroup,
+  Icon,
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 
@@ -212,12 +213,7 @@ function Lighting() {
         <Radio label="Night inside" value="nightInside" />
         <Radio label="Day outside" value="dayOutside" />
       </RadioGroup>
-      <PictureInner
-        contrast={contrast}
-        sharpness={sharpness}
-        gain={gain}
-        disabled
-      />
+      <PictureInner contrast={contrast} sharpness={sharpness} gain={gain} disabled />
     </div>
   );
 }
@@ -244,7 +240,7 @@ function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
   );
 }
 
-function Picture() {
+function Picture({ closePanel }: PanelProps) {
   const [contrast, setContrast] = useState(0);
   const [sharpness, setSharpness] = useState(0);
   const [gain, setGain] = useState(0.0);
@@ -285,6 +281,7 @@ function Picture() {
           onChange={setFramerate}
         />
       </Label>
+      <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} />
     </div>
   );
 }
