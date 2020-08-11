@@ -14,6 +14,9 @@ import {
   MenuDivider,
   Alert,
   Toaster,
+  Label,
+  ControlGroup,
+  InputGroup,
 } from "@blueprintjs/core";
 import "./Filemanager.css";
 import * as api from "./api";
@@ -108,6 +111,30 @@ function Filemanager() {
         intent={Intent.DANGER}
       >
         <p>Are you sure you want to delete "{deleteFile?.name}"?</p>
+      </Alert>
+      <Alert
+        isOpen={!!renameFile}
+        onCancel={() => setRenameFile(undefined)}
+        onConfirm={() => {
+          FilemanagerToaster.show({
+            message: <div>"{renameFile?.name}" has been renamed.</div>,
+            className: "bp3-dark bp3-large bp3-text-large",
+            timeout: 3000,
+          });
+          setRenameFile(undefined);
+        }}
+        className="bp3-dark bp3-large bp3-text-large"
+        icon="edit"
+        cancelButtonText="Cancel"
+        confirmButtonText="Rename"
+        intent={Intent.SUCCESS}
+      >
+        <Label>
+          New file name
+          <ControlGroup>
+            <InputGroup placeholder={renameFile?.name} fill />
+          </ControlGroup>
+        </Label>
       </Alert>
     </div>
   );
