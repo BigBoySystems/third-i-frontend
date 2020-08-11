@@ -128,7 +128,7 @@ function App() {
           <Filemanager />
         </div>
       </Overlay>
-      <div id="video" style={{ width: "100vw", height: "*" }} />
+      <div id="video" style={{ width: "100vw" }} />
       <div className="App-top">
         <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
           <Icon
