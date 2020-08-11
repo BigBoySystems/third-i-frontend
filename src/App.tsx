@@ -11,7 +11,7 @@ import numeral from "numeral";
 
 const player = new WSAvcPlayer({ useWorker: false });
 const retryInterval = 3000;
-const iconSize = 64;
+const iconSize = 32;
 
 export interface PhotoMode {
   photoMode: boolean;
@@ -129,25 +129,25 @@ function App() {
         </div>
       </Overlay>
       <div id="video" style={{ width: "100vw", height: "*" }} />
-      <div className="App-top-left">
+      <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
         <Icon
           icon="folder-close"
           iconSize={iconSize}
           onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
         />
       </div>
-      <div className="App-top-center">
+      <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
         <Icon
           icon="cog"
           iconSize={iconSize}
           onClick={() => setMenubarVisibility(!menubarVisible)}
         />
       </div>
-      <div className="App-bottom-left">
+      <div className="App-bottom-left" style={{ fontSize: `${iconSize}px` }}>
         <Icon icon="database" iconSize={iconSize} />
         {storageInfo}
       </div>
-      <div className="App-bottom-center">
+      <div className="App-bottom-center" style={{ fontSize: `${iconSize}px` }}>
         <Icon
           icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
           iconSize={iconSize}
@@ -162,11 +162,9 @@ function App() {
         />
         <div className="App-timestamp">01:14:56</div>
       </div>
-      <div className="App-bottom-right">
-        <div>
-          <Icon icon="globe-network" iconSize={iconSize} />
-          {network || "Access Point"}
-        </div>
+      <div className="App-bottom-right" style={{ fontSize: `${iconSize}px` }}>
+        <Icon icon="globe-network" iconSize={iconSize} />
+        {network || "Access Point"}
       </div>
       {recording && <div className="App-recording-frame" />}
       {shutter && <div className="App-shutter" />}
