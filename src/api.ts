@@ -11,6 +11,11 @@ export interface Connect {
   success: boolean;
 }
 
+export interface Storage {
+  used: number;
+  total: number;
+}
+
 export function isPortal() {
   return fetch("/portal")
     .then((resp) => resp.json())

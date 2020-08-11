@@ -7,6 +7,7 @@ import classNames from "classnames";
 import CaptivePortal from "./CaptivePortal";
 import * as api from "./api";
 import Filemanager from "./Filemanager";
+import numeral from "numeral";
 
 const player = new WSAvcPlayer({ useWorker: false });
 const retryInterval = 3000;
@@ -46,6 +47,10 @@ function App() {
   const [initialized, setInitialized] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
+  const [storage, setStorage] = useState({
+    used: 300000000,
+    total: 16000000000,
+  } as api.Storage);
 
   useEffect(() => {
     if (!initialized) {
@@ -60,6 +65,11 @@ function App() {
       setVideoStarted(true);
     }
   }, [videoStarted]);
+
+  const used = numeral(storage.used);
+  const total = numeral(storage.total);
+  const pct = numeral(storage.used / storage.total);
+  const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
 
   return (
     <div className="App bp3-dark bp3-large bp3-text-large">
@@ -133,6 +143,7 @@ function App() {
       </div>
       <div className="App-bottom-left">
         <Icon icon="database" iconSize={iconSize} />
+        {storageInfo}
       </div>
       <div className="App-bottom-center">
         <Icon icon={photoMode ? "camera" : "mobile-video"} iconSize={iconSize} />
