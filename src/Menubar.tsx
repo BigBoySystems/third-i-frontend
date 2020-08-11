@@ -16,7 +16,6 @@ import {
   Button,
   InputGroup,
   ControlGroup,
-  Icon,
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 
@@ -295,6 +294,13 @@ function PictureInner({
   setGain,
   disabled,
 }: PictureProps) {
+  /*
+      <Label>
+        <Icon icon="pivot-table" />
+        Stabilization
+      </Label>
+  */
+
   return (
     <div className="Menubar-content">
       <Label>
@@ -355,10 +361,6 @@ function PictureInner({
           onChange={setSharpness}
           disabled={disabled}
         />
-      </Label>
-      <Label>
-        <Icon icon="pivot-table" />
-        Stabilization
       </Label>
       <Label>
         Digital gain
