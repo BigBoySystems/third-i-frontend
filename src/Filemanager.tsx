@@ -2,13 +2,9 @@ import React, { useState } from "react";
 import {
   Tree,
   ITreeNode,
-  Tooltip,
-  Icon,
-  Position,
   Intent,
   Classes,
   ContextMenu,
-  TreeEventHandler,
   Menu,
   MenuItem,
   MenuDivider,
