@@ -1,9 +1,24 @@
 import React, { useState } from "react";
-import { Tree, ITreeNode, Tooltip, Icon, Position, Intent, Classes } from "@blueprintjs/core";
+import {
+  Tree,
+  ITreeNode,
+  Tooltip,
+  Icon,
+  Position,
+  Intent,
+  Classes,
+  ContextMenu,
+  TreeEventHandler,
+  Menu,
+  MenuItem,
+  MenuDivider,
+} from "@blueprintjs/core";
 import "./Filemanager.css";
+import * as api from "./api";
 
 function Filemanager() {
-  const [contents, setContents] = useState(INITIAL_STATE);
+  const [contents, setContents] = useState(fromApi(EXAMPLE));
+  const refreshContents = () => setContents([...contents]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
     for (const node of nodes) {
@@ -12,7 +27,7 @@ function Filemanager() {
     }
   };
 
-  const handle_node_click = (
+  const handleNodeClick = (
     nodeData: ITreeNode,
     _nodePath: number[],
     e: React.MouseEvent<HTMLElement>
@@ -22,95 +37,93 @@ function Filemanager() {
       forEachNode(contents, (n) => (n.isSelected = false));
     }
     nodeData.isSelected = originallySelected == null ? true : !originallySelected;
-    setContents([...contents]);
+    refreshContents();
   };
 
   const handleNodeCollapse = (nodeData: ITreeNode) => {
     nodeData.isExpanded = false;
-    setContents([...contents]);
+    refreshContents();
   };
 
   const handleNodeExpand = (nodeData: ITreeNode) => {
     nodeData.isExpanded = true;
-    setContents([...contents]);
+    refreshContents();
+  };
+
+  const handleContextMenu = (
+    { label, nodeData }: ITreeNode<api.File>,
+    _nodePath: number[],
+    e: React.MouseEvent<HTMLElement>
+  ) => {
+    e.preventDefault();
+    ContextMenu.show(
+      <Menu>
+        <MenuDivider title={label} />
+        {!nodeData?.directory && (
+          <MenuItem text="Preview" icon="eye-open" href={nodeData?.preview} />
+        )}
+        {!nodeData?.directory && (
+          <MenuItem text="Download" icon="download" href={nodeData?.download} />
+        )}
+        <MenuItem text="Rename" icon="edit" />
+        <MenuItem text="Delete" icon="trash" />
+      </Menu>,
+      { left: e.clientX, top: e.clientY },
+      () => {},
+      true
+    );
   };
 
   return (
     <Tree
       contents={contents}
-      onNodeClick={handle_node_click}
+      onNodeClick={handleNodeClick}
       onNodeCollapse={handleNodeCollapse}
       onNodeExpand={handleNodeExpand}
+      onNodeContextMenu={handleContextMenu}
       className={Classes.ELEVATION_0}
     />
   );
 }
 
-const INITIAL_STATE: ITreeNode[] = [
-  {
-    id: 0,
-    hasCaret: true,
-    icon: "folder-close",
-    label: "Folder 0",
-  },
-  {
-    id: 1,
-    icon: "folder-close",
-    isExpanded: true,
-    label: (
-      <Tooltip content="I'm a folder <3" position={Position.RIGHT}>
-        Folder 1
-      </Tooltip>
-    ),
-    childNodes: [
-      {
-        id: 2,
-        icon: "document",
-        label: "Item 0",
-        secondaryLabel: (
-          <Tooltip content="An eye!">
-            <Icon icon="eye-open" />
-          </Tooltip>
-        ),
-      },
-      {
-        id: 3,
-        icon: <Icon icon="tag" intent={Intent.PRIMARY} className={Classes.TREE_NODE_ICON} />,
-        label: "Organic meditation gluten-free, sriracha VHS drinking vinegar beard man.",
-      },
-      {
-        id: 4,
-        hasCaret: true,
-        icon: "folder-close",
-        label: (
-          <Tooltip content="foo" position={Position.RIGHT}>
-            Folder 2
-          </Tooltip>
-        ),
-        childNodes: [
-          { id: 5, label: "No-Icon Item" },
-          { id: 6, icon: "tag", label: "Item 1" },
-          {
-            id: 7,
-            hasCaret: true,
-            icon: "folder-close",
-            label: "Folder 3",
-            childNodes: [
-              { id: 8, icon: "document", label: "Item 0" },
-              { id: 9, icon: "tag", label: "Item 1" },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    hasCaret: true,
-    icon: "folder-close",
-    label: "Super secret files",
-    disabled: true,
-  },
-];
+function fromApi(root: api.File): ITreeNode<api.File>[] {
+  const transform = (child: api.File): ITreeNode<api.File> => ({
+    id: child.name,
+    icon: child.directory ? "folder-close" : "document",
+    label: child.name,
+    hasCaret: child.directory,
+    childNodes: child.children.map(transform),
+    nodeData: child,
+  });
+
+  return root.children.map(transform);
+}
+
+const EXAMPLE: api.File = {
+  name: "/",
+  directory: true,
+  children: [
+    {
+      name: "Dir 1",
+      directory: true,
+      children: [
+        {
+          name: "File 3",
+          preview: "preview",
+          download: "download",
+          directory: false,
+          children: [],
+        },
+      ],
+    },
+    {
+      name: "File 2",
+      preview: "preview",
+      download: "download",
+      directory: false,
+      children: [],
+    },
+  ],
+};
 
 export default Filemanager;
