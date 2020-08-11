@@ -52,6 +52,7 @@ function App() {
     total: 16000000000,
   } as api.Storage);
   const [recording, setRecording] = useState(false);
+  const [shutter, setShutter] = useState(false);
 
   useEffect(() => {
     if (!initialized) {
@@ -150,7 +151,14 @@ function App() {
         <Icon
           icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
           iconSize={iconSize}
-          onClick={() => setRecording(!recording)}
+          onClick={() => {
+            if (photoMode) {
+              setShutter(true);
+              setTimeout(() => setShutter(false), 1000);
+            } else {
+              setRecording(!recording);
+            }
+          }}
         />
         <div className="App-timestamp">01:14:56</div>
       </div>
@@ -161,6 +169,7 @@ function App() {
         </div>
       </div>
       {recording && <div className="App-recording-frame" />}
+      {shutter && <div className="App-shutter" />}
     </div>
   );
 }

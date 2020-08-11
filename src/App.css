@@ -99,15 +99,29 @@
   border: 5px solid red;
   pointer-events: none;
   animation: pulse 1.5s infinite;
-  animation-direction: alternate;
+}
+
+.App-shutter {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  background: white;
+  pointer-events: none;
+  animation: pulse 400ms 1;
 }
 
 @keyframes pulse {
   0% {
     opacity: 0;
   }
-  100% {
+  50% {
     opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
