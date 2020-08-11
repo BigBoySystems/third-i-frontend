@@ -12,13 +12,19 @@ import {
   Menu,
   MenuItem,
   MenuDivider,
+  Alert,
+  Toaster,
 } from "@blueprintjs/core";
 import "./Filemanager.css";
 import * as api from "./api";
 
+const FilemanagerToaster = Toaster.create({});
+
 function Filemanager() {
-  const [contents, setContents] = useState(fromApi(EXAMPLE));
-  const refreshContents = () => setContents([...contents]);
+  const [nodes, setNodes] = useState(fromApi(EXAMPLE));
+  const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
+  const [deleteFile, setDeleteFile] = useState<api.File | undefined>(undefined);
+  const refreshContents = () => setNodes([...nodes]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
     for (const node of nodes) {
@@ -34,7 +40,7 @@ function Filemanager() {
   ) => {
     const originallySelected = nodeData.isSelected;
     if (!e.shiftKey) {
-      forEachNode(contents, (n) => (n.isSelected = false));
+      forEachNode(nodes, (n) => (n.isSelected = false));
     }
     nodeData.isSelected = originallySelected == null ? true : !originallySelected;
     refreshContents();
@@ -65,8 +71,8 @@ function Filemanager() {
         {!nodeData?.directory && (
           <MenuItem text="Download" icon="download" href={nodeData?.download} />
         )}
-        <MenuItem text="Rename" icon="edit" />
-        <MenuItem text="Delete" icon="trash" />
+        <MenuItem text="Rename" icon="edit" onClick={() => setRenameFile(nodeData)} />
+        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile(nodeData)} />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},
@@ -75,14 +81,35 @@ function Filemanager() {
   };
 
   return (
-    <Tree
-      contents={contents}
-      onNodeClick={handleNodeClick}
-      onNodeCollapse={handleNodeCollapse}
-      onNodeExpand={handleNodeExpand}
-      onNodeContextMenu={handleContextMenu}
-      className={Classes.ELEVATION_0}
-    />
+    <div>
+      <Tree
+        contents={nodes}
+        onNodeClick={handleNodeClick}
+        onNodeCollapse={handleNodeCollapse}
+        onNodeExpand={handleNodeExpand}
+        onNodeContextMenu={handleContextMenu}
+        className={Classes.ELEVATION_0}
+      />
+      <Alert
+        isOpen={!!deleteFile}
+        onCancel={() => setDeleteFile(undefined)}
+        onConfirm={() => {
+          FilemanagerToaster.show({
+            message: <div>"{deleteFile?.name}" has been deleted.</div>,
+            className: "bp3-dark bp3-large bp3-text-large",
+            timeout: 3000,
+          });
+          setDeleteFile(undefined);
+        }}
+        className="bp3-dark bp3-large bp3-text-large"
+        icon="trash"
+        cancelButtonText="Cancel"
+        confirmButtonText="Move to Trash"
+        intent={Intent.DANGER}
+      >
+        <p>Are you sure you want to delete "{deleteFile?.name}"?</p>
+      </Alert>
+    </div>
   );
 }
 
@@ -105,12 +132,16 @@ const EXAMPLE: api.File = {
   children: [
     {
       name: "Dir 1",
+      rename: "rename",
+      delete: "delete",
       directory: true,
       children: [
         {
           name: "File 3",
           preview: "preview",
           download: "download",
+          rename: "rename",
+          delete: "delete",
           directory: false,
           children: [],
         },
@@ -120,6 +151,8 @@ const EXAMPLE: api.File = {
       name: "File 2",
       preview: "preview",
       download: "download",
+      rename: "rename",
+      delete: "delete",
       directory: false,
       children: [],
     },

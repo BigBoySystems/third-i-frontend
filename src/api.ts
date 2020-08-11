@@ -20,6 +20,8 @@ export interface File {
   name: string;
   preview?: string;
   download?: string;
+  rename?: string;
+  delete?: string;
   directory: boolean;
   children: File[];
 }
