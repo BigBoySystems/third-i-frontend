@@ -10,7 +10,7 @@ import Filemanager from "./Filemanager";
 import numeral from "numeral";
 
 const player = new WSAvcPlayer({ useWorker: false });
-const retryInterval = 3000;
+const retryInterval = 1000;
 const iconSize = 32;
 
 export interface PhotoMode {

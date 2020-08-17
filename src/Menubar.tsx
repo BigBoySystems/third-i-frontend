@@ -18,6 +18,7 @@ import {
   ControlGroup,
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
+import * as api from "./api";
 
 const LIGHTING: any = {
   nightOutside: {
@@ -123,10 +124,38 @@ function Display() {
   const [inverted, setInverted] = useState(false);
   const [flipped, setFlipped] = useState(false);
 
+  const updateDisplay = (value: string) => {
+    setRadioCheck(value);
+
+    switch (value) {
+      case "3dFlat":
+        api.updateConfig({
+          video_mode: "3D",
+          swapcams: "",
+        });
+        break;
+      case "2dLeftOnly":
+        api.updateConfig({
+          video_mode: "",
+          swapcams: "",
+        });
+        break;
+      case "2dRightOnly":
+        api.updateConfig({
+          video_mode: "",
+          swapcams: "1",
+        });
+        break;
+      default:
+        console.error("Not implemented display:", value);
+        break;
+    }
+  };
+
   return (
     <div className="Menubar-content">
       <RadioGroup
-        onChange={(event) => setRadioCheck(event.currentTarget.value)}
+        onChange={(event) => updateDisplay(event.currentTarget.value)}
         selectedValue={radioCheck}
       >
         <Radio label="3D flat" value="3dFlat" />
