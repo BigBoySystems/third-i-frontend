@@ -238,7 +238,7 @@ const SAMPLE_NETWORKS: api.Network[] = [
     password: true,
   },
   {
-    essid: "iCafe",
+    essid: "eCafe",
     password: false,
   },
   {

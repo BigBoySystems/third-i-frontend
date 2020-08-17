@@ -37,7 +37,8 @@ function startVideo() {
 
 function connect() {
   const host = document.location.hostname;
-  const uri = `ws://${host}:8080`;
+  const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
+  const uri = `${scheme}://${host}:8080`;
   player.connect(uri);
 }
 
@@ -67,7 +68,7 @@ function App() {
         .isPortal()
         .then((portal) => setNetworkDialog(portal))
         .catch(() => {
-          if (process.env.NODE_ENV === "development") {
+          if (process.env.REACT_APP_MOCK_API === "true" || process.env.NODE_ENV === "development") {
             setMockApi(true);
             // NOTE: comment the line below if you want to work on the CaptivePortal dialog
             setNetworkDialog(false);
