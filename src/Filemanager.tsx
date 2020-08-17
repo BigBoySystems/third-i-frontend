@@ -128,7 +128,7 @@ function Filemanager() {
         <Label>
           New file name
           <ControlGroup>
-            <InputGroup placeholder={renameFile?.name} fill />
+            <InputGroup placeholder="File name" fill defaultValue={renameFile?.name} />
           </ControlGroup>
         </Label>
       </Alert>
