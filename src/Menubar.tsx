@@ -103,6 +103,7 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
         text="Viewing angle"
         labelElement={viewAngleSquare ? "Square" : "Extended"}
         onClick={() => setViewAngleSquare(!viewAngleSquare)}
+        disabled
       />
       <MenuItem
         icon="lightbulb"
@@ -309,7 +310,7 @@ function Picture({ closePanel }: PanelProps) {
           onChange={setFramerate}
         />
       </Label>
-      <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} />
+      <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} disabled />
     </div>
   );
 }
