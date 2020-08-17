@@ -97,7 +97,7 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
         text="Streaming settings"
         onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
       />
-      <MenuItem icon="headset" text="Audio settings" />
+      <MenuItem icon="headset" text="Audio" disabled />
       <MenuItem
         icon="square"
         text="Viewing angle"
