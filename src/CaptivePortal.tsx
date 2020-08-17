@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Menu,
   MenuItem,
@@ -13,64 +13,99 @@ import {
 } from "@blueprintjs/core";
 import "./CaptivePortal.css";
 import * as api from "./api";
+import { MockApi } from "./App";
 
 interface CaptivePortalProps {
   onConnected: (essid: string) => void;
   onAP: () => void;
+  vertical?: boolean;
 }
 
-function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
+function CaptivePortal(props: CaptivePortalProps) {
+  return (
+    <MockApi.Consumer>
+      {(mockApi) => <CaptivePortalInner mockApi={mockApi} {...props} />}
+    </MockApi.Consumer>
+  );
+}
+
+function CaptivePortalInner({
+  onConnected,
+  onAP,
+  vertical,
+  mockApi,
+}: CaptivePortalProps & MockApi) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState(false);
 
-  const updateNetworks = () => {
+  const updateNetworks = useCallback(() => {
     setNetworks([]);
     setError(false);
-    api
-      .networks()
-      .then((x) => setNetworks(x))
-      .catch((err) => {
-        console.log(err);
-        setError(true);
-      });
+    if (mockApi) {
+      setTimeout(() => setNetworks(SAMPLE_NETWORKS), 1500);
+    } else {
+      api
+        .networks()
+        .then((x) => setNetworks(x))
+        .catch((err) => {
+          console.log(err);
+          setError(true);
+        });
+    }
+  }, [mockApi]);
+
+  const onFailure = (essid: string) => {
+    CaptivePortalToaster.show({
+      message: (
+        <div>
+          <p>Could not connect to "{essid}".</p>
+          <p>
+            Please check that the password is correct. If the problem persists, please contact the
+            network administrator.
+          </p>
+        </div>
+      ),
+      intent: Intent.WARNING,
+      timeout: 10000,
+    });
+    updateNetworks();
   };
 
-  const connect = (essid: string, password: string) => {
+  const connect = (essid: string, password?: string) => {
     setConnecting(true);
     setError(false);
     setNetworks([]);
 
-    api
-      .connect(essid, password)
-      .then((res) => {
+    if (mockApi) {
+      setTimeout(() => {
         setConnecting(false);
 
-        if (res.success) {
-          onConnected(essid);
+        if (essid.startsWith("Ted")) {
+          onFailure(essid);
         } else {
-          CaptivePortalToaster.show({
-            message: (
-              <div>
-                <p>Could not connect to "{essid}".</p>
-                <p>
-                  Please check that the password is correct. If the problem persists, please contact
-                  the network administrator.
-                </p>
-              </div>
-            ),
-            intent: Intent.WARNING,
-            timeout: 10000,
-          });
-          updateNetworks();
+          onConnected(essid);
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        setError(true);
-        setConnecting(false);
-      });
+      }, 1500);
+    } else {
+      api
+        .connect(essid, password)
+        .then((res) => {
+          setConnecting(false);
+
+          if (res.success) {
+            onConnected(essid);
+          } else {
+            onFailure(essid);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setError(true);
+          setConnecting(false);
+        });
+    }
   };
 
   useEffect(() => {
@@ -78,7 +113,7 @@ function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
       updateNetworks();
       setInitialized(true);
     }
-  }, [initialized, networks]);
+  }, [initialized, updateNetworks]);
 
   return (
     <div className="CaptivePortal-content">
@@ -101,14 +136,14 @@ function CaptivePortal({ onConnected, onAP }: CaptivePortalProps) {
                 key={essid}
                 icon={password ? "lock" : "unlock"}
                 text={essid}
-                onClick={() => alert(essid)}
+                onClick={() => connect(essid)}
               />
             )
           )}
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
-        <ButtonGroup>
+        <ButtonGroup vertical={vertical} fill>
           <Popover className="CaptivePortal-popover" position="left">
             <Button text="Hidden network..." />
             <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
@@ -196,5 +231,20 @@ function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
 }
 
 const CaptivePortalToaster = Toaster.create({});
+
+const SAMPLE_NETWORKS: api.Network[] = [
+  {
+    essid: "MYHOME",
+    password: true,
+  },
+  {
+    essid: "iCafe",
+    password: false,
+  },
+  {
+    essid: "Ted's network (password will be invalid)",
+    password: true,
+  },
+];
 
 export default CaptivePortal;

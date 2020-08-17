@@ -22,6 +22,10 @@ export interface Network {
   setNetwork: (value: string) => void;
 }
 
+export interface MockApi {
+  mockApi: boolean;
+}
+
 function startVideo() {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
@@ -37,13 +41,15 @@ function connect() {
   player.connect(uri);
 }
 
+export const MockApi = React.createContext(false);
+
 function App() {
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
 
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
-  const [networkDialog, setNetworkDialog] = useState(false);
+  const [networkDialog, setNetworkDialog] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
@@ -53,10 +59,20 @@ function App() {
   } as api.Storage);
   const [recording, setRecording] = useState(false);
   const [shutter, setShutter] = useState(false);
+  const [mockApiDetected, setMockApi] = useState(false);
 
   useEffect(() => {
     if (!initialized) {
-      api.isPortal().then((portal) => setNetworkDialog(portal));
+      api
+        .isPortal()
+        .then((portal) => setNetworkDialog(portal))
+        .catch(() => {
+          if (process.env.NODE_ENV === "development") {
+            setMockApi(true);
+            // NOTE: comment the line below if you want to work on the CaptivePortal dialog
+            setNetworkDialog(false);
+          }
+        });
       setInitialized(true);
     }
   }, [initialized, networkDialog]);
@@ -74,106 +90,115 @@ function App() {
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
 
   return (
-    <div className="App bp3-dark bp3-large bp3-text-large">
-      <Dialog
-        isOpen={networkDialog}
-        onClose={() => setNetworkDialog(false)}
-        className="bp3-dark bp3-large bp3-text-large"
-        title={<div>Select network</div>}
-        icon="globe-network"
-        hasBackdrop={false}
-        canEscapeKeyClose={false}
-        canOutsideClickClose={false}
-        isCloseButtonShown={false}
-      >
-        <CaptivePortal
-          onConnected={(essid) => {
-            setNetworkDialog(false);
-            setNetwork(essid);
-          }}
-          onAP={() => {
-            setNetworkDialog(false);
-            setNetwork("");
-          }}
-        />
-      </Dialog>
-      <Overlay
-        className="bp3-dark bp3-large bp3-text-large"
-        isOpen={menubarVisible}
-        hasBackdrop={false}
-        onClose={() => setMenubarVisibility(false)}
-        transitionDuration={0}
-      >
-        <div className={classNames(classes, "App-menubar")}>
-          <MenuBar
-            photoMode={photoMode}
-            setPhotoMode={setPhotoMode}
-            setNetwork={setNetwork}
-            // We need this custom key because the props of the Settings component is in the state
-            // of the Menubar component (which makes the Settings not re-render)
-            //
-            // https://github.com/palantir/blueprint/issues/3173
-            key={`${photoMode}`}
-          />
-        </div>
-      </Overlay>
-      <Overlay
-        className="bp3-dark bp3-large bp3-text-large"
-        isOpen={filemanagerVisible}
-        hasBackdrop={false}
-        onClose={() => setFilemanagerVisibility(false)}
-        transitionDuration={0}
-      >
-        <div className={classNames(classes, "App-filemanager")}>
-          <Filemanager />
-        </div>
-      </Overlay>
-      <div id="video" style={{ width: "100vw" }} />
-      <div className="App-top">
-        <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
-          <Icon
-            icon="folder-close"
-            iconSize={iconSize}
-            onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
-          />
-        </div>
-        <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
-          <Icon
-            icon="cog"
-            iconSize={iconSize}
-            onClick={() => setMenubarVisibility(!menubarVisible)}
-          />
-        </div>
-        <div className="App-top-right" style={{ fontSize: `${iconSize}px` }}></div>
-      </div>
-      <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
-        <div className="App-bottom-left">
-          <Icon icon="database" iconSize={iconSize} />
-          {storageInfo}
-        </div>
-        <div className="App-bottom-center">
-          <Icon
-            icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
-            iconSize={iconSize}
-            onClick={() => {
-              if (photoMode) {
-                setShutter(true);
-                setTimeout(() => setShutter(false), 1000);
-              } else {
-                setRecording(!recording);
-              }
+    // According to the documentation:
+    //
+    // The propagation from Provider to its descendant consumers (including .contextType and
+    // useContext) is not subject to the shouldComponentUpdate method, so the consumer is updated
+    // even when an ancestor component skips an update.
+    //
+    // Therefore the CaptivePortal component is not refreshed properly on startup
+    <MockApi.Provider value={mockApiDetected}>
+      <div className="App bp3-dark bp3-large bp3-text-large">
+        <Dialog
+          isOpen={networkDialog}
+          onClose={() => setNetworkDialog(false)}
+          className="bp3-dark bp3-large bp3-text-large"
+          title={<div>Select network</div>}
+          icon="globe-network"
+          hasBackdrop={false}
+          canEscapeKeyClose={false}
+          canOutsideClickClose={false}
+          isCloseButtonShown={false}
+        >
+          <CaptivePortal
+            onConnected={(essid) => {
+              setNetworkDialog(false);
+              setNetwork(essid);
+            }}
+            onAP={() => {
+              setNetworkDialog(false);
+              setNetwork("");
             }}
           />
-          <div className="App-timestamp">01:14:56</div>
+        </Dialog>
+        <Overlay
+          className="bp3-dark bp3-large bp3-text-large"
+          isOpen={menubarVisible}
+          hasBackdrop={false}
+          onClose={() => setMenubarVisibility(false)}
+          transitionDuration={0}
+        >
+          <div className={classNames(classes, "App-menubar")}>
+            <MenuBar
+              photoMode={photoMode}
+              setPhotoMode={setPhotoMode}
+              setNetwork={setNetwork}
+              // We need this custom key because the props of the Settings component is in the state
+              // of the Menubar component (which makes the Settings not re-render)
+              //
+              // https://github.com/palantir/blueprint/issues/3173
+              key={`${photoMode}`}
+            />
+          </div>
+        </Overlay>
+        <Overlay
+          className="bp3-dark bp3-large bp3-text-large"
+          isOpen={filemanagerVisible}
+          hasBackdrop={false}
+          onClose={() => setFilemanagerVisibility(false)}
+          transitionDuration={0}
+        >
+          <div className={classNames(classes, "App-filemanager")}>
+            <Filemanager />
+          </div>
+        </Overlay>
+        <div id="video" style={{ width: "100vw" }} />
+        <div className="App-top">
+          <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
+            <Icon
+              icon="folder-close"
+              iconSize={iconSize}
+              onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
+            />
+          </div>
+          <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
+            <Icon
+              icon="cog"
+              iconSize={iconSize}
+              onClick={() => setMenubarVisibility(!menubarVisible)}
+            />
+          </div>
+          <div className="App-top-right" style={{ fontSize: `${iconSize}px` }}></div>
         </div>
-        <div className="App-bottom-right">
-          <Icon icon="globe-network" iconSize={iconSize} />
-          {network || "Access Point"}
+        <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
+          <div className="App-bottom-left">
+            <Icon icon="database" iconSize={iconSize} />
+            {storageInfo}
+          </div>
+          <div className="App-bottom-center">
+            <Icon
+              icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
+              iconSize={iconSize}
+              onClick={() => {
+                if (photoMode) {
+                  setShutter(true);
+                  setTimeout(() => setShutter(false), 1000);
+                } else {
+                  setRecording(!recording);
+                }
+              }}
+            />
+            <div className="App-timestamp">01:14:56</div>
+          </div>
+          <div className="App-bottom-right">
+            <Icon icon="globe-network" iconSize={iconSize} />
+            {network || "Access Point"}
+          </div>
         </div>
+        {recording && <div className="App-recording-frame" />}
+        {shutter && <div className="App-shutter" />}
       </div>
-      {recording && <div className="App-recording-frame" />}
-      {shutter && <div className="App-shutter" />}
-    </div>
+    </MockApi.Provider>
   );
 }
 

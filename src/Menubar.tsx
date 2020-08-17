@@ -306,38 +306,38 @@ function PictureInner({
       <Label>
         White balance
         <div className="bp3-select">
-        <select>
-          <option value="off">Off</option>
-          <option value="auto">Auto</option>
-          <option value="sun">Sun</option>
-          <option value="cloud">Cloud</option>
-          <option value="shade">Shade</option>
-          <option value="tungsten">Tungsten</option>
-          <option value="fluorescent">Fluorescent</option>
-          <option value="incandescent">Incandescent</option>
-          <option value="flash">Flash</option>
-          <option value="horizon">Horizon</option>
-        </select>
+          <select>
+            <option value="off">Off</option>
+            <option value="auto">Auto</option>
+            <option value="sun">Sun</option>
+            <option value="cloud">Cloud</option>
+            <option value="shade">Shade</option>
+            <option value="tungsten">Tungsten</option>
+            <option value="fluorescent">Fluorescent</option>
+            <option value="incandescent">Incandescent</option>
+            <option value="flash">Flash</option>
+            <option value="horizon">Horizon</option>
+          </select>
         </div>
       </Label>
       <Label>
         Exposure
         <div className="bp3-select">
-        <select>
-          <option value="off">Off</option>
-          <option value="auto">Auto</option>
-          <option value="night">Night</option>
-          <option value="nightpreview">Night preview</option>
-          <option value="backlight">Backlight</option>
-          <option value="spotlight">Spotlight</option>
-          <option value="sports">Sports</option>
-          <option value="snow">Snow</option>
-          <option value="beach">Beach</option>
-          <option value="verylong">Very long</option>
-          <option value="fixedfps">Fixed fps</option>
-          <option value="antishake">Anti-shake</option>
-          <option value="fireworks">Fireworks</option>
-        </select>
+          <select>
+            <option value="off">Off</option>
+            <option value="auto">Auto</option>
+            <option value="night">Night</option>
+            <option value="nightpreview">Night preview</option>
+            <option value="backlight">Backlight</option>
+            <option value="spotlight">Spotlight</option>
+            <option value="sports">Sports</option>
+            <option value="snow">Snow</option>
+            <option value="beach">Beach</option>
+            <option value="verylong">Very long</option>
+            <option value="fixedfps">Fixed fps</option>
+            <option value="antishake">Anti-shake</option>
+            <option value="fireworks">Fireworks</option>
+          </select>
         </div>
       </Label>
       <Label>
@@ -394,6 +394,7 @@ function SelectNetwork({ closePanel, setNetwork }: PanelProps) {
         closePanel();
         setNetwork("");
       }}
+      vertical
     />
   );
 }
