@@ -336,7 +336,7 @@ function PictureInner({
       <Label>
         White balance
         <div className="bp3-select">
-          <select>
+          <select disabled={disabled} >
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="sun">Sun</option>
@@ -353,7 +353,7 @@ function PictureInner({
       <Label>
         Exposure
         <div className="bp3-select">
-          <select>
+          <select disabled={disabled} >
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="night">Night</option>
