@@ -19,6 +19,7 @@ import {
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 import * as api from "./api";
+import { debounce, throttle } from "throttle-debounce";
 
 const LIGHTING: any = {
   nightOutside: {
@@ -97,7 +98,7 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
         text="Streaming settings"
         onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
       />
-      <MenuItem icon="headset" text="Audio" disabled />
+      <MenuItem icon="headset" text="Audio" labelElement="Enabled" disabled />
       <MenuItem
         icon="square"
         text="Viewing angle"
@@ -177,42 +178,83 @@ function Display() {
 }
 
 function Streaming() {
-  const [browser, setBrowser] = useState(false);
-  const [udp, setUdp] = useState(false);
-  const [rtmp, setRtmp] = useState(false);
-  const [mpeg, setMpeg] = useState(false);
-  const [rtsp, setRtsp] = useState(false);
+  const updateWs = (value: boolean) => {
+    api.updateConfig({
+      ws_enabled: value ? "1" : "0",
+    });
+  };
 
-  /*
-    const [usb, setUsb] = useState(false);
-    <Switch label="USB enabled" checked={usb} onChange={() => setUsb(!usb)} />
-  */
+  const updateUdp = (value: boolean) => {
+    api.updateConfig({
+      udp_enabled: value ? "1" : "0",
+    });
+  };
+
+  const updateUdpClients = debounce(2000, (value: string) =>
+    api.updateConfig({ udp_clients: value })
+  );
+
+  const updateRtmp = (value: boolean) => {
+    api.updateConfig({
+      rtmp_enabled: value ? "1" : "0",
+    });
+  };
+
+  const updateRtmpurl = debounce(2000, (value: string) => api.updateConfig({ rtmp_url: value }));
+
+  const updateMpegts = (value: boolean) => {
+    api.updateConfig({
+      mpegts_enabled: value ? "1" : "0",
+    });
+  };
+
+  const updateMpegtsClients = debounce(2000, (value: string) =>
+    api.updateConfig({ mpegts_clients: value })
+  );
+
+  const updateRtsp = (value: boolean) => {
+    api.updateConfig({
+      rtsp_enabled: value ? "1" : "0",
+    });
+  };
 
   return (
     <div className="Menubar-content">
-      <Switch label="Browser stream" checked={browser} onChange={() => setBrowser(!browser)} />
+      <Switch label="Browser stream" onChange={(ev) => updateWs(ev.currentTarget.checked)} />
       <Label>
         Stream UDP
         <ControlGroup>
-          <Switch checked={udp} onChange={() => setUdp(!udp)} />
-          <InputGroup placeholder="Client addresses" fill />
+          <Switch onChange={(ev) => updateUdp(ev.currentTarget.checked)} />
+          <InputGroup
+            placeholder="Client addresses"
+            onChange={(ev: any) => updateUdpClients(ev.currentTarget.value)}
+            fill
+          />
         </ControlGroup>
       </Label>
       <Label>
         RTMP
         <ControlGroup>
-          <Switch checked={rtmp} onChange={() => setRtmp(!rtmp)} />
-          <InputGroup placeholder="URL" fill />
+          <Switch onChange={(ev) => updateRtmp(ev.currentTarget.checked)} />
+          <InputGroup
+            placeholder="URL"
+            onChange={(ev: any) => updateRtmpurl(ev.currentTarget.value)}
+            fill
+          />
         </ControlGroup>
       </Label>
       <Label>
         MPEG-TS
         <ControlGroup>
-          <Switch checked={mpeg} onChange={() => setMpeg(!mpeg)} />
-          <InputGroup placeholder="Clients addresses" fill />
+          <Switch onChange={(ev) => updateMpegts(ev.currentTarget.checked)} />
+          <InputGroup
+            placeholder="Clients addresses"
+            onChange={(ev: any) => updateMpegtsClients(ev.currentTarget.value)}
+            fill
+          />
         </ControlGroup>
       </Label>
-      <Switch label="RTSP enabled" checked={rtsp} onChange={() => setRtsp(!rtsp)} />
+      <Switch label="RTSP enabled" onChange={(ev) => updateRtsp(ev.currentTarget.checked)} />
     </div>
   );
 }
@@ -336,7 +378,7 @@ function PictureInner({
       <Label>
         White balance
         <div className="bp3-select">
-          <select disabled={disabled} >
+          <select disabled={disabled}>
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="sun">Sun</option>
@@ -353,7 +395,7 @@ function PictureInner({
       <Label>
         Exposure
         <div className="bp3-select">
-          <select disabled={disabled} >
+          <select disabled={disabled}>
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="night">Night</option>

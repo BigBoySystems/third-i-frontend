@@ -9,11 +9,13 @@
     "@types/numeral": "0.0.28",
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
+    "@types/throttle-debounce": "^2.1.0",
     "classnames": "^2.2.6",
     "numeral": "^2.0.6",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "throttle-debounce": "^2.3.0",
     "typescript": "^3.7.5",
     "ws-avc-player": "^2.0.2"
   },
