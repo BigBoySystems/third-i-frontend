@@ -68,18 +68,20 @@ function App() {
       setInitialized(true);
       api
         .isPortal()
-        .then((portal) => setNetworkDialog(portal))
+        .then((portal) => {
+          setNetworkDialog(portal);
+          api.getConfig().then((config) => {
+            setConfig(config);
+          });
+        })
         .catch(() => {
           if (process.env.REACT_APP_MOCK_API === "true" || process.env.NODE_ENV === "development") {
             setMockApi(true);
             // NOTE: comment the line below if you want to work on the CaptivePortal dialog
             setNetworkDialog(false);
+            setConfig(CONFIG_SAMPLE);
           }
         });
-      api.getConfig().then((config) => {
-        setConfig(config);
-        setInitialized(true);
-      });
     }
   }, [initialized, networkDialog]);
 
@@ -210,5 +212,38 @@ function App() {
     </MockApi.Provider>
   );
 }
+
+const CONFIG_SAMPLE: api.Config = {
+  photo_resolution: "",
+  video_width: "1280",
+  video_mode: "",
+  video_height: "720",
+  video_fps: "30",
+  video_bitrate: "3000000",
+  video_profile: "baseline",
+  rtmp_url: "",
+  rtmp_enabled: "0",
+  mpegts_clients: "192.168.1.10:3001",
+  mpegts_enabled: "0",
+  rtsp_enabled: "0",
+  usb_enabled: "1",
+  audio_enabled: "0",
+  video_wb: "auto",
+  exposure: "auto",
+  contrast: "-15",
+  sharpness: "0",
+  digitalgain: "0.0",
+  wifi_iface: "",
+  wifi_ssid: "",
+  wifi_psk: "",
+  record_enabled: "0",
+  record_time: "300",
+  dec_enabled: "0",
+  up_down: "1",
+  swapcams: "1",
+  udp_clients: "10.10.0.238:3000",
+  udp_enabled: "0",
+  ws_enabled: "1",
+};
 
 export default App;
