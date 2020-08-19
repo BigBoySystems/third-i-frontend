@@ -105,3 +105,7 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
     body: JSON.stringify(patch),
   });
 }
+
+export function getConfig(): Promise<Config> {
+  return fetch("/config").then((resp) => resp.json());
+}

@@ -61,9 +61,11 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [shutter, setShutter] = useState(false);
   const [mockApiDetected, setMockApi] = useState(false);
+  const [config, setConfig] = useState<api.Config | undefined>(undefined);
 
   useEffect(() => {
     if (!initialized) {
+      setInitialized(true);
       api
         .isPortal()
         .then((portal) => setNetworkDialog(portal))
@@ -74,7 +76,10 @@ function App() {
             setNetworkDialog(false);
           }
         });
-      setInitialized(true);
+      api.getConfig().then((config) => {
+        setConfig(config);
+        setInitialized(true);
+      });
     }
   }, [initialized, networkDialog]);
 
@@ -130,16 +135,19 @@ function App() {
           transitionDuration={0}
         >
           <div className={classNames(classes, "App-menubar")}>
-            <MenuBar
-              photoMode={photoMode}
-              setPhotoMode={setPhotoMode}
-              setNetwork={setNetwork}
-              // We need this custom key because the props of the Settings component is in the state
-              // of the Menubar component (which makes the Settings not re-render)
-              //
-              // https://github.com/palantir/blueprint/issues/3173
-              key={`${photoMode}`}
-            />
+            {config !== undefined && (
+              <MenuBar
+                config={config}
+                photoMode={photoMode}
+                setPhotoMode={setPhotoMode}
+                setNetwork={setNetwork}
+                // We need this custom key because the props of the Settings component is in the state
+                // of the Menubar component (which makes the Settings not re-render)
+                //
+                // https://github.com/palantir/blueprint/issues/3173
+                key={`${photoMode}`}
+              />
+            )}
           </div>
         </Overlay>
         <Overlay

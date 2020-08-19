@@ -44,8 +44,12 @@ const LIGHTING: any = {
   },
 };
 
-type MenubarProps = PhotoMode & Network;
-type PanelProps = IPanelProps & PhotoMode & Network;
+interface ConfigProps {
+  config: api.Config;
+}
+
+type MenubarProps = PhotoMode & Network & ConfigProps;
+type PanelProps = IPanelProps & MenubarProps;
 
 interface PictureProps {
   contrast: number;
@@ -177,7 +181,7 @@ function Display() {
   );
 }
 
-function Streaming() {
+function Streaming({ config }: PanelProps) {
   const updateWs = (value: boolean) => {
     api.updateConfig({
       ws_enabled: value ? "1" : "0",
@@ -220,13 +224,21 @@ function Streaming() {
 
   return (
     <div className="Menubar-content">
-      <Switch label="Browser stream" onChange={(ev) => updateWs(ev.currentTarget.checked)} />
+      <Switch
+        defaultChecked={config?.ws_enabled === "1"}
+        label="Browser stream"
+        onChange={(ev) => updateWs(ev.currentTarget.checked)}
+      />
       <Label>
         Stream UDP
         <ControlGroup>
-          <Switch onChange={(ev) => updateUdp(ev.currentTarget.checked)} />
+          <Switch
+            defaultChecked={config?.udp_enabled === "1"}
+            onChange={(ev) => updateUdp(ev.currentTarget.checked)}
+          />
           <InputGroup
             placeholder="Client addresses"
+            defaultValue={config?.udp_clients}
             onChange={(ev: any) => updateUdpClients(ev.currentTarget.value)}
             fill
           />
@@ -235,9 +247,13 @@ function Streaming() {
       <Label>
         RTMP
         <ControlGroup>
-          <Switch onChange={(ev) => updateRtmp(ev.currentTarget.checked)} />
+          <Switch
+            defaultChecked={config?.rtmp_enabled === "1"}
+            onChange={(ev) => updateRtmp(ev.currentTarget.checked)}
+          />
           <InputGroup
             placeholder="URL"
+            defaultValue={config?.rtmp_url}
             onChange={(ev: any) => updateRtmpurl(ev.currentTarget.value)}
             fill
           />
@@ -246,15 +262,23 @@ function Streaming() {
       <Label>
         MPEG-TS
         <ControlGroup>
-          <Switch onChange={(ev) => updateMpegts(ev.currentTarget.checked)} />
+          <Switch
+            defaultChecked={config?.mpegts_enabled === "1"}
+            onChange={(ev) => updateMpegts(ev.currentTarget.checked)}
+          />
           <InputGroup
             placeholder="Clients addresses"
+            defaultValue={config?.mpegts_clients}
             onChange={(ev: any) => updateMpegtsClients(ev.currentTarget.value)}
             fill
           />
         </ControlGroup>
       </Label>
-      <Switch label="RTSP enabled" onChange={(ev) => updateRtsp(ev.currentTarget.checked)} />
+      <Switch
+        defaultChecked={config?.rtsp_enabled === "1"}
+        label="RTSP enabled"
+        onChange={(ev) => updateRtsp(ev.currentTarget.checked)}
+      />
     </div>
   );
 }
