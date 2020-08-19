@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import "./Menubar.css";
 import CaptivePortal from "./CaptivePortal";
 import {
@@ -20,6 +20,8 @@ import {
 import { PhotoMode, Network } from "./App";
 import * as api from "./api";
 import { debounce, throttle } from "throttle-debounce";
+
+const THROTTLE = 2000;
 
 const fromStr = (value: string, default_: number) => {
   const parsed = parseFloat(value);
@@ -199,7 +201,7 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateUdpClients = debounce(2000, (value: string) =>
+  const updateUdpClients = debounce(THROTTLE, (value: string) =>
     api.updateConfig({ udp_clients: value })
   );
 
@@ -209,7 +211,9 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateRtmpurl = debounce(2000, (value: string) => api.updateConfig({ rtmp_url: value }));
+  const updateRtmpurl = debounce(THROTTLE, (value: string) =>
+    api.updateConfig({ rtmp_url: value })
+  );
 
   const updateMpegts = (value: boolean) => {
     api.updateConfig({
@@ -217,7 +221,7 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateMpegtsClients = debounce(2000, (value: string) =>
+  const updateMpegtsClients = debounce(THROTTLE, (value: string) =>
     api.updateConfig({ mpegts_clients: value })
   );
 
@@ -340,9 +344,25 @@ function Picture({ closePanel, config }: PanelProps) {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
 
+  const reallyUpdateFramerate = useCallback(
+    throttle(THROTTLE, (value: number) =>
+      api.updateConfig({
+        video_fps: `${value}`,
+      })
+    ),
+    []
+  );
+  const updateFramerate = useCallback(
+    (value: number) => {
+      setFramerate(value);
+      reallyUpdateFramerate(value);
+    },
+    [reallyUpdateFramerate]
+  );
+
   return (
     <div className="Menubar-content">
-      <PictureInner config={config} />
+      <PictureInner config={config} onConfigUpdate={console.log} />
       <Label>
         Bitrate (Mbps)
         <Slider
@@ -364,7 +384,7 @@ function Picture({ closePanel, config }: PanelProps) {
           labelStepSize={5}
           value={framerate}
           showTrackFill={false}
-          onChange={setFramerate}
+          onChange={updateFramerate}
         />
       </Label>
       <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} disabled />
@@ -379,7 +399,13 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   const [sharpness, setSharpness] = useState(fromStr(config.sharpness, 0));
   const [gain, setGain] = useState(fromStr(config.digitalgain, 0.0));
 
-  const updateConfig = onConfigUpdate || ((config: Partial<api.Config>) => {});
+  const updateConfig = useCallback(onConfigUpdate || ((config: Partial<api.Config>) => {}), [
+    onConfigUpdate,
+  ]);
+  const updateConfigThrottled = useCallback(
+    debounce(THROTTLE, (config: any) => updateConfig(config)),
+    [updateConfig]
+  );
 
   /*
       <Label>
@@ -452,7 +478,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setContrast(value);
-            updateConfig({ contrast: `${value}` });
+            updateConfigThrottled({ contrast: `${value}` });
           }}
           disabled={disabled}
         />
@@ -468,7 +494,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setSharpness(value);
-            updateConfig({ sharpness: `${value}` });
+            updateConfigThrottled({ sharpness: `${value}` });
           }}
           disabled={disabled}
         />
@@ -484,7 +510,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setGain(value);
-            updateConfig({ digitalgain: `${value}` });
+            updateConfigThrottled({ digitalgain: `${value}` });
           }}
           disabled={disabled}
         />
