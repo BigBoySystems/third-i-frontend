@@ -21,26 +21,35 @@ import { PhotoMode, Network } from "./App";
 import * as api from "./api";
 import { debounce, throttle } from "throttle-debounce";
 
-const LIGHTING: any = {
+const fromStr = (value: string, default_: number) => {
+  const parsed = parseFloat(value);
+  if (isNaN(parsed)) {
+    return default_;
+  } else {
+    return parsed;
+  }
+};
+
+const LIGHTING: { [k: string]: Partial<api.Config> } = {
   nightOutside: {
-    contrast: 0,
-    sharpness: 0,
-    gain: 0,
+    contrast: "0",
+    sharpness: "0",
+    digitalgain: "0",
   },
   dayInside: {
-    contrast: 1,
-    sharpness: 1,
-    gain: 1,
+    contrast: "1",
+    sharpness: "1",
+    digitalgain: "1",
   },
   nightInside: {
-    contrast: 2,
-    sharpness: 2,
-    gain: 2,
+    contrast: "2",
+    sharpness: "2",
+    digitalgain: "2",
   },
   dayOutside: {
-    contrast: 3,
-    sharpness: 3,
-    gain: 3,
+    contrast: "3",
+    sharpness: "3",
+    digitalgain: "3",
   },
 };
 
@@ -52,12 +61,8 @@ type MenubarProps = PhotoMode & Network & ConfigProps;
 type PanelProps = IPanelProps & MenubarProps;
 
 interface PictureProps {
-  contrast: number;
-  setContrast?: React.Dispatch<React.SetStateAction<number>>;
-  sharpness: number;
-  setSharpness?: React.Dispatch<React.SetStateAction<number>>;
-  gain: number;
-  setGain?: React.Dispatch<React.SetStateAction<number>>;
+  config: api.Config;
+  onConfigUpdate?: (config: Partial<api.Config>) => void;
   disabled?: boolean;
 }
 
@@ -225,7 +230,7 @@ function Streaming({ config }: PanelProps) {
   return (
     <div className="Menubar-content">
       <Switch
-        defaultChecked={config?.ws_enabled === "1"}
+        defaultChecked={config.ws_enabled === "1"}
         label="Browser stream"
         onChange={(ev) => updateWs(ev.currentTarget.checked)}
       />
@@ -233,12 +238,12 @@ function Streaming({ config }: PanelProps) {
         Stream UDP
         <ControlGroup>
           <Switch
-            defaultChecked={config?.udp_enabled === "1"}
+            defaultChecked={config.udp_enabled === "1"}
             onChange={(ev) => updateUdp(ev.currentTarget.checked)}
           />
           <InputGroup
             placeholder="Client addresses"
-            defaultValue={config?.udp_clients}
+            defaultValue={config.udp_clients}
             onChange={(ev: any) => updateUdpClients(ev.currentTarget.value)}
             fill
           />
@@ -248,12 +253,12 @@ function Streaming({ config }: PanelProps) {
         RTMP
         <ControlGroup>
           <Switch
-            defaultChecked={config?.rtmp_enabled === "1"}
+            defaultChecked={config.rtmp_enabled === "1"}
             onChange={(ev) => updateRtmp(ev.currentTarget.checked)}
           />
           <InputGroup
             placeholder="URL"
-            defaultValue={config?.rtmp_url}
+            defaultValue={config.rtmp_url}
             onChange={(ev: any) => updateRtmpurl(ev.currentTarget.value)}
             fill
           />
@@ -263,19 +268,19 @@ function Streaming({ config }: PanelProps) {
         MPEG-TS
         <ControlGroup>
           <Switch
-            defaultChecked={config?.mpegts_enabled === "1"}
+            defaultChecked={config.mpegts_enabled === "1"}
             onChange={(ev) => updateMpegts(ev.currentTarget.checked)}
           />
           <InputGroup
             placeholder="Clients addresses"
-            defaultValue={config?.mpegts_clients}
+            defaultValue={config.mpegts_clients}
             onChange={(ev: any) => updateMpegtsClients(ev.currentTarget.value)}
             fill
           />
         </ControlGroup>
       </Label>
       <Switch
-        defaultChecked={config?.rtsp_enabled === "1"}
+        defaultChecked={config.rtsp_enabled === "1"}
         label="RTSP enabled"
         onChange={(ev) => updateRtsp(ev.currentTarget.checked)}
       />
@@ -283,11 +288,9 @@ function Streaming({ config }: PanelProps) {
   );
 }
 
-function Lighting() {
+function Lighting({ config }: PanelProps) {
   const [radioCheck, setRadioCheck] = useState("nightOutside");
-  const [contrast, setContrast] = useState(0);
-  const [sharpness, setSharpness] = useState(0);
-  const [gain, setGain] = useState(0.0);
+  const [configPreview, setConfigPreview] = useState(config);
 
   return (
     <div className="Menubar-content">
@@ -297,9 +300,7 @@ function Lighting() {
           const settings = LIGHTING[value];
 
           setRadioCheck(value);
-          setContrast(settings.contrast);
-          setSharpness(settings.sharpness);
-          setGain(settings.gain);
+          setConfigPreview({ ...configPreview, ...settings });
         }}
         selectedValue={radioCheck}
       >
@@ -308,7 +309,7 @@ function Lighting() {
         <Radio label="Night inside" value="nightInside" />
         <Radio label="Day outside" value="dayOutside" />
       </RadioGroup>
-      <PictureInner contrast={contrast} sharpness={sharpness} gain={gain} disabled />
+      <PictureInner config={configPreview} disabled key={`${JSON.stringify(configPreview)}`} />
     </div>
   );
 }
@@ -335,30 +336,20 @@ function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
   );
 }
 
-function Picture({ closePanel }: PanelProps) {
-  const [contrast, setContrast] = useState(0);
-  const [sharpness, setSharpness] = useState(0);
-  const [gain, setGain] = useState(0.0);
-  const [bitrate, setBitrate] = useState(30);
-  const [framerate, setFramerate] = useState(30);
+function Picture({ closePanel, config }: PanelProps) {
+  const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
+  const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
 
   return (
     <div className="Menubar-content">
-      <PictureInner
-        contrast={contrast}
-        setContrast={setContrast}
-        sharpness={sharpness}
-        setSharpness={setSharpness}
-        gain={gain}
-        setGain={setGain}
-      />
+      <PictureInner config={config} />
       <Label>
         Bitrate (Mbps)
         <Slider
-          min={5}
-          max={100}
-          stepSize={5}
-          labelStepSize={25}
+          min={0.5}
+          max={10.0}
+          stepSize={0.5}
+          labelStepSize={1.0}
           value={bitrate}
           showTrackFill={false}
           onChange={setBitrate}
@@ -381,15 +372,15 @@ function Picture({ closePanel }: PanelProps) {
   );
 }
 
-function PictureInner({
-  contrast,
-  setContrast,
-  sharpness,
-  setSharpness,
-  gain,
-  setGain,
-  disabled,
-}: PictureProps) {
+function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
+  const [whiteBalance, setWhiteBalance] = useState(config.video_wb);
+  const [exposure, setExposure] = useState(config.exposure);
+  const [contrast, setContrast] = useState(fromStr(config.contrast, 0));
+  const [sharpness, setSharpness] = useState(fromStr(config.sharpness, 0));
+  const [gain, setGain] = useState(fromStr(config.digitalgain, 0.0));
+
+  const updateConfig = onConfigUpdate || ((config: Partial<api.Config>) => {});
+
   /*
       <Label>
         <Icon icon="pivot-table" />
@@ -402,7 +393,14 @@ function PictureInner({
       <Label>
         White balance
         <div className="bp3-select">
-          <select disabled={disabled}>
+          <select
+            disabled={disabled}
+            value={whiteBalance}
+            onChange={(ev) => {
+              setWhiteBalance(ev.currentTarget.value);
+              updateConfig({ video_wb: ev.currentTarget.value });
+            }}
+          >
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="sun">Sun</option>
@@ -419,7 +417,14 @@ function PictureInner({
       <Label>
         Exposure
         <div className="bp3-select">
-          <select disabled={disabled}>
+          <select
+            disabled={disabled}
+            value={exposure}
+            onChange={(ev) => {
+              setExposure(ev.currentTarget.value);
+              updateConfig({ exposure: ev.currentTarget.value });
+            }}
+          >
             <option value="off">Off</option>
             <option value="auto">Auto</option>
             <option value="night">Night</option>
@@ -445,7 +450,10 @@ function PictureInner({
           labelStepSize={10}
           value={contrast}
           showTrackFill={false}
-          onChange={setContrast}
+          onChange={(value) => {
+            setContrast(value);
+            updateConfig({ contrast: `${value}` });
+          }}
           disabled={disabled}
         />
       </Label>
@@ -458,7 +466,10 @@ function PictureInner({
           labelStepSize={10}
           value={sharpness}
           showTrackFill={false}
-          onChange={setSharpness}
+          onChange={(value) => {
+            setSharpness(value);
+            updateConfig({ sharpness: `${value}` });
+          }}
           disabled={disabled}
         />
       </Label>
@@ -471,7 +482,10 @@ function PictureInner({
           labelStepSize={5.0}
           value={gain}
           showTrackFill={false}
-          onChange={setGain}
+          onChange={(value) => {
+            setGain(value);
+            updateConfig({ digitalgain: `${value}` });
+          }}
           disabled={disabled}
         />
       </Label>
