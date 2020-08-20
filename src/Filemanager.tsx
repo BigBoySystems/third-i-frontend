@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Tree,
   ITreeNode,
@@ -20,10 +20,21 @@ import * as api from "./api";
 const FilemanagerToaster = Toaster.create({});
 
 function Filemanager() {
-  const [nodes, setNodes] = useState(fromApi(EXAMPLE));
+  const [initialized, setInitialized] = useState(false);
+  const [nodes, setNodes] = useState(fromApi(SAMPLE_FILES));
   const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
   const [deleteFile, setDeleteFile] = useState<api.File | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
+
+  useEffect(() => {
+    if (!initialized) {
+      setInitialized(true);
+      api
+        .getFiles()
+        .then((root) => setNodes(fromApi(root)))
+        .catch((err) => console.log("Could not load files from API:", err));
+    }
+  }, [initialized]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
     for (const node of nodes) {
@@ -65,11 +76,9 @@ function Filemanager() {
       <Menu>
         <MenuDivider title={label} />
         {!nodeData?.directory && (
-          <MenuItem text="Preview" icon="eye-open" href={nodeData?.preview} />
+          <MenuItem text="Preview" icon="eye-open" href={`${nodeData?.url}?preview`} />
         )}
-        {!nodeData?.directory && (
-          <MenuItem text="Download" icon="download" href={nodeData?.download} />
-        )}
+        {!nodeData?.directory && <MenuItem text="Download" icon="download" href={nodeData?.url} />}
         <MenuItem text="Rename" icon="edit" onClick={() => setRenameFile(nodeData)} />
         <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile(nodeData)} />
       </Menu>,
@@ -142,29 +151,26 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
     icon: child.directory ? "folder-close" : "document",
     label: child.name,
     hasCaret: child.directory,
-    childNodes: child.children.map(transform),
+    childNodes: child.children?.map(transform),
     nodeData: child,
   });
 
   return root.children.map(transform);
 }
 
-const EXAMPLE: api.File = {
+const SAMPLE_FILES: api.File = {
   name: "/",
+  url: "/files",
   directory: true,
   children: [
     {
       name: "Dir 1",
-      rename: "rename",
-      delete: "delete",
+      url: "/files/dir1",
       directory: true,
       children: [
         {
           name: "File 3",
-          preview: "preview",
-          download: "download",
-          rename: "rename",
-          delete: "delete",
+          url: "/files/dir1/file3",
           directory: false,
           children: [],
         },
@@ -172,10 +178,7 @@ const EXAMPLE: api.File = {
     },
     {
       name: "File 2",
-      preview: "preview",
-      download: "download",
-      rename: "rename",
-      delete: "delete",
+      url: "/files/file2",
       directory: false,
       children: [],
     },

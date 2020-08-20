@@ -18,10 +18,7 @@ export interface Storage {
 
 export interface File {
   name: string;
-  preview?: string;
-  download?: string;
-  rename?: string;
-  delete?: string;
+  url: string;
   directory: boolean;
   children: File[];
 }
@@ -108,4 +105,8 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
 
 export function getConfig(): Promise<Config> {
   return fetch("/config").then((resp) => resp.json());
+}
+
+export function getFiles(): Promise<File> {
+  return fetch("/files").then((resp) => resp.json());
 }

@@ -47,11 +47,11 @@ export const MockApi = React.createContext(false);
 function App() {
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
 
+  const [initialized, setInitialized] = useState(false);
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [networkDialog, setNetworkDialog] = useState(true);
-  const [initialized, setInitialized] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
   const [storage, setStorage] = useState({
