@@ -123,7 +123,11 @@ function CaptivePortalInner({
       <div className="CaptivePortal-list">
         <Menu>
           {networks.length === 0 && (
-            <MenuItem icon="refresh" text={error ? "An error occurred" : "Loading..."} disabled />
+            <MenuItem
+              icon="refresh"
+              text={error ? "An error occurred" : "No network detected"}
+              disabled
+            />
           )}
           {networks.map(({ essid, password }) =>
             password ? (
