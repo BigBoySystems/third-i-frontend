@@ -19,9 +19,9 @@ import {
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 import * as api from "./api";
-import { debounce, throttle } from "throttle-debounce";
+import { useDebounceCallback } from "@react-hook/debounce";
 
-const THROTTLE = 2000;
+const DEBOUNCE_TIME = 2000;
 
 const fromStr = (value: string, default_: number) => {
   const parsed = parseFloat(value);
@@ -201,8 +201,9 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateUdpClients = debounce(THROTTLE, (value: string) =>
-    api.updateConfig({ udp_clients: value })
+  const updateUdpClients = useDebounceCallback(
+    (value: string) => api.updateConfig({ udp_clients: value }),
+    DEBOUNCE_TIME
   );
 
   const updateRtmp = (value: boolean) => {
@@ -211,8 +212,9 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateRtmpurl = debounce(THROTTLE, (value: string) =>
-    api.updateConfig({ rtmp_url: value })
+  const updateRtmpurl = useDebounceCallback(
+    (value: string) => api.updateConfig({ rtmp_url: value }),
+    DEBOUNCE_TIME
   );
 
   const updateMpegts = (value: boolean) => {
@@ -221,8 +223,9 @@ function Streaming({ config }: PanelProps) {
     });
   };
 
-  const updateMpegtsClients = debounce(THROTTLE, (value: string) =>
-    api.updateConfig({ mpegts_clients: value })
+  const updateMpegtsClients = useDebounceCallback(
+    (value: string) => api.updateConfig({ mpegts_clients: value }),
+    DEBOUNCE_TIME
   );
 
   const updateRtsp = (value: boolean) => {
@@ -344,25 +347,25 @@ function Picture({ closePanel, config }: PanelProps) {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
 
-  const reallyUpdateFramerate = useCallback(
-    throttle(THROTTLE, (value: number) =>
+  const updateFramerate = useDebounceCallback(
+    (value: number) =>
       api.updateConfig({
         video_fps: `${value}`,
-      })
-    ),
-    []
+      }),
+    DEBOUNCE_TIME
   );
-  const updateFramerate = useCallback(
-    (value: number) => {
-      setFramerate(value);
-      reallyUpdateFramerate(value);
-    },
-    [reallyUpdateFramerate]
+
+  const updateBitrate = useDebounceCallback(
+    (value: number) =>
+      api.updateConfig({
+        video_bitrate: `${value}`,
+      }),
+    DEBOUNCE_TIME
   );
 
   return (
     <div className="Menubar-content">
-      <PictureInner config={config} onConfigUpdate={console.log} />
+      <PictureInner config={config} onConfigUpdate={api.updateConfig} />
       <Label>
         Bitrate (Mbps)
         <Slider
@@ -372,7 +375,10 @@ function Picture({ closePanel, config }: PanelProps) {
           labelStepSize={1.0}
           value={bitrate}
           showTrackFill={false}
-          onChange={setBitrate}
+          onChange={(value) => {
+            setBitrate(value);
+            updateBitrate(value);
+          }}
         />
       </Label>
       <Label>
@@ -384,7 +390,10 @@ function Picture({ closePanel, config }: PanelProps) {
           labelStepSize={5}
           value={framerate}
           showTrackFill={false}
-          onChange={updateFramerate}
+          onChange={(value) => {
+            setFramerate(value);
+            updateFramerate(value);
+          }}
         />
       </Label>
       <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} disabled />
@@ -402,9 +411,20 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   const updateConfig = useCallback(onConfigUpdate || ((config: Partial<api.Config>) => {}), [
     onConfigUpdate,
   ]);
-  const updateConfigThrottled = useCallback(
-    debounce(THROTTLE, (config: any) => updateConfig(config)),
-    [updateConfig]
+
+  const updateContrast = useDebounceCallback(
+    (value: number) => updateConfig({ contrast: `${value}` }),
+    DEBOUNCE_TIME
+  );
+
+  const updateSharpness = useDebounceCallback(
+    (value: number) => updateConfig({ sharpness: `${value}` }),
+    DEBOUNCE_TIME
+  );
+
+  const updateGain = useDebounceCallback(
+    (value: number) => updateConfig({ digitalgain: `${value}` }),
+    DEBOUNCE_TIME
   );
 
   /*
@@ -478,7 +498,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setContrast(value);
-            updateConfigThrottled({ contrast: `${value}` });
+            updateContrast(value);
           }}
           disabled={disabled}
         />
@@ -494,7 +514,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setSharpness(value);
-            updateConfigThrottled({ sharpness: `${value}` });
+            updateSharpness(value);
           }}
           disabled={disabled}
         />
@@ -510,7 +530,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
           showTrackFill={false}
           onChange={(value) => {
             setGain(value);
-            updateConfigThrottled({ digitalgain: `${value}` });
+            updateGain(value);
           }}
           disabled={disabled}
         />
