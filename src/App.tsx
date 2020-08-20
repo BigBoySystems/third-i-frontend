@@ -216,7 +216,7 @@ function App() {
 const CONFIG_SAMPLE: api.Config = {
   photo_resolution: "",
   video_width: "1280",
-  video_mode: "",
+  video_mode: "3D",
   video_height: "720",
   video_fps: "30",
   video_bitrate: "3000000",
@@ -240,7 +240,7 @@ const CONFIG_SAMPLE: api.Config = {
   record_time: "300",
   dec_enabled: "0",
   up_down: "1",
-  swapcams: "1",
+  swapcams: "",
   udp_clients: "10.10.0.238:3000",
   udp_enabled: "0",
   ws_enabled: "1",

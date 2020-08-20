@@ -132,8 +132,19 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
   );
 }
 
-function Display() {
-  const [radioCheck, setRadioCheck] = useState("3dFlat");
+function Display({ config }: PanelProps) {
+  let defaultDisplay = "3dFlat";
+  if (config.video_mode === "3D") {
+    defaultDisplay = "3dFlat";
+  } else {
+    if (config.swapcams === "1") {
+      defaultDisplay = "2dRightOnly";
+    } else {
+      defaultDisplay = "2dLeftOnly";
+    }
+  }
+
+  const [radioCheck, setRadioCheck] = useState(defaultDisplay);
   const [inverted, setInverted] = useState(false);
   const [flipped, setFlipped] = useState(false);
 
