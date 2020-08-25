@@ -76,7 +76,7 @@ function CaptivePortalInner({
     setConnecting(true);
     setError(false);
     setNetworks([]);
-
+    /*
     if (mockApi) {
       setTimeout(() => {
         setConnecting(false);
@@ -91,7 +91,7 @@ function CaptivePortalInner({
       api
         .connect(essid, password)
         .then((res) => {
-          setConnecting(false);
+          setConnecting();
 
           if (res.success) {
             onConnected(essid);
@@ -105,8 +105,8 @@ function CaptivePortalInner({
           setConnecting(false);
         });
     }
+  */
   };
-
   useEffect(() => {
     if (!initialized) {
       updateNetworks();
