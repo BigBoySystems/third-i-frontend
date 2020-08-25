@@ -119,14 +119,14 @@ function CaptivePortalInner({
       <Dialog
           isOpen={connecting}
           className="bp3-dark bp3-large bp3-text-large"
-          title={<div>Oops, connection issues</div>}
+          title={<div>Connection issues</div>}
           icon="globe-network"
           hasBackdrop={true}
           canEscapeKeyClose={false}
           canOutsideClickClose={false}
           isCloseButtonShown={false} >
           <div className="CaptivePortal-dialog" >
-           <p>Your Third-I is gone to another place in the Internet</p>
+           <p>Your Third-I is gone to an another network</p>
            <p> Please follow him : </p>
            <p> See you later !</p>
           </div>
