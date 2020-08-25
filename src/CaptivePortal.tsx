@@ -7,8 +7,7 @@ import {
   Label,
   Toaster,
   Intent,
-  Overlay,
-  Spinner,
+  Dialog,
   ButtonGroup,
 } from "@blueprintjs/core";
 import "./CaptivePortal.css";
@@ -117,10 +116,22 @@ function CaptivePortalInner({
 
   return (
     <div className="CaptivePortal-content">
-      <Overlay isOpen={connecting}>
-        <Spinner size={Spinner.SIZE_LARGE} className="CaptivePortal-spinner" />
-      </Overlay>
-      <div className="CaptivePortal-list">
+      <Dialog
+          isOpen={connecting}
+          className="bp3-dark bp3-large bp3-text-large"
+          title={<div>Oops, connection issues</div>}
+          icon="globe-network"
+          hasBackdrop={true}
+          canEscapeKeyClose={false}
+          canOutsideClickClose={false}
+          isCloseButtonShown={false} >
+          <div className="CaptivePortal-dialog" >
+           <p>Your Third-I is gone to another place in the Internet</p>
+           <p> Please follow him : </p>
+           <p> See you later !</p>
+          </div>
+      </Dialog>
+     <div className="CaptivePortal-list">
         <Menu>
           {networks.length === 0 && (
             <MenuItem
