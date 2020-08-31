@@ -1,3 +1,5 @@
+const API_PREFIX = "/api";
+
 export interface Portal {
   portal: boolean;
 }
@@ -57,13 +59,13 @@ export interface Config {
 }
 
 export function isPortal() {
-  return fetch("/portal")
+  return fetch(`${API_PREFIX}/portal`)
     .then((resp) => resp.json())
     .then((json: Portal) => json.portal);
 }
 
 export function networks(): Promise<Network[]> {
-  return fetch("/list-networks").then((resp) => resp.json());
+  return fetch(`${API_PREFIX}/list-networks`).then((resp) => resp.json());
 }
 
 export function connect(essid: string, password?: string): Promise<Connect> {
@@ -72,7 +74,7 @@ export function connect(essid: string, password?: string): Promise<Connect> {
     password,
   };
 
-  return fetch("/connect", {
+  return fetch(`${API_PREFIX}/connect`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
@@ -84,7 +86,7 @@ export function connect(essid: string, password?: string): Promise<Connect> {
 export function startAp(): Promise<any> {
   const data = {};
 
-  return fetch("/start-ap", {
+  return fetch(`${API_PREFIX}/start-ap`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
@@ -94,7 +96,7 @@ export function startAp(): Promise<any> {
 }
 
 export function updateConfig(patch: Partial<Config>): Promise<any> {
-  return fetch("/config", {
+  return fetch(`${API_PREFIX}/config`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
@@ -104,9 +106,9 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
 }
 
 export function getConfig(): Promise<Config> {
-  return fetch("/config").then((resp) => resp.json());
+  return fetch(`${API_PREFIX}/config`).then((resp) => resp.json());
 }
 
 export function getFiles(): Promise<File> {
-  return fetch("/files").then((resp) => resp.json());
+  return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
 }
