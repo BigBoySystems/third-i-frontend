@@ -19,6 +19,8 @@ interface CaptivePortalProps {
   onConnected: (essid: string) => void;
   onAP: () => void;
   vertical?: boolean;
+  ap: boolean;
+  setAp: (value: boolean) => void;
 }
 
 function CaptivePortal(props: CaptivePortalProps) {
@@ -34,6 +36,8 @@ function CaptivePortalInner({
   onAP,
   vertical,
   mockApi,
+  ap,
+  setAp,
 }: CaptivePortalProps & MockApi) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
@@ -161,6 +165,7 @@ function CaptivePortalInner({
       setConnecting(false);
 
       if (!portalInfo.portal) {
+        setAp(false);
         onConnected(essid);
       } else {
         onFailure(essid);
@@ -184,6 +189,11 @@ function CaptivePortalInner({
   };
 
   const startAp = async () => {
+    if (ap) {
+      onAP();
+      return;
+    }
+
     setConnecting(true);
     setError(false);
     setNetworks([]);
@@ -227,6 +237,7 @@ function CaptivePortalInner({
 
       CaptivePortalToaster.clear();
       setConnecting(false);
+      setAp(true);
       onAP();
     } catch (err) {
       CaptivePortalToaster.show({

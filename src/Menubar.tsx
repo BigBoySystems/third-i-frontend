@@ -59,7 +59,12 @@ interface ConfigProps {
   config: api.Config;
 }
 
-type MenubarProps = PhotoMode & Network & ConfigProps;
+interface ApProps {
+  ap: boolean;
+  setAp: (value: boolean) => void;
+}
+
+type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
 type PanelProps = IPanelProps & MenubarProps;
 
 interface PictureProps {
@@ -550,7 +555,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   );
 }
 
-function SelectNetwork({ closePanel, setNetwork }: PanelProps) {
+function SelectNetwork({ closePanel, setNetwork, ap, setAp }: PanelProps) {
   return (
     <CaptivePortal
       onConnected={(essid) => {
@@ -561,6 +566,8 @@ function SelectNetwork({ closePanel, setNetwork }: PanelProps) {
         closePanel();
         setNetwork("");
       }}
+      ap={ap}
+      setAp={setAp}
       vertical
     />
   );

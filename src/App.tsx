@@ -52,6 +52,7 @@ function App() {
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [networkDialog, setNetworkDialog] = useState(false);
+  const [ap, setAp] = useState(true);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
   const [storage, setStorage] = useState({
@@ -70,6 +71,7 @@ function App() {
         .isPortal()
         .then(({ portal, essid }) => {
           setNetworkDialog(portal);
+          setAp(portal);
           setNetwork(essid || "");
           api.getConfig().then((config) => {
             setConfig(config);
@@ -128,6 +130,8 @@ function App() {
               setNetworkDialog(false);
               setNetwork("");
             }}
+            ap={ap}
+            setAp={setAp}
           />
         </Dialog>
         <Overlay
@@ -144,11 +148,13 @@ function App() {
                 photoMode={photoMode}
                 setPhotoMode={setPhotoMode}
                 setNetwork={setNetwork}
+                ap={ap}
+                setAp={setAp}
                 // We need this custom key because the props of the Settings component is in the state
                 // of the Menubar component (which makes the Settings not re-render)
                 //
                 // https://github.com/palantir/blueprint/issues/3173
-                key={`${photoMode}`}
+                key={`menubar-${photoMode}-${ap}`}
               />
             )}
           </div>
