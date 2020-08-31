@@ -79,8 +79,8 @@ function CaptivePortalInner({
     updateNetworks();
   };
 
-  const waitConnected = async (waitDisconnected?: boolean): Promise<boolean> => {
-    let res = true;
+  const waitConnected = async (waitDisconnected?: boolean): Promise<api.Portal> => {
+    let res: api.Portal = { portal: true, essid: null };
     let connected = waitDisconnected ? true : false;
     do {
       try {
@@ -94,7 +94,7 @@ function CaptivePortalInner({
     return res;
   };
 
-  const waitDisconnected = async (): Promise<boolean> => await waitConnected(true);
+  const waitDisconnected = async (): Promise<api.Portal> => await waitConnected(true);
 
   const connect = async (essid: string, password?: string) => {
     setConnecting(true);
@@ -132,11 +132,11 @@ function CaptivePortalInner({
         if (process.env.NODE_ENV !== "development") {
           await waitDisconnected();
         }
-        const isPortal = await waitConnected();
+        const portalInfo = await waitConnected();
         CaptivePortalToaster.clear();
         setConnecting(false);
 
-        if (!isPortal) {
+        if (!portalInfo.portal) {
           onConnected(essid);
         } else {
           onFailure(essid);

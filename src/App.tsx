@@ -68,8 +68,9 @@ function App() {
       setInitialized(true);
       api
         .isPortal()
-        .then((portal) => {
+        .then(({ portal, essid }) => {
           setNetworkDialog(portal);
+          setNetwork(essid || "");
           api.getConfig().then((config) => {
             setConfig(config);
           });

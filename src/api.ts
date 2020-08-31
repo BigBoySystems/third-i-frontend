@@ -2,6 +2,7 @@ const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
 export interface Portal {
   portal: boolean;
+  essid: string | null;
 }
 
 export interface Network {
@@ -59,10 +60,8 @@ export interface Config {
   ws_enabled: string;
 }
 
-export function isPortal(): Promise<boolean> {
-  return fetch(`${API_PREFIX}/portal`)
-    .then((resp) => resp.json())
-    .then((json: Portal) => json.portal);
+export function isPortal(): Promise<Portal> {
+  return fetch(`${API_PREFIX}/portal`).then((resp) => resp.json());
 }
 
 export function networks(): Promise<Network[]> {
