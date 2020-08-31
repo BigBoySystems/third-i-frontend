@@ -11,6 +11,7 @@ export interface Network {
 
 export interface Connect {
   success: boolean;
+  reason?: string;
 }
 
 export interface Storage {

@@ -48,7 +48,13 @@ function CaptivePortalInner({
     } else {
       api
         .networks()
-        .then((x) => setNetworks(x))
+        .then((networks) => {
+          networks.sort((a, b) => (a.essid < b.essid ? -1 : 1));
+          setNetworks(networks);
+          if (networks.length === 0) {
+            setTimeout(updateNetworks, 1000);
+          }
+        })
         .catch((err) => {
           console.log(err);
           setError(true);
@@ -73,20 +79,22 @@ function CaptivePortalInner({
     updateNetworks();
   };
 
-  const waitConnected = async (waitDisconnected?: boolean) => {
+  const waitConnected = async (waitDisconnected?: boolean): Promise<boolean> => {
+    let res = true;
     let connected = waitDisconnected ? true : false;
     do {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        await api.isPortal();
+        res = await api.isPortal();
         connected = true;
       } catch (err) {
         connected = false;
       }
     } while (waitDisconnected ? connected : !connected);
+    return res;
   };
 
-  const waitDisconnected = async () => await waitConnected(true);
+  const waitDisconnected = async (): Promise<boolean> => await waitConnected(true);
 
   const connect = async (essid: string, password?: string) => {
     setConnecting(true);
@@ -106,26 +114,31 @@ function CaptivePortalInner({
     } else {
       try {
         const res = await api.connect(essid, password);
-        if (res.success) {
-          CaptivePortalToaster.show({
-            message: (
-              <div>
-                <p>The Third-I device is now connected to "{essid}".</p>
-                <p>Please now connect your computer (or mobile device) to the same network.</p>
-              </div>
-            ),
-            intent: Intent.SUCCESS,
-            timeout: 0,
-          });
+        if (!res.success) {
+          throw new Error(res?.reason || "API call failed");
+        }
 
+        CaptivePortalToaster.show({
+          message: (
+            <div>
+              <p>The Third-I device is now connected to "{essid}".</p>
+              <p>Please now connect your computer (or mobile device) to the same network.</p>
+            </div>
+          ),
+          intent: Intent.SUCCESS,
+          timeout: 0,
+        });
+
+        if (process.env.NODE_ENV !== "development") {
           await waitDisconnected();
-          await waitConnected();
+        }
+        const isPortal = await waitConnected();
+        CaptivePortalToaster.clear();
+        setConnecting(false);
 
-          CaptivePortalToaster.clear();
-          setConnecting(false);
+        if (!isPortal) {
           onConnected(essid);
         } else {
-          setConnecting(false);
           onFailure(essid);
         }
       } catch (err) {
