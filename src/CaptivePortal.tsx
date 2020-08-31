@@ -101,51 +101,85 @@ function CaptivePortalInner({
     setError(false);
     setNetworks([]);
 
-    if (mockApi) {
-      setTimeout(() => {
-        setConnecting(false);
-
-        if (essid.startsWith("Ted")) {
-          onFailure(essid);
-        } else {
-          onConnected(essid);
-        }
-      }, 1500);
-    } else {
-      try {
+    try {
+      if (!mockApi) {
         const res = await api.connect(essid, password);
         if (!res.success) {
           throw new Error(res?.reason || "API call failed");
         }
-
-        CaptivePortalToaster.show({
-          message: (
-            <div>
-              <p>The Third-I device is now connected to "{essid}".</p>
-              <p>Please now connect your computer (or mobile device) to the same network.</p>
-            </div>
-          ),
-          intent: Intent.SUCCESS,
-          timeout: 0,
-        });
-
-        if (process.env.NODE_ENV !== "development") {
-          await waitDisconnected();
-        }
-        const portalInfo = await waitConnected();
-        CaptivePortalToaster.clear();
-        setConnecting(false);
-
-        if (!portalInfo.portal) {
-          onConnected(essid);
-        } else {
-          onFailure(essid);
-        }
-      } catch (err) {
-        console.log(err);
-        setError(true);
-        setConnecting(false);
       }
+
+      if (!mockApi && process.env.NODE_ENV !== "development") {
+        await waitDisconnected();
+      }
+
+      CaptivePortalToaster.show({
+        message: (
+          <div>
+            <p>The Third-I device is now connecting to "{essid}".</p>
+            <p>Please now connect your computer (or mobile device) to the same WiFi network.</p>
+            <ul>
+              <li>
+                If the connection works, this message should disappear by itself after your computer
+                (or mobile device) gets connected to the WiFi network.
+              </li>
+              <li>
+                If the connection failed, you will see the WiFi network "Third-I" reappearing in the
+                list of available WiFi.
+              </li>
+            </ul>
+            <p>
+              <strong>Note:</strong> you should be able to connect to the Third-I device on the same
+              URL if you are connected on the same WiFi network. You might want to refresh this page
+              if you encounter difficulties.
+            </p>
+          </div>
+        ),
+        intent: Intent.SUCCESS,
+        timeout: 0,
+      });
+
+      let portalInfo = undefined;
+      if (!mockApi) {
+        portalInfo = await waitConnected();
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
+        if (essid.startsWith("Ted")) {
+          portalInfo = {
+            portal: true,
+            network: null,
+          };
+        } else {
+          portalInfo = {
+            portalInfo: false,
+            network: essid,
+          };
+        }
+      }
+      CaptivePortalToaster.clear();
+      setConnecting(false);
+
+      if (!portalInfo.portal) {
+        onConnected(essid);
+      } else {
+        onFailure(essid);
+      }
+    } catch (err) {
+      CaptivePortalToaster.show({
+        message: (
+          <div>
+            <p>An error occured.</p>
+            <p>Please try again.</p>
+          </div>
+        ),
+        intent: Intent.DANGER,
+        timeout: 10000,
+      });
+
+      console.log(err);
+      setError(true);
+      setConnecting(false);
     }
   };
 
