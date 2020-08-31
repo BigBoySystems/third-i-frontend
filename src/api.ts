@@ -61,7 +61,10 @@ export interface Config {
 }
 
 export function isPortal(): Promise<Portal> {
-  return fetch(`${API_PREFIX}/portal`).then((resp) => resp.json());
+  const controller = new AbortController();
+  const signal = controller.signal;
+  setTimeout(() => controller.abort(), 5000);
+  return fetch(`${API_PREFIX}/portal`, { signal }).then((resp) => resp.json());
 }
 
 export function networks(): Promise<Network[]> {

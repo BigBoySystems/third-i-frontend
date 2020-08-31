@@ -51,7 +51,7 @@ function CaptivePortalInner({
         .then((networks) => {
           networks.sort((a, b) => (a.essid < b.essid ? -1 : 1));
           setNetworks(networks);
-          if (networks.length === 0) {
+          if (networks.length === 0 && !connecting) {
             setTimeout(updateNetworks, 1000);
           }
         })
@@ -60,7 +60,7 @@ function CaptivePortalInner({
           setError(true);
         });
     }
-  }, [mockApi]);
+  }, [mockApi, connecting]);
 
   const onFailure = (essid: string) => {
     CaptivePortalToaster.show({
