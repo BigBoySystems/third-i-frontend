@@ -73,7 +73,22 @@ function CaptivePortalInner({
     updateNetworks();
   };
 
-  const connect = (essid: string, password?: string) => {
+  const waitConnected = async (waitDisconnected?: boolean) => {
+    let connected = waitDisconnected ? true : false;
+    do {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await api.isPortal();
+        connected = true;
+      } catch (err) {
+        connected = false;
+      }
+    } while (waitDisconnected ? connected : !connected);
+  };
+
+  const waitDisconnected = async () => await waitConnected(true);
+
+  const connect = async (essid: string, password?: string) => {
     setConnecting(true);
     setError(false);
     setNetworks([]);
@@ -89,22 +104,35 @@ function CaptivePortalInner({
         }
       }, 1500);
     } else {
-      api
-        .connect(essid, password)
-        .then((res) => {
-          setConnecting(false);
+      try {
+        const res = await api.connect(essid, password);
+        if (res.success) {
+          CaptivePortalToaster.show({
+            message: (
+              <div>
+                <p>The Third-I device is now connected to "{essid}".</p>
+                <p>Please now connect your computer (or mobile device) to the same network.</p>
+              </div>
+            ),
+            intent: Intent.SUCCESS,
+            timeout: 0,
+          });
 
-          if (res.success) {
-            onConnected(essid);
-          } else {
-            onFailure(essid);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          setError(true);
+          await waitDisconnected();
+          await waitConnected();
+
+          CaptivePortalToaster.clear();
           setConnecting(false);
-        });
+          onConnected(essid);
+        } else {
+          setConnecting(false);
+          onFailure(essid);
+        }
+      } catch (err) {
+        console.log(err);
+        setError(true);
+        setConnecting(false);
+      }
     }
   };
 

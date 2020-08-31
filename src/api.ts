@@ -1,4 +1,4 @@
-const API_PREFIX = "/api";
+const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
 export interface Portal {
   portal: boolean;
@@ -58,7 +58,7 @@ export interface Config {
   ws_enabled: string;
 }
 
-export function isPortal() {
+export function isPortal(): Promise<boolean> {
   return fetch(`${API_PREFIX}/portal`)
     .then((resp) => resp.json())
     .then((json: Portal) => json.portal);
