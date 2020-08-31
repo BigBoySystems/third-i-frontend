@@ -51,7 +51,7 @@ function App() {
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
-  const [networkDialog, setNetworkDialog] = useState(true);
+  const [networkDialog, setNetworkDialog] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
   const [storage, setStorage] = useState({
