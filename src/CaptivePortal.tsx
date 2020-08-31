@@ -183,6 +183,69 @@ function CaptivePortalInner({
     }
   };
 
+  const startAp = async () => {
+    setConnecting(true);
+    setError(false);
+    setNetworks([]);
+
+    try {
+      if (!mockApi) {
+        await api.startAp();
+      }
+
+      if (!mockApi && process.env.NODE_ENV !== "development") {
+        await waitDisconnected();
+      }
+
+      CaptivePortalToaster.show({
+        message: (
+          <div>
+            <p>The Third-I device is now using its own WiFi network.</p>
+            <p>Please now connect your computer (or mobile device) to the Third-I WiFi network.</p>
+            <p>
+              When the access point is ready, this message should disappear by itself after your
+              computer (or mobile device) gets connected to the Third-I WiFi network.
+            </p>
+            <p>
+              <strong>Note:</strong> you should be able to connect to the Third-I device on the same
+              URL if you are connected on the same WiFi network. You might want to refresh this page
+              if you encounter difficulties.
+            </p>
+          </div>
+        ),
+        intent: Intent.SUCCESS,
+        timeout: 0,
+      });
+
+      if (!mockApi) {
+        await waitConnected();
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        // NOTE: uncomment this to simulate an error
+        //throw new Error("boo");
+      }
+
+      CaptivePortalToaster.clear();
+      setConnecting(false);
+      onAP();
+    } catch (err) {
+      CaptivePortalToaster.show({
+        message: (
+          <div>
+            <p>An error occured.</p>
+            <p>Please try again.</p>
+          </div>
+        ),
+        intent: Intent.DANGER,
+        timeout: 10000,
+      });
+
+      console.log(err);
+      setError(true);
+      setConnecting(false);
+    }
+  };
+
   useEffect(() => {
     if (!initialized) {
       updateNetworks();
@@ -227,13 +290,7 @@ function CaptivePortalInner({
             <Button text="Hidden network..." />
             <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
           </Popover>
-          <Button
-            text="Use access point"
-            onClick={() => {
-              api.startAp();
-              onAP();
-            }}
-          />
+          <Button text="Use access point" onClick={startAp} />
           <Button text="Refresh" onClick={updateNetworks} />
         </ButtonGroup>
       </div>
