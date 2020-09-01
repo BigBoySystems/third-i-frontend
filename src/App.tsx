@@ -217,6 +217,9 @@ function App() {
                   setShutter(true);
                   setTimeout(() => setShutter(false), 1000);
                 } else {
+                  api.updateConfig({
+                    record_enabled: recording ? "0" : "1",
+                  });
                   setRecording(!recording);
                 }
               }}
