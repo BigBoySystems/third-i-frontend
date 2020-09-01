@@ -115,3 +115,17 @@ export function getConfig(): Promise<Config> {
 export function getFiles(): Promise<File> {
   return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
 }
+
+export function makePhoto(): Promise<string> {
+  const data = {};
+
+  return fetch(`${API_PREFIX}/make-photo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((resp) => resp.json())
+    .then((data) => data.filename);
+}

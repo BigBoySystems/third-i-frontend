@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Overlay, Classes, Dialog, Icon } from "@blueprintjs/core";
+import { Overlay, Classes, Dialog, Icon, Toaster, Intent } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
@@ -199,6 +199,21 @@ function App() {
               iconSize={iconSize}
               onClick={() => {
                 if (photoMode) {
+                  const apiCall = mockApiDetected
+                    ? Promise.resolve("super-cool-pic.jpeg")
+                    : api.makePhoto();
+
+                  apiCall.then((filename) => {
+                    AppToaster.show({
+                      message: (
+                        <div>
+                          <p>Photo taken: {filename}</p>
+                        </div>
+                      ),
+                      intent: Intent.SUCCESS,
+                      timeout: 2000,
+                    });
+                  });
                   setShutter(true);
                   setTimeout(() => setShutter(false), 1000);
                 } else {
@@ -219,6 +234,8 @@ function App() {
     </MockApi.Provider>
   );
 }
+
+const AppToaster = Toaster.create({});
 
 const CONFIG_SAMPLE: api.Config = {
   photo_resolution: "",
