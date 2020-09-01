@@ -95,6 +95,7 @@ function Menubar(props: MenubarProps) {
 function Settings({ openPanel, closePanel, ...props }: PanelProps) {
   const { photoMode, setPhotoMode } = props;
   const [viewAngleSquare, setViewAngleSquare] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(props.config.audio_enabled === "1");
 
   return (
     <Menu>
@@ -114,7 +115,15 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
         text="Streaming settings"
         onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
       />
-      <MenuItem icon="headset" text="Audio" labelElement="Enabled" disabled />
+      <MenuItem
+        icon="headset"
+        text="Audio"
+        labelElement={audioEnabled ? "Enabled" : "Disabled"}
+        onClick={() => {
+          api.updateConfig({ audio_enabled: audioEnabled ? "0" : "1" });
+          setAudioEnabled(!audioEnabled);
+        }}
+      />
       <MenuItem
         icon="square"
         text="Viewing angle"
