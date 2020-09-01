@@ -80,8 +80,8 @@ function App() {
         .catch(() => {
           if (process.env.REACT_APP_MOCK_API === "true" || process.env.NODE_ENV === "development") {
             setMockApi(true);
-            // NOTE: comment the line below if you want to work on the CaptivePortal dialog
-            setNetworkDialog(false);
+            // NOTE: uncomment the line below if you want to work on the CaptivePortal dialog
+            //setNetworkDialog(true);
             setConfig(CONFIG_SAMPLE);
           }
         });
