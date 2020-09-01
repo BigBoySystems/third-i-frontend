@@ -44,6 +44,8 @@ function connect() {
 
 export const MockApi = React.createContext(false);
 
+export const unixTime = () => Math.floor(Date.now() / 1000);
+
 function App() {
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
 
@@ -59,10 +61,11 @@ function App() {
     used: 300000000,
     total: 16000000000,
   } as api.Storage);
-  const [recording, setRecording] = useState(false);
+  const [recording, setRecording] = useState<ReturnType<typeof setInterval> | undefined>(undefined);
   const [shutter, setShutter] = useState(false);
   const [mockApiDetected, setMockApi] = useState(false);
   const [config, setConfig] = useState<api.Config | undefined>(undefined);
+  const [recordingTime, setRecordingTime] = useState([0, 0]);
 
   useEffect(() => {
     if (!initialized) {
@@ -99,6 +102,7 @@ function App() {
   const total = numeral(storage.total);
   const pct = numeral(storage.used / storage.total);
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
+  const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
 
   return (
     // According to the documentation:
@@ -195,7 +199,7 @@ function App() {
           </div>
           <div className="App-bottom-center">
             <Icon
-              icon={recording ? "stop" : photoMode ? "camera" : "mobile-video"}
+              icon={recording !== undefined ? "stop" : photoMode ? "camera" : "mobile-video"}
               iconSize={iconSize}
               onClick={() => {
                 if (photoMode) {
@@ -218,20 +222,27 @@ function App() {
                   setTimeout(() => setShutter(false), 1000);
                 } else {
                   api.updateConfig({
-                    record_enabled: recording ? "0" : "1",
+                    record_enabled: recording === undefined ? "1" : "0",
                   });
-                  setRecording(!recording);
+                  if (recording === undefined) {
+                    const start = unixTime();
+                    setRecording(setInterval(() => setRecordingTime([start, unixTime()]), 1000));
+                    setRecordingTime([start, start]);
+                  } else {
+                    clearInterval(recording);
+                    setRecording(undefined);
+                  }
                 }
               }}
             />
-            <div className="App-timestamp">01:14:56</div>
+            <div className="App-timestamp">{formattedRecordingTime}</div>
           </div>
           <div className="App-bottom-right">
             <Icon icon="globe-network" iconSize={iconSize} />
             {network || "Access Point"}
           </div>
         </div>
-        {recording && <div className="App-recording-frame" />}
+        {recording !== undefined && <div className="App-recording-frame" />}
         {shutter && <div className="App-shutter" />}
       </div>
     </MockApi.Provider>
