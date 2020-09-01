@@ -23,7 +23,8 @@ function Filemanager() {
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState(fromApi(SAMPLE_FILES));
   const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
-  const [deleteFile, setDeleteFile] = useState<api.File | undefined>(undefined);
+  const [newName, setNewName] = useState("");
+  const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
 
   useEffect(() => {
@@ -68,19 +69,41 @@ function Filemanager() {
 
   const handleContextMenu = (
     { label, nodeData }: ITreeNode<api.File>,
-    _nodePath: number[],
+    nodePath: number[],
     e: React.MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
+    if (nodeData === undefined) {
+      throw new Error("assertion: nodeData must not be undefined");
+    }
+
     ContextMenu.show(
       <Menu>
         <MenuDivider title={label} />
-        {!nodeData?.directory && (
-          <MenuItem text="Preview" icon="eye-open" href={`${nodeData?.url}?preview`} />
+        {!nodeData.directory && (
+          <MenuItem
+            text="Preview"
+            icon="eye-open"
+            href={`${nodeData?.url}?disposition=inline`}
+            target="_blank"
+          />
         )}
-        {!nodeData?.directory && <MenuItem text="Download" icon="download" href={nodeData?.url} />}
-        <MenuItem text="Rename" icon="edit" onClick={() => setRenameFile(nodeData)} />
-        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile(nodeData)} />
+        {!nodeData.directory && (
+          <MenuItem
+            text="Download"
+            icon="download"
+            href={`${nodeData.url}?disposition=attachment`}
+          />
+        )}
+        <MenuItem
+          text="Rename"
+          icon="edit"
+          onClick={() => {
+            setRenameFile(nodeData);
+            setNewName(nodeData.name);
+          }}
+        />
+        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile([nodeData, nodePath])} />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},
@@ -99,15 +122,40 @@ function Filemanager() {
         className={Classes.ELEVATION_0}
       />
       <Alert
-        isOpen={!!deleteFile}
+        isOpen={deleteFile !== undefined}
         onCancel={() => setDeleteFile(undefined)}
         onConfirm={() => {
-          FilemanagerToaster.show({
-            message: <div>"{deleteFile?.name}" has been deleted.</div>,
-            className: "bp3-dark bp3-large bp3-text-large",
-            timeout: 3000,
-          });
+          if (deleteFile === undefined) {
+            throw new Error("assertion error: must not be undefined");
+          }
+
           setDeleteFile(undefined);
+
+          fetch(deleteFile[0].url, {
+            method: "DELETE",
+          })
+            .then((resp) => resp.json())
+            .then((data: api.Response) => {
+              if (data?.success) {
+                FilemanagerToaster.show({
+                  message: <div>"{deleteFile[0].name}" has been deleted.</div>,
+                  className: "bp3-dark bp3-large bp3-text-large",
+                  timeout: 3000,
+                });
+              } else {
+                FilemanagerToaster.show({
+                  message: (
+                    <div>
+                      <p>Could not delete file "{deleteFile[0].name}".</p>
+                      {data?.reason && <p>{data?.reason}</p>}
+                    </div>
+                  ),
+                  className: "bp3-dark bp3-large bp3-text-large",
+                  timeout: 3000,
+                  intent: Intent.DANGER,
+                });
+              }
+            });
         }}
         className="bp3-dark bp3-large bp3-text-large"
         icon="trash"
@@ -115,18 +163,50 @@ function Filemanager() {
         confirmButtonText="Move to Trash"
         intent={Intent.DANGER}
       >
-        <p>Are you sure you want to delete "{deleteFile?.name}"?</p>
+        <p>Are you sure you want to delete "{deleteFile && deleteFile[0].name}"?</p>
       </Alert>
       <Alert
-        isOpen={!!renameFile}
+        isOpen={renameFile !== undefined}
         onCancel={() => setRenameFile(undefined)}
         onConfirm={() => {
-          FilemanagerToaster.show({
-            message: <div>"{renameFile?.name}" has been renamed.</div>,
-            className: "bp3-dark bp3-large bp3-text-large",
-            timeout: 3000,
-          });
+          if (renameFile === undefined) {
+            throw new Error("assertion error: must not be undefined");
+          }
+
           setRenameFile(undefined);
+
+          const body = {
+            dst: `${renameFile.path}/${newName}`,
+          };
+          fetch(renameFile.url, {
+            method: "PATCH",
+            body: JSON.stringify(body),
+            headers: {
+              "Content-Type": "application/json;charset=utf-8",
+            },
+          })
+            .then((resp) => resp.json())
+            .then((data: api.Response) => {
+              if (data?.success) {
+                FilemanagerToaster.show({
+                  message: <div>"{renameFile.name}" has been renamed.</div>,
+                  className: "bp3-dark bp3-large bp3-text-large",
+                  timeout: 3000,
+                });
+              } else {
+                FilemanagerToaster.show({
+                  message: (
+                    <div>
+                      <p>Could not rename file "{renameFile.name}".</p>
+                      {data?.reason && <p>{data?.reason}</p>}
+                    </div>
+                  ),
+                  className: "bp3-dark bp3-large bp3-text-large",
+                  timeout: 3000,
+                  intent: Intent.DANGER,
+                });
+              }
+            });
         }}
         className="bp3-dark bp3-large bp3-text-large"
         icon="edit"
@@ -137,7 +217,12 @@ function Filemanager() {
         <Label>
           New file name
           <ControlGroup>
-            <InputGroup placeholder="File name" fill defaultValue={renameFile?.name} />
+            <InputGroup
+              placeholder="File name"
+              fill
+              defaultValue={newName}
+              onChange={(ev: any) => setNewName(ev.target.value)}
+            />
           </ControlGroup>
         </Label>
       </Alert>
@@ -160,16 +245,19 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
 
 const SAMPLE_FILES: api.File = {
   name: "/",
+  path: "",
   url: "/files",
   directory: true,
   children: [
     {
       name: "Dir 1",
+      path: "",
       url: "/files/dir1",
       directory: true,
       children: [
         {
           name: "File 3",
+          path: "dir1",
           url: "/files/dir1/file3",
           directory: false,
           children: [],
@@ -178,6 +266,7 @@ const SAMPLE_FILES: api.File = {
     },
     {
       name: "File 2",
+      path: "",
       url: "/files/file2",
       directory: false,
       children: [],

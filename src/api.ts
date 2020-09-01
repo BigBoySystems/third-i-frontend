@@ -10,10 +10,12 @@ export interface Network {
   password: boolean;
 }
 
-export interface Connect {
+export interface Response {
   success: boolean;
   reason?: string;
 }
+
+export interface Connect extends Response {}
 
 export interface Storage {
   used: number;
@@ -22,6 +24,7 @@ export interface Storage {
 
 export interface File {
   name: string;
+  path: string;
   url: string;
   directory: boolean;
   children: File[];
