@@ -85,9 +85,9 @@
   height: 100vh;
   top: 0;
   left: 0;
-  border: 5px solid red;
+  border: 2px solid red;
   pointer-events: none;
-  animation: pulse 1.5s infinite;
+  animation: pulse 3s infinite;
 }
 
 .App-shutter {

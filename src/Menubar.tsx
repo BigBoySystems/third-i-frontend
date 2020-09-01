@@ -348,7 +348,7 @@ function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
         />
         <MenuItem
           icon="globe-network"
-          text="Wifi-settings"
+          text="Wifi settings"
           onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
         />
       </Menu>
