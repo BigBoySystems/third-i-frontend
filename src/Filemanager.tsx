@@ -32,7 +32,7 @@ function FilemanagerInner({
   mockApi,
 }: MockApi) {
   const [initialized, setInitialized] = useState(false);
-  const [nodes, setNodes] = useState(fromApi(SAMPLE_FILES));
+  const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
   const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
   const [newName, setNewName] = useState("");
   const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
