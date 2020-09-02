@@ -16,10 +16,21 @@ import {
 } from "@blueprintjs/core";
 import "./Filemanager.css";
 import * as api from "./api";
+import { MockApi } from "./App";
 
 const FilemanagerToaster = Toaster.create({});
 
 function Filemanager() {
+  return (
+    <MockApi.Consumer>
+      {(mockApi) => <FilemanagerInner mockApi={mockApi}  />}
+    </MockApi.Consumer>
+  );
+}
+
+function FilemanagerInner({
+  mockApi,
+}: MockApi) {
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState(fromApi(SAMPLE_FILES));
   const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
