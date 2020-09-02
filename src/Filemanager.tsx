@@ -41,12 +41,16 @@ function FilemanagerInner({
   useEffect(() => {
     if (!initialized) {
       setInitialized(true);
+      if (mockApi) {
+        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 1500);
+      } else {
       api
         .getFiles()
         .then((root) => setNodes(fromApi(root)))
         .catch((err) => console.log("Could not load files from API:", err));
-    }
-  }, [initialized]);
+      }
+      }
+  }, [initialized, mockApi]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
     for (const node of nodes) {
@@ -270,6 +274,28 @@ const SAMPLE_FILES: api.File = {
           name: "File 3",
           path: "dir1",
           url: "/files/dir1/file3",
+          directory: false,
+          children: [],
+        },
+      ],
+    },
+    {
+      name: "Dir 2",
+      path: "",
+      url: "/files/dir2",
+      directory: true,
+      children: [
+        {
+          name: "File 4",
+          path: "dir2",
+          url: "/files/dir2/file4",
+          directory: false,
+          children: [],
+        },
+        {
+          name: "File 5",
+          path: "dir2",
+          url: "/files/dir2/file5",
           directory: false,
           children: [],
         },
