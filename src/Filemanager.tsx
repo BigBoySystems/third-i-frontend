@@ -88,26 +88,23 @@ function FilemanagerInner({
     e: React.MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
-    if (node === undefined) {
-      throw new Error("assertion: nodeData must not be undefined");
-    }
 
     ContextMenu.show(
       <Menu>
         <MenuDivider title={node.label} />
-        {!node.nodeData?.directory && (
+        {!node.nodeData!.directory && (
           <MenuItem
             text="Preview"
             icon="eye-open"
-            href={`${node.nodeData?.url}?disposition=inline`}
+            href={`${node.nodeData!.url}?disposition=inline`}
             target="_blank"
           />
         )}
-        {!node.nodeData?.directory && (
+        {!node.nodeData!.directory && (
           <MenuItem
             text="Download"
             icon="download"
-            href={`${node.nodeData?.url}?disposition=attachment`}
+            href={`${node.nodeData!.url}?disposition=attachment`}
           />
         )}
         <MenuItem
@@ -151,7 +148,7 @@ function FilemanagerInner({
           })
             .then((resp) => resp.json())
             .then((data: api.Response) => {
-              if (data?.success) {
+              if (data!.success) {
                 FilemanagerToaster.show({
                   message: <div>"{deleteFile[0].name}" has been deleted.</div>,
                   className: "bp3-dark bp3-large bp3-text-large",
@@ -162,7 +159,7 @@ function FilemanagerInner({
                   message: (
                     <div>
                       <p>Could not delete file "{deleteFile[0].name}".</p>
-                      {data?.reason && <p>{data?.reason}</p>}
+                      {data!.reason && <p>{data!.reason}</p>}
                     </div>
                   ),
                   className: "bp3-dark bp3-large bp3-text-large",
@@ -191,7 +188,7 @@ function FilemanagerInner({
           setRenameFile(undefined);
 
           const body = {
-            dst: `${renameFile.nodeData?.path}/${newName}`,
+            dst: `${renameFile.nodeData!.path}/${newName}`,
           };
           fetch(renameFile.nodeData!.url, {
             method: "PATCH",
@@ -202,9 +199,9 @@ function FilemanagerInner({
           })
             .then((resp) => resp.json())
             .then((data: api.Response) => {
-              if (data?.success) {
+              if (data!.success) {
                 FilemanagerToaster.show({
-                  message: <div>"{renameFile.nodeData?.name}" has been renamed.</div>,
+                  message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
                   className: "bp3-dark bp3-large bp3-text-large",
                   timeout: 3000,
                 });
@@ -214,8 +211,8 @@ function FilemanagerInner({
                 FilemanagerToaster.show({
                   message: (
                     <div>
-                      <p>Could not rename file "{renameFile.nodeData?.name}".</p>
-                      {data?.reason && <p>{data?.reason}</p>}
+                      <p>Could not rename file "{renameFile.nodeData!.name}".</p>
+                      {data!.reason && <p>{data!.reason}</p>}
                     </div>
                   ),
                   className: "bp3-dark bp3-large bp3-text-large",
