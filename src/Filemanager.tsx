@@ -33,7 +33,7 @@ function FilemanagerInner({
 }: MockApi) {
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
-  const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
+  const [renameFile, setRenameFile] = useState<ITreeNode<api.File> | undefined>(undefined);
   const [newName, setNewName] = useState("");
   const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
@@ -60,15 +60,15 @@ function FilemanagerInner({
   };
 
   const handleNodeClick = (
-    nodeData: ITreeNode,
+    node: ITreeNode<api.File>,
     _nodePath: number[],
     e: React.MouseEvent<HTMLElement>
   ) => {
-    const originallySelected = nodeData.isSelected;
+    const originallySelected = node.isSelected;
     if (!e.shiftKey) {
       forEachNode(nodes, (n) => (n.isSelected = false));
     }
-    nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+    node.isSelected = originallySelected == null ? true : !originallySelected;
     refreshContents();
   };
 
@@ -83,42 +83,42 @@ function FilemanagerInner({
   };
 
   const handleContextMenu = (
-    { label, nodeData }: ITreeNode<api.File>,
+    node: ITreeNode<api.File>,
     nodePath: number[],
     e: React.MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
-    if (nodeData === undefined) {
+    if (node === undefined) {
       throw new Error("assertion: nodeData must not be undefined");
     }
 
     ContextMenu.show(
       <Menu>
-        <MenuDivider title={label} />
-        {!nodeData.directory && (
+        <MenuDivider title={node.label} />
+        {!node.nodeData?.directory && (
           <MenuItem
             text="Preview"
             icon="eye-open"
-            href={`${nodeData?.url}?disposition=inline`}
+            href={`${node.nodeData?.url}?disposition=inline`}
             target="_blank"
           />
         )}
-        {!nodeData.directory && (
+        {!node.nodeData?.directory && (
           <MenuItem
             text="Download"
             icon="download"
-            href={`${nodeData.url}?disposition=attachment`}
+            href={`${node.nodeData?.url}?disposition=attachment`}
           />
         )}
         <MenuItem
           text="Rename"
           icon="edit"
           onClick={() => {
-            setRenameFile(nodeData);
-            setNewName(nodeData.name);
+            setRenameFile(node);
+            setNewName(node.nodeData!.name);
           }}
         />
-        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile([nodeData, nodePath])} />
+        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile([node.nodeData!, nodePath])} />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},
@@ -191,9 +191,9 @@ function FilemanagerInner({
           setRenameFile(undefined);
 
           const body = {
-            dst: `${renameFile.path}/${newName}`,
+            dst: `${renameFile.nodeData?.path}/${newName}`,
           };
-          fetch(renameFile.url, {
+          fetch(renameFile.nodeData!.url, {
             method: "PATCH",
             body: JSON.stringify(body),
             headers: {
@@ -204,15 +204,17 @@ function FilemanagerInner({
             .then((data: api.Response) => {
               if (data?.success) {
                 FilemanagerToaster.show({
-                  message: <div>"{renameFile.name}" has been renamed.</div>,
+                  message: <div>"{renameFile.nodeData?.name}" has been renamed.</div>,
                   className: "bp3-dark bp3-large bp3-text-large",
                   timeout: 3000,
                 });
+                renameFile.label = newName;
+                refreshContents();
               } else {
                 FilemanagerToaster.show({
                   message: (
                     <div>
-                      <p>Could not rename file "{renameFile.name}".</p>
+                      <p>Could not rename file "{renameFile.nodeData?.name}".</p>
                       {data?.reason && <p>{data?.reason}</p>}
                     </div>
                   ),
