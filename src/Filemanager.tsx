@@ -190,7 +190,10 @@ function FilemanagerInner({
           const body = {
             dst: `${renameFile.nodeData!.path}/${newName}`,
           };
-          fetch(renameFile.nodeData!.url, {
+          const apiCall = new Promise((resolve) => setTimeout(
+            () => resolve({ success: true }), 1500)
+          )
+          /*const apiCall = fetch(renameFile.nodeData!.url, {
             method: "PATCH",
             body: JSON.stringify(body),
             headers: {
@@ -198,7 +201,9 @@ function FilemanagerInner({
             },
           })
             .then((resp) => resp.json())
-            .then((data: api.Response) => {
+          */
+          apiCall
+            .then((data: any) => {
               if (data!.success) {
                 FilemanagerToaster.show({
                   message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
