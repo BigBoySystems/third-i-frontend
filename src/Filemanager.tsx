@@ -21,16 +21,10 @@ import { MockApi } from "./App";
 const FilemanagerToaster = Toaster.create({});
 
 function Filemanager() {
-  return (
-    <MockApi.Consumer>
-      {(mockApi) => <FilemanagerInner mockApi={mockApi}  />}
-    </MockApi.Consumer>
-  );
+  return <MockApi.Consumer>{(mockApi) => <FilemanagerInner mockApi={mockApi} />}</MockApi.Consumer>;
 }
 
-function FilemanagerInner({
-  mockApi,
-}: MockApi) {
+function FilemanagerInner({ mockApi }: MockApi) {
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
   const [renameFile, setRenameFile] = useState<ITreeNode<api.File> | undefined>(undefined);
@@ -44,12 +38,12 @@ function FilemanagerInner({
       if (mockApi) {
         setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 1500);
       } else {
-      api
-        .getFiles()
-        .then((root) => setNodes(fromApi(root)))
-        .catch((err) => console.log("Could not load files from API:", err));
+        api
+          .getFiles()
+          .then((root) => setNodes(fromApi(root)))
+          .catch((err) => console.log("Could not load files from API:", err));
       }
-      }
+    }
   }, [initialized, mockApi]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
@@ -115,7 +109,11 @@ function FilemanagerInner({
             setNewName(node.nodeData!.name);
           }}
         />
-        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile([node.nodeData!, nodePath])} />
+        <MenuItem
+          text="Delete"
+          icon="trash"
+          onClick={() => setDeleteFile([node.nodeData!, nodePath])}
+        />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},
@@ -190,42 +188,38 @@ function FilemanagerInner({
           const body = {
             dst: `${renameFile.nodeData!.path}/${newName}`,
           };
-          const apiCall = new Promise((resolve) => setTimeout(
-            () => resolve({ success: true }), 1500)
-          )
-          /*const apiCall = fetch(renameFile.nodeData!.url, {
-            method: "PATCH",
-            body: JSON.stringify(body),
-            headers: {
-              "Content-Type": "application/json;charset=utf-8",
-            },
-          })
-            .then((resp) => resp.json())
-          */
-          apiCall
-            .then((data: any) => {
-              if (data!.success) {
-                FilemanagerToaster.show({
-                  message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                });
-                renameFile.label = newName;
-                refreshContents();
-              } else {
-                FilemanagerToaster.show({
-                  message: (
-                    <div>
-                      <p>Could not rename file "{renameFile.nodeData!.name}".</p>
-                      {data!.reason && <p>{data!.reason}</p>}
-                    </div>
-                  ),
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                  intent: Intent.DANGER,
-                });
-              }
-            });
+          const apiCall = mockApi
+            ? new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500))
+            : fetch(renameFile.nodeData!.url, {
+                method: "PATCH",
+                body: JSON.stringify(body),
+                headers: {
+                  "Content-Type": "application/json;charset=utf-8",
+                },
+              }).then((resp) => resp.json());
+          apiCall.then((data: any) => {
+            if (data!.success) {
+              FilemanagerToaster.show({
+                message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+              });
+              renameFile.label = newName;
+              refreshContents();
+            } else {
+              FilemanagerToaster.show({
+                message: (
+                  <div>
+                    <p>Could not rename file "{renameFile.nodeData!.name}".</p>
+                    {data!.reason && <p>{data!.reason}</p>}
+                  </div>
+                ),
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+                intent: Intent.DANGER,
+              });
+            }
+          });
         }}
         className="bp3-dark bp3-large bp3-text-large"
         icon="edit"
