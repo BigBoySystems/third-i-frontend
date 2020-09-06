@@ -205,6 +205,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
                 timeout: 3000,
               });
               renameFile.label = newName;
+              renameFile.nodeData!.name = newName;
               refreshContents();
             } else {
               FilemanagerToaster.show({
