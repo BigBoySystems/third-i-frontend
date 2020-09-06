@@ -16,13 +16,18 @@ import {
 } from "@blueprintjs/core";
 import "./Filemanager.css";
 import * as api from "./api";
+import { MockApi } from "./App";
 
 const FilemanagerToaster = Toaster.create({});
 
 function Filemanager() {
+  return <MockApi.Consumer>{(mockApi) => <FilemanagerInner mockApi={mockApi} />}</MockApi.Consumer>;
+}
+
+function FilemanagerInner({ mockApi }: MockApi) {
   const [initialized, setInitialized] = useState(false);
-  const [nodes, setNodes] = useState(fromApi(SAMPLE_FILES));
-  const [renameFile, setRenameFile] = useState<api.File | undefined>(undefined);
+  const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
+  const [renameFile, setRenameFile] = useState<ITreeNode<api.File> | undefined>(undefined);
   const [newName, setNewName] = useState("");
   const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
@@ -30,12 +35,16 @@ function Filemanager() {
   useEffect(() => {
     if (!initialized) {
       setInitialized(true);
-      api
-        .getFiles()
-        .then((root) => setNodes(fromApi(root)))
-        .catch((err) => console.log("Could not load files from API:", err));
+      if (mockApi) {
+        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 1500);
+      } else {
+        api
+          .getFiles()
+          .then((root) => setNodes(fromApi(root)))
+          .catch((err) => console.log("Could not load files from API:", err));
+      }
     }
-  }, [initialized]);
+  }, [initialized, mockApi]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
     for (const node of nodes) {
@@ -45,15 +54,15 @@ function Filemanager() {
   };
 
   const handleNodeClick = (
-    nodeData: ITreeNode,
+    node: ITreeNode<api.File>,
     _nodePath: number[],
     e: React.MouseEvent<HTMLElement>
   ) => {
-    const originallySelected = nodeData.isSelected;
+    const originallySelected = node.isSelected;
     if (!e.shiftKey) {
       forEachNode(nodes, (n) => (n.isSelected = false));
     }
-    nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+    node.isSelected = originallySelected == null ? true : !originallySelected;
     refreshContents();
   };
 
@@ -68,42 +77,43 @@ function Filemanager() {
   };
 
   const handleContextMenu = (
-    { label, nodeData }: ITreeNode<api.File>,
+    node: ITreeNode<api.File>,
     nodePath: number[],
     e: React.MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
-    if (nodeData === undefined) {
-      throw new Error("assertion: nodeData must not be undefined");
-    }
 
     ContextMenu.show(
       <Menu>
-        <MenuDivider title={label} />
-        {!nodeData.directory && (
+        <MenuDivider title={node.label} />
+        {!node.nodeData!.directory && (
           <MenuItem
             text="Preview"
             icon="eye-open"
-            href={`${nodeData?.url}?disposition=inline`}
+            href={`${node.nodeData!.url}?disposition=inline`}
             target="_blank"
           />
         )}
-        {!nodeData.directory && (
+        {!node.nodeData!.directory && (
           <MenuItem
             text="Download"
             icon="download"
-            href={`${nodeData.url}?disposition=attachment`}
+            href={`${node.nodeData!.url}?disposition=attachment`}
           />
         )}
         <MenuItem
           text="Rename"
           icon="edit"
           onClick={() => {
-            setRenameFile(nodeData);
-            setNewName(nodeData.name);
+            setRenameFile(node);
+            setNewName(node.nodeData!.name);
           }}
         />
-        <MenuItem text="Delete" icon="trash" onClick={() => setDeleteFile([nodeData, nodePath])} />
+        <MenuItem
+          text="Delete"
+          icon="trash"
+          onClick={() => setDeleteFile([node.nodeData!, nodePath])}
+        />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},
@@ -136,7 +146,7 @@ function Filemanager() {
           })
             .then((resp) => resp.json())
             .then((data: api.Response) => {
-              if (data?.success) {
+              if (data!.success) {
                 FilemanagerToaster.show({
                   message: <div>"{deleteFile[0].name}" has been deleted.</div>,
                   className: "bp3-dark bp3-large bp3-text-large",
@@ -147,7 +157,7 @@ function Filemanager() {
                   message: (
                     <div>
                       <p>Could not delete file "{deleteFile[0].name}".</p>
-                      {data?.reason && <p>{data?.reason}</p>}
+                      {data!.reason && <p>{data!.reason}</p>}
                     </div>
                   ),
                   className: "bp3-dark bp3-large bp3-text-large",
@@ -176,37 +186,42 @@ function Filemanager() {
           setRenameFile(undefined);
 
           const body = {
-            dst: `${renameFile.path}/${newName}`,
+            dst: `${renameFile.nodeData!.path}/${newName}`,
           };
-          fetch(renameFile.url, {
-            method: "PATCH",
-            body: JSON.stringify(body),
-            headers: {
-              "Content-Type": "application/json;charset=utf-8",
-            },
-          })
-            .then((resp) => resp.json())
-            .then((data: api.Response) => {
-              if (data?.success) {
-                FilemanagerToaster.show({
-                  message: <div>"{renameFile.name}" has been renamed.</div>,
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                });
-              } else {
-                FilemanagerToaster.show({
-                  message: (
-                    <div>
-                      <p>Could not rename file "{renameFile.name}".</p>
-                      {data?.reason && <p>{data?.reason}</p>}
-                    </div>
-                  ),
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                  intent: Intent.DANGER,
-                });
-              }
-            });
+          const apiCall = mockApi
+            ? new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500))
+            : fetch(renameFile.nodeData!.url, {
+                method: "PATCH",
+                body: JSON.stringify(body),
+                headers: {
+                  "Content-Type": "application/json;charset=utf-8",
+                },
+              }).then((resp) => resp.json());
+
+          apiCall.then((data: any) => {
+            if (data!.success) {
+              FilemanagerToaster.show({
+                message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+              });
+              renameFile.label = newName;
+              renameFile.nodeData!.name = newName;
+              refreshContents();
+            } else {
+              FilemanagerToaster.show({
+                message: (
+                  <div>
+                    <p>Could not rename file "{renameFile.nodeData!.name}".</p>
+                    {data!.reason && <p>{data!.reason}</p>}
+                  </div>
+                ),
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+                intent: Intent.DANGER,
+              });
+            }
+          });
         }}
         className="bp3-dark bp3-large bp3-text-large"
         icon="edit"
@@ -259,6 +274,28 @@ const SAMPLE_FILES: api.File = {
           name: "File 3",
           path: "dir1",
           url: "/files/dir1/file3",
+          directory: false,
+          children: [],
+        },
+      ],
+    },
+    {
+      name: "Dir 2",
+      path: "",
+      url: "/files/dir2",
+      directory: true,
+      children: [
+        {
+          name: "File 4",
+          path: "dir2",
+          url: "/files/dir2/file4",
+          directory: false,
+          children: [],
+        },
+        {
+          name: "File 5",
+          path: "dir2",
+          url: "/files/dir2/file5",
           directory: false,
           children: [],
         },
