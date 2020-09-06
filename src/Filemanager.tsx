@@ -197,7 +197,8 @@ function FilemanagerInner({ mockApi }: MockApi) {
                   "Content-Type": "application/json;charset=utf-8",
                 },
               }).then((resp) => resp.json());
-          apiCall.then((data: any) => {
+
+              apiCall.then((data: any) => {
             if (data!.success) {
               FilemanagerToaster.show({
                 message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
