@@ -53,6 +53,24 @@ function FilemanagerInner({ mockApi }: MockApi) {
     }
   };
 
+  const removeNode = (nodePath: number[]) => {
+    const [tail] = nodePath.splice(-1, 1);
+
+    if (nodePath.length === 0) {
+      nodes.splice(tail, 1);
+    } else {
+      const node = getNodeFromPath(nodes, nodePath);
+      const { childNodes } = node;
+
+      if (childNodes === undefined) {
+        throw new Error("assertion: childNodes must not be undefined");
+      }
+      childNodes.splice(tail, 1);
+    }
+
+    refreshContents();
+  };
+
   const handleNodeClick = (
     node: ITreeNode<api.File>,
     _nodePath: number[],
@@ -224,6 +242,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
                 className: "bp3-dark bp3-large bp3-text-large",
                 timeout: 3000,
               });
+              removeNode(deleteFile[1]);
             } else {
               FilemanagerToaster.show({
                 message: (
@@ -294,6 +313,38 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
   return root.children.map(transform);
 }
 
+function getNodeFromPath<T>(nodes: ITreeNode<T>[], path: number[]): ITreeNode<T> {
+  if (path.length === 0) {
+    throw new Error("assertion error: getNodeFromPath called with empty path");
+  }
+
+  const find = (root: ITreeNode<T>, path: number[]): ITreeNode<T> => {
+    const [i, ...rest] = path;
+
+    if (root.childNodes === undefined) {
+      throw new Error("assertion error: childNodes must not be undefined");
+    }
+
+    const node = root.childNodes[i];
+
+    if (rest.length === 0) {
+      return node;
+    } else if (node === undefined) {
+      throw new Error("assertion error: rest is not empty but node is undefined");
+    } else {
+      return find(node, rest);
+    }
+  };
+
+  const [i, ...rest] = path;
+
+  if (rest.length === 0) {
+    return nodes[i];
+  } else {
+    return find(nodes[i], rest);
+  }
+}
+
 const SAMPLE_FILES: api.File = {
   name: "/",
   path: "",
@@ -322,16 +373,38 @@ const SAMPLE_FILES: api.File = {
       directory: true,
       children: [
         {
-          name: "File 4",
+          name: "Dir 3",
           path: "dir2",
-          url: "/files/dir2/file4",
+          url: "/files/dir2/dir3",
+          directory: true,
+          children: [
+            {
+              name: "File 4",
+              path: "dir2/dir3",
+              url: "/files/dir2/dir3/file4",
+              directory: false,
+              children: [],
+            },
+            {
+              name: "File 5",
+              path: "dir2/dir3",
+              url: "/files/dir2/dir3/file5",
+              directory: false,
+              children: [],
+            },
+          ],
+        },
+        {
+          name: "File 6",
+          path: "dir2",
+          url: "/files/dir2/file6",
           directory: false,
           children: [],
         },
         {
-          name: "File 5",
+          name: "File 7",
           path: "dir2",
-          url: "/files/dir2/file5",
+          url: "/files/dir2/file7",
           directory: false,
           children: [],
         },
