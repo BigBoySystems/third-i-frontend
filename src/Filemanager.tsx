@@ -131,14 +131,14 @@ function FilemanagerInner({ mockApi }: MockApi) {
     const body = {
       dst: `${renameFile.nodeData!.path}/${newName}`,
     };
-    const apiCall = mockApi
+    const apiCall: Promise<api.RenameFile> = mockApi
       ? new Promise((resolve) =>
           setTimeout(
             () =>
               resolve({
                 success: true,
                 file: {
-                  ...renameFile.nodeData,
+                  ...(renameFile.nodeData as api.File),
                   name: newName,
                 },
               }),
@@ -203,31 +203,41 @@ function FilemanagerInner({ mockApi }: MockApi) {
 
           setDeleteFile(undefined);
 
-          fetch(deleteFile[0].url, {
-            method: "DELETE",
-          })
-            .then((resp) => resp.json())
-            .then((data: api.Response) => {
-              if (data!.success) {
-                FilemanagerToaster.show({
-                  message: <div>"{deleteFile[0].name}" has been deleted.</div>,
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                });
-              } else {
-                FilemanagerToaster.show({
-                  message: (
-                    <div>
-                      <p>Could not delete file "{deleteFile[0].name}".</p>
-                      {data!.reason && <p>{data!.reason}</p>}
-                    </div>
-                  ),
-                  className: "bp3-dark bp3-large bp3-text-large",
-                  timeout: 3000,
-                  intent: Intent.DANGER,
-                });
-              }
-            });
+          const apiCall: Promise<api.Response> = mockApi
+            ? new Promise((resolve) =>
+                setTimeout(
+                  () =>
+                    resolve({
+                      success: true,
+                    }),
+                  500
+                )
+              )
+            : fetch(deleteFile[0].url, {
+                method: "DELETE",
+              }).then((resp) => resp.json());
+
+          apiCall.then((data) => {
+            if (data!.success) {
+              FilemanagerToaster.show({
+                message: <div>"{deleteFile[0].name}" has been deleted.</div>,
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+              });
+            } else {
+              FilemanagerToaster.show({
+                message: (
+                  <div>
+                    <p>Could not delete file "{deleteFile[0].name}".</p>
+                    {data!.reason && <p>{data!.reason}</p>}
+                  </div>
+                ),
+                className: "bp3-dark bp3-large bp3-text-large",
+                timeout: 3000,
+                intent: Intent.DANGER,
+              });
+            }
+          });
         }}
         className="bp3-dark bp3-large bp3-text-large"
         icon="trash"

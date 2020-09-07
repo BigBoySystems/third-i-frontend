@@ -17,6 +17,10 @@ export interface Response {
 
 export interface Connect extends Response {}
 
+export interface RenameFile extends Response {
+  file: File;
+}
+
 export interface Storage {
   used: number;
   total: number;
