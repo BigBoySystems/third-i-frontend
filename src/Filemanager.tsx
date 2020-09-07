@@ -36,7 +36,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     if (!initialized) {
       setInitialized(true);
       if (mockApi) {
-        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 1500);
+        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 500);
       } else {
         api
           .getFiles()
@@ -121,6 +121,68 @@ function FilemanagerInner({ mockApi }: MockApi) {
     );
   };
 
+  const confirmRenameFile = () => {
+    if (renameFile === undefined) {
+      throw new Error("assertion error: must not be undefined");
+    }
+
+    setRenameFile(undefined);
+
+    const body = {
+      dst: `${renameFile.nodeData!.path}/${newName}`,
+    };
+    const apiCall = mockApi
+      ? new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                success: true,
+                file: {
+                  ...renameFile.nodeData,
+                  name: newName,
+                },
+              }),
+            500
+          )
+        )
+      : fetch(renameFile.nodeData!.url, {
+          method: "PATCH",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json;charset=utf-8",
+          },
+        }).then((resp) => resp.json());
+
+    apiCall.then((data: any) => {
+      if (data!.success) {
+        FilemanagerToaster.show({
+          message: (
+            <div>
+              "{renameFile.nodeData!.name}" has been renamed to "{newName}".
+            </div>
+          ),
+          className: "bp3-dark bp3-large bp3-text-large",
+          timeout: 3000,
+        });
+        renameFile.label = newName;
+        renameFile.nodeData = data.file;
+        refreshContents();
+      } else {
+        FilemanagerToaster.show({
+          message: (
+            <div>
+              <p>Could not rename file "{renameFile.nodeData!.name}".</p>
+              {data!.reason && <p>{data!.reason}</p>}
+            </div>
+          ),
+          className: "bp3-dark bp3-large bp3-text-large",
+          timeout: 3000,
+          intent: Intent.DANGER,
+        });
+      }
+    });
+  };
+
   return (
     <div>
       <Tree
@@ -178,51 +240,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
       <Alert
         isOpen={renameFile !== undefined}
         onCancel={() => setRenameFile(undefined)}
-        onConfirm={() => {
-          if (renameFile === undefined) {
-            throw new Error("assertion error: must not be undefined");
-          }
-
-          setRenameFile(undefined);
-
-          const body = {
-            dst: `${renameFile.nodeData!.path}/${newName}`,
-          };
-          const apiCall = mockApi
-            ? new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1500))
-            : fetch(renameFile.nodeData!.url, {
-                method: "PATCH",
-                body: JSON.stringify(body),
-                headers: {
-                  "Content-Type": "application/json;charset=utf-8",
-                },
-              }).then((resp) => resp.json());
-
-          apiCall.then((data: any) => {
-            if (data!.success) {
-              FilemanagerToaster.show({
-                message: <div>"{renameFile.nodeData!.name}" has been renamed.</div>,
-                className: "bp3-dark bp3-large bp3-text-large",
-                timeout: 3000,
-              });
-              renameFile.label = newName;
-              renameFile.nodeData!.name = newName;
-              refreshContents();
-            } else {
-              FilemanagerToaster.show({
-                message: (
-                  <div>
-                    <p>Could not rename file "{renameFile.nodeData!.name}".</p>
-                    {data!.reason && <p>{data!.reason}</p>}
-                  </div>
-                ),
-                className: "bp3-dark bp3-large bp3-text-large",
-                timeout: 3000,
-                intent: Intent.DANGER,
-              });
-            }
-          });
-        }}
+        onConfirm={confirmRenameFile}
         className="bp3-dark bp3-large bp3-text-large"
         icon="edit"
         cancelButtonText="Cancel"
@@ -236,7 +254,15 @@ function FilemanagerInner({ mockApi }: MockApi) {
               placeholder="File name"
               fill
               defaultValue={newName}
-              onChange={(ev: any) => setNewName(ev.target.value)}
+              onChange={(ev: any) => {
+                setNewName(ev.target.value);
+              }}
+              onKeyUp={(ev) => {
+                if (ev.key === "Enter") {
+                  confirmRenameFile();
+                }
+              }}
+              autoFocus
             />
           </ControlGroup>
         </Label>
