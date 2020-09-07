@@ -102,7 +102,7 @@ function App() {
 
   const used = numeral(storage.used);
   const total = numeral(storage.total);
-  const pct = numeral(Math.ceil(storage.used / storage.total));
+  const pct = numeral(Math.ceil(storage.used / storage.total * 100) / 100);
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
   const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
 
