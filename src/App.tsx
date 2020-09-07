@@ -57,10 +57,7 @@ function App() {
   const [ap, setAp] = useState(true);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
-  const [storage, setStorage] = useState({
-    used: 300000000,
-    total: 16000000000,
-  } as api.Storage);
+  const [storage, setStorage] = useState<api.Storage>({ used: 0, total: 0 });
   const [recording, setRecording] = useState<ReturnType<typeof setInterval> | undefined>(undefined);
   const [shutter, setShutter] = useState(false);
   const [mockApiDetected, setMockApi] = useState(false);
@@ -79,10 +76,15 @@ function App() {
           api.getConfig().then((config) => {
             setConfig(config);
           });
+          api.getDiskUsage().then((diskUsage: api.Storage) => setStorage(diskUsage));
         })
         .catch(() => {
           if (process.env.REACT_APP_MOCK_API === "true" || process.env.NODE_ENV === "development") {
             setMockApi(true);
+            setStorage({
+              used: 300000000,
+              total: 16000000000,
+            });
             // NOTE: uncomment the line below if you want to work on the CaptivePortal dialog
             //setNetworkDialog(true);
             setConfig(CONFIG_SAMPLE);
@@ -100,7 +102,7 @@ function App() {
 
   const used = numeral(storage.used);
   const total = numeral(storage.total);
-  const pct = numeral(storage.used / storage.total);
+  const pct = numeral(Math.ceil(storage.used / storage.total));
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
   const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
 

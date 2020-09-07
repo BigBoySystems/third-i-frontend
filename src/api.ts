@@ -136,3 +136,7 @@ export function makePhoto(): Promise<string> {
     .then((resp) => resp.json())
     .then((data) => data.filename);
 }
+
+export function getDiskUsage(): Promise<Storage> {
+  return fetch(`${API_PREFIX}/disk-usage`).then((resp) => resp.json());
+}
