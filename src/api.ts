@@ -1,16 +1,16 @@
 const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
-export interface Portal {
+export interface Portal { // implement if you are in portal mode or not
   portal: boolean;
   essid: string | null;
 }
 
-export interface Network {
+export interface Network { // implement the network you are connected to
   essid: string;
   password: boolean;
 }
 
-export interface Response {
+export interface Response { // implement the api response
   success: boolean;
   reason?: string;
 }
@@ -21,12 +21,12 @@ export interface RenameFile extends Response {
   file: File;
 }
 
-export interface Storage {
+export interface Storage { // retrieve the disk usage of the Third-i
   used: number;
   total: number;
 }
 
-export interface File {
+export interface File { // retrieve the file you will use in the Filemanager
   name: string;
   path: string;
   url: string;
@@ -34,7 +34,7 @@ export interface File {
   children: File[];
 }
 
-export interface Config {
+export interface Config { // retrieve the configuration file
   photo_resolution: string;
   video_width: string;
   video_mode: string;
@@ -67,18 +67,18 @@ export interface Config {
   ws_enabled: string;
 }
 
-export function isPortal(): Promise<Portal> {
+export function isPortal(): Promise<Portal> { // function who set if you are in portal mode or not
   const controller = new AbortController();
   const signal = controller.signal;
   setTimeout(() => controller.abort(), 5000);
   return fetch(`${API_PREFIX}/portal`, { signal }).then((resp) => resp.json());
 }
 
-export function networks(): Promise<Network[]> {
+export function networks(): Promise<Network[]> { // function who return a list of network nearby
   return fetch(`${API_PREFIX}/list-networks`).then((resp) => resp.json());
 }
 
-export function connect(essid: string, password?: string): Promise<Connect> {
+export function connect(essid: string, password?: string): Promise<Connect> { // function to connect your device to a network nearby
   const data = {
     essid,
     password,
@@ -93,7 +93,7 @@ export function connect(essid: string, password?: string): Promise<Connect> {
   }).then((resp) => resp.json());
 }
 
-export function startAp(): Promise<any> {
+export function startAp(): Promise<any> { // call to start the Access point mode
   const data = {};
 
   return fetch(`${API_PREFIX}/start-ap`, {
@@ -105,7 +105,7 @@ export function startAp(): Promise<any> {
   });
 }
 
-export function updateConfig(patch: Partial<Config>): Promise<any> {
+export function updateConfig(patch: Partial<Config>): Promise<any> { // call to update the configuration file when you make a change in settings
   return fetch(`${API_PREFIX}/config`, {
     method: "PATCH",
     headers: {
@@ -115,15 +115,15 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
   });
 }
 
-export function getConfig(): Promise<Config> {
+export function getConfig(): Promise<Config> { // call to retrieve the configuration file
   return fetch(`${API_PREFIX}/config`).then((resp) => resp.json());
 }
 
-export function getFiles(): Promise<File> {
+export function getFiles(): Promise<File> { // call to retrieve the third-i user files
   return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
 }
 
-export function makePhoto(): Promise<string> {
+export function makePhoto(): Promise<string> { // call api when you take a picture
   const data = {};
 
   return fetch(`${API_PREFIX}/make-photo`, {
@@ -137,6 +137,6 @@ export function makePhoto(): Promise<string> {
     .then((data) => data.filename);
 }
 
-export function getDiskUsage(): Promise<Storage> {
+export function getDiskUsage(): Promise<Storage> { // call to retrieve the disk usage of the Third-i user files
   return fetch(`${API_PREFIX}/disk-usage`).then((resp) => resp.json());
 }
