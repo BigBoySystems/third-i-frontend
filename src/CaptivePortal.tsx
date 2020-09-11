@@ -15,7 +15,7 @@ import "./CaptivePortal.css";
 import * as api from "./api";
 import { MockApi } from "./App";
 
-interface CaptivePortalProps {
+interface CaptivePortalProps { // declare the props CaptivePortal needs
   onConnected: (essid: string) => void;
   onAP: () => void;
   vertical?: boolean;
@@ -23,7 +23,7 @@ interface CaptivePortalProps {
   setAp: (value: boolean) => void;
 }
 
-function CaptivePortal(props: CaptivePortalProps) {
+function CaptivePortal(props: CaptivePortalProps) { // component of the captive portal when is on MockApi mode 
   return (
     <MockApi.Consumer>
       {(mockApi) => <CaptivePortalInner mockApi={mockApi} {...props} />}
@@ -31,7 +31,7 @@ function CaptivePortal(props: CaptivePortalProps) {
   );
 }
 
-function CaptivePortalInner({
+function CaptivePortalInner({ // inner of the captive portal when you are not in mockApi mode
   onConnected,
   onAP,
   vertical,
@@ -44,13 +44,13 @@ function CaptivePortalInner({
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState(false);
 
-  const updateNetworks = useCallback(() => {
+  const updateNetworks = useCallback(() => { // update the network list the user can connect to
     setNetworks([]);
     setError(false);
-    if (mockApi) {
+    if (mockApi) { // in mockApi mode
       setTimeout(() => setNetworks(SAMPLE_NETWORKS), 1500);
-    } else {
-      api
+    } else { // when you are not in mockApi mode
+      api 
         .networks()
         .then((networks) => {
           networks.sort((a, b) => (a.essid < b.essid ? -1 : 1));
@@ -66,7 +66,7 @@ function CaptivePortalInner({
     }
   }, [mockApi, connecting]);
 
-  const onFailure = (essid: string) => {
+  const onFailure = (essid: string) => { // handling possible error of connection
     CaptivePortalToaster.show({
       message: (
         <div>
@@ -83,7 +83,7 @@ function CaptivePortalInner({
     updateNetworks();
   };
 
-  const waitConnected = async (waitDisconnected?: boolean): Promise<api.Portal> => {
+  const waitConnected = async (waitDisconnected?: boolean): Promise<api.Portal> => { // handling when you are waiting to connect the device to a new network
     let res: api.Portal = { portal: true, essid: null };
     let connected = waitDisconnected ? true : false;
     do {
@@ -100,7 +100,7 @@ function CaptivePortalInner({
 
   const waitDisconnected = async (): Promise<api.Portal> => await waitConnected(true);
 
-  const connect = async (essid: string, password?: string) => {
+  const connect = async (essid: string, password?: string) => { // handling when you can connect to a network
     setConnecting(true);
     setError(false);
     setNetworks([]);
@@ -188,7 +188,7 @@ function CaptivePortalInner({
     }
   };
 
-  const startAp = async () => {
+  const startAp = async () => { // starting in access point when you want a device connect to the third-i
     if (ap) {
       onAP();
       return;
@@ -257,7 +257,7 @@ function CaptivePortalInner({
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { // initialize the captive portal and retrieve network nearby
     if (!initialized) {
       updateNetworks();
       setInitialized(true);
@@ -313,7 +313,7 @@ interface PasswordEntryProps {
   onValidate: (value: string) => void;
 }
 
-function PasswordEntry({ onValidate }: PasswordEntryProps) {
+function PasswordEntry({ onValidate }: PasswordEntryProps) { // management of the password user give to connect to a network
   return (
     <div className="CaptivePortal-password bp3-large bp3-text-large">
       <Label>
@@ -337,7 +337,7 @@ interface HiddenNetworkProps {
   onValidate: (essid: string, password: string) => void;
 }
 
-function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
+function HiddenNetwork({ onValidate }: HiddenNetworkProps) { // management of the case the network is hidden but you know information for connecting to it
   const [essid, setEssid] = useState("");
   const [password, setPassword] = useState("");
 
@@ -379,7 +379,7 @@ function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
 
 const CaptivePortalToaster = Toaster.create({});
 
-const SAMPLE_NETWORKS: api.Network[] = [
+const SAMPLE_NETWORKS: api.Network[] = [ // mockApi network sample
   {
     essid: "MYHOME",
     password: true,
