@@ -9,24 +9,28 @@ import * as api from "./api";
 import Filemanager from "./Filemanager";
 import numeral from "numeral";
 
-const player = new WSAvcPlayer({ useWorker: false });
+const player = new WSAvcPlayer({ useWorker: false }); // declaration of the video player
 const retryInterval = 1000;
 const iconSize = 32;
 
 export interface PhotoMode {
+  // implement when you are in photo mode or not
   photoMode: boolean;
   setPhotoMode: (value: boolean) => void;
 }
 
 export interface Network {
+  // implement of the network you are connected to
   setNetwork: (value: string) => void;
 }
 
 export interface MockApi {
+  // implement a mockApi mode
   mockApi: boolean;
 }
 
 function startVideo() {
+  // component who start the video player and signal if it's connect or not
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
   player.on("disconnected", () => console.log("WS disconnected"));
@@ -36,6 +40,7 @@ function startVideo() {
 }
 
 function connect() {
+  // component who set the connection of the video player
   const host = document.location.hostname;
   const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
   const uri = `${scheme}://${host}:8080`;
@@ -47,8 +52,10 @@ export const MockApi = React.createContext(false);
 export const unixTime = () => Math.floor(Date.now() / 1000);
 
 function App() {
+  // main component of the third-i web app
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
 
+  // declaration of each variable used in the app
   const [initialized, setInitialized] = useState(false);
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
@@ -65,6 +72,7 @@ function App() {
   const [recordingTime, setRecordingTime] = useState([0, 0]);
 
   useEffect(() => {
+    // useEffect who initialize the third-i, set the portal mode and retrieve disk usage and the config file
     if (!initialized) {
       setInitialized(true);
       api
@@ -79,6 +87,7 @@ function App() {
           api.getDiskUsage().then((diskUsage: api.Storage) => setStorage(diskUsage));
         })
         .catch(() => {
+          // initialize in mockApi mode
           if (process.env.REACT_APP_MOCK_API === "true" || process.env.NODE_ENV === "development") {
             setMockApi(true);
             setStorage({
@@ -94,6 +103,7 @@ function App() {
   }, [initialized, networkDialog]);
 
   useEffect(() => {
+    // useEffect who restart the video player if the video don't start
     if (!videoStarted) {
       startVideo();
       setVideoStarted(true);
@@ -102,7 +112,7 @@ function App() {
 
   const used = numeral(storage.used);
   const total = numeral(storage.total);
-  const pct = numeral(Math.ceil(storage.used / storage.total * 100) / 100);
+  const pct = numeral(Math.ceil((storage.used / storage.total) * 100) / 100);
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
   const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
 
@@ -116,7 +126,7 @@ function App() {
     // Therefore the CaptivePortal component is not refreshed properly on startup
     <MockApi.Provider value={mockApiDetected}>
       <div className="App bp3-dark bp3-large bp3-text-large">
-        <Dialog
+        <Dialog // dialog who invite the user to connect the device on a network nearby
           isOpen={networkDialog}
           onClose={() => setNetworkDialog(false)}
           className="bp3-dark bp3-large bp3-text-large"
@@ -127,7 +137,7 @@ function App() {
           canOutsideClickClose={false}
           isCloseButtonShown={false}
         >
-          <CaptivePortal
+          <CaptivePortal // if you choose access point mode
             onConnected={(essid) => {
               setNetworkDialog(false);
               setNetwork(essid);
@@ -140,7 +150,7 @@ function App() {
             setAp={setAp}
           />
         </Dialog>
-        <Overlay
+        <Overlay // component of the menubar
           className="bp3-dark bp3-large bp3-text-large"
           isOpen={menubarVisible}
           hasBackdrop={false}
@@ -165,7 +175,7 @@ function App() {
             )}
           </div>
         </Overlay>
-        <Overlay
+        <Overlay // component of the filemanager
           className="bp3-dark bp3-large bp3-text-large"
           isOpen={filemanagerVisible}
           hasBackdrop={false}
@@ -179,14 +189,14 @@ function App() {
         <div id="video" style={{ width: "100vw" }} />
         <div className="App-top">
           <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
-            <Icon
+            <Icon // icon of the filemanager
               icon="folder-close"
               iconSize={iconSize}
               onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
             />
           </div>
           <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
-            <Icon
+            <Icon // icon of the menubar
               icon="cog"
               iconSize={iconSize}
               onClick={() => setMenubarVisibility(!menubarVisible)}
@@ -196,11 +206,15 @@ function App() {
         </div>
         <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
           <div className="App-bottom-left">
-            <Icon icon="database" iconSize={iconSize} />
+            <Icon
+              icon="database"
+              iconSize={iconSize}
+              // icon and display of disk usage information
+            />
             {storageInfo}
           </div>
           <div className="App-bottom-center">
-            <Icon
+            <Icon // icon when you click on to take a picture or take a video
               icon={recording !== undefined ? "stop" : photoMode ? "camera" : "mobile-video"}
               iconSize={iconSize}
               onClick={() => {
@@ -240,7 +254,11 @@ function App() {
             <div className="App-timestamp">{formattedRecordingTime}</div>
           </div>
           <div className="App-bottom-right">
-            <Icon icon="globe-network" iconSize={iconSize} />
+            <Icon
+              icon="globe-network"
+              iconSize={iconSize}
+              // icon who display the network you are connected to or if you are in access point mode
+            />
             {network || "Access Point"}
           </div>
         </div>
