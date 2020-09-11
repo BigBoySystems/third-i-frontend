@@ -22,7 +22,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write ./src"
   },
   "eslintConfig": {
     "extends": "react-app"
