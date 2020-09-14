@@ -16,13 +16,16 @@ import * as api from "./api";
 import { MockApi } from "./App";
 
 interface CaptivePortalProps {
+  // handler that triggers when the user choose to connect to a network
   onConnected: (essid: string) => void;
+  // handler that triggers when the user choose to stay in Access Point (portal) mode
   onAP: () => void;
   vertical?: boolean;
   ap: boolean;
   setAp: (value: boolean) => void;
 }
 
+// wrapper that provides the mockApi property to the inner CaptivePortal component
 function CaptivePortal(props: CaptivePortalProps) {
   return (
     <MockApi.Consumer>
@@ -31,6 +34,7 @@ function CaptivePortal(props: CaptivePortalProps) {
   );
 }
 
+// inner component of the captive portal (requires the property mockApi)
 function CaptivePortalInner({
   onConnected,
   onAP,
@@ -44,6 +48,7 @@ function CaptivePortalInner({
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState(false);
 
+  // update the network list the user can connect to
   const updateNetworks = useCallback(() => {
     setNetworks([]);
     setError(false);
@@ -66,6 +71,7 @@ function CaptivePortalInner({
     }
   }, [mockApi, connecting]);
 
+  // handle possible error during connection
   const onFailure = (essid: string) => {
     CaptivePortalToaster.show({
       message: (
@@ -83,6 +89,7 @@ function CaptivePortalInner({
     updateNetworks();
   };
 
+  // helper used when you are waiting to connect the device to a new network
   const waitConnected = async (waitDisconnected?: boolean): Promise<api.Portal> => {
     let res: api.Portal = { portal: true, essid: null };
     let connected = waitDisconnected ? true : false;
@@ -188,6 +195,7 @@ function CaptivePortalInner({
     }
   };
 
+  // start Access Point mode (when the users wants to connect directly to the thingy)
   const startAp = async () => {
     if (ap) {
       onAP();
@@ -257,6 +265,7 @@ function CaptivePortalInner({
     }
   };
 
+  // initialize the captive portal by retrieving the networks nearby
   useEffect(() => {
     if (!initialized) {
       updateNetworks();
@@ -313,6 +322,7 @@ interface PasswordEntryProps {
   onValidate: (value: string) => void;
 }
 
+// input component for the password
 function PasswordEntry({ onValidate }: PasswordEntryProps) {
   return (
     <div className="CaptivePortal-password bp3-large bp3-text-large">
@@ -337,6 +347,7 @@ interface HiddenNetworkProps {
   onValidate: (essid: string, password: string) => void;
 }
 
+// input component for hidden network
 function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
   const [essid, setEssid] = useState("");
   const [password, setPassword] = useState("");
@@ -379,6 +390,7 @@ function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
 
 const CaptivePortalToaster = Toaster.create({});
 
+// mockApi network sample
 const SAMPLE_NETWORKS: api.Network[] = [
   {
     essid: "MYHOME",

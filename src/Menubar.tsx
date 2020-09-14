@@ -32,6 +32,7 @@ const fromStr = (value: string, default_: number) => {
   }
 };
 
+// declaration of default preset of the lightning setting
 const LIGHTING: { [k: string]: Partial<api.Config> } = {
   nightOutside: {
     contrast: "0",
@@ -59,6 +60,7 @@ interface ConfigProps {
   config: api.Config;
 }
 
+// props for the Access Point state
 interface ApProps {
   ap: boolean;
   setAp: (value: boolean) => void;
@@ -83,7 +85,7 @@ function Menubar(props: MenubarProps) {
   ]);
 
   return (
-    <PanelStack
+    <PanelStack // behavior of the menu bar
       className="Menubar"
       initialPanel={panels[0]}
       onOpen={(new_) => setPanels([new_ as IPanel<MenubarProps>, ...panels])}
@@ -99,23 +101,23 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
 
   return (
     <Menu>
-      <MenuItem
+      <MenuItem // open the panel of display settings
         icon="desktop"
         text="Display"
         onClick={() => openPanel({ component: Display, props, title: "Display" })}
       />
-      <MenuItem
+      <MenuItem // toggle between photo and video mode
         icon={photoMode ? "camera" : "mobile-video"}
         text="Photo/Video mode"
         labelElement={photoMode ? "Photo" : "Video"}
         onClick={() => setPhotoMode(!photoMode)}
       />
-      <MenuItem
+      <MenuItem // open the panel of streaming settings
         icon="mobile-video"
         text="Streaming settings"
         onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
       />
-      <MenuItem
+      <MenuItem // toggle audio
         icon="headset"
         text="Audio"
         labelElement={audioEnabled ? "Enabled" : "Disabled"}
@@ -124,20 +126,20 @@ function Settings({ openPanel, closePanel, ...props }: PanelProps) {
           setAudioEnabled(!audioEnabled);
         }}
       />
-      <MenuItem
+      <MenuItem // set the viewing angle parameter
         icon="square"
         text="Viewing angle"
         labelElement={viewAngleSquare ? "Square" : "Extended"}
         onClick={() => setViewAngleSquare(!viewAngleSquare)}
         disabled
       />
-      <MenuItem
+      <MenuItem // open the panel of the lighting settings
         icon="lightbulb"
         text="Lighting"
         onClick={() => openPanel({ component: Lighting, props, title: "Lighting" })}
       />
       <MenuDivider />
-      <MenuItem
+      <MenuItem // open the panel of the advanced settings
         icon="cog"
         text="Advanced parameters"
         onClick={() => openPanel({ component: Advanced, props, title: "Advanced parameters" })}
@@ -162,6 +164,7 @@ function Display({ config }: PanelProps) {
   const [inverted, setInverted] = useState(false);
   const [flipped, setFlipped] = useState(false);
 
+  // update the configuration file when you change a parameter in the display settings
   const updateDisplay = (value: string) => {
     setRadioCheck(value);
 
@@ -214,46 +217,54 @@ function Display({ config }: PanelProps) {
 }
 
 function Streaming({ config }: PanelProps) {
+  // update the configuration to enable/disable the video stream on websocket
   const updateWs = (value: boolean) => {
     api.updateConfig({
       ws_enabled: value ? "1" : "0",
     });
   };
 
+  // update the config to enable/disable UDP stream
   const updateUdp = (value: boolean) => {
     api.updateConfig({
       udp_enabled: value ? "1" : "0",
     });
   };
 
+  // update the config file for UDP clients address
   const updateUdpClients = useDebounceCallback(
     (value: string) => api.updateConfig({ udp_clients: value }),
     DEBOUNCE_TIME
   );
 
   const updateRtmp = (value: boolean) => {
+    // set if the rtmp stream is on or not and change this in the configuration file
     api.updateConfig({
       rtmp_enabled: value ? "1" : "0",
     });
   };
 
   const updateRtmpurl = useDebounceCallback(
+    // update the rtmp url and change it in the configuration file
     (value: string) => api.updateConfig({ rtmp_url: value }),
     DEBOUNCE_TIME
   );
 
   const updateMpegts = (value: boolean) => {
+    // update if Mpeg stream is on or not and change that in the configuration file
     api.updateConfig({
       mpegts_enabled: value ? "1" : "0",
     });
   };
 
   const updateMpegtsClients = useDebounceCallback(
+    // update the config file for MPEG clients address
     (value: string) => api.updateConfig({ mpegts_clients: value }),
     DEBOUNCE_TIME
   );
 
   const updateRtsp = (value: boolean) => {
+    // set if Rtsp is on or not and change it in the configuration file
     api.updateConfig({
       rtsp_enabled: value ? "1" : "0",
     });
@@ -261,7 +272,7 @@ function Streaming({ config }: PanelProps) {
 
   return (
     <div className="Menubar-content">
-      <Switch
+      <Switch // set if the browser stream is on or not
         defaultChecked={config.ws_enabled === "1"}
         label="Browser stream"
         onChange={(ev) => updateWs(ev.currentTarget.checked)}
@@ -269,11 +280,11 @@ function Streaming({ config }: PanelProps) {
       <Label>
         Stream UDP
         <ControlGroup>
-          <Switch
+          <Switch // set if udp stream is on or not
             defaultChecked={config.udp_enabled === "1"}
             onChange={(ev) => updateUdp(ev.currentTarget.checked)}
           />
-          <InputGroup
+          <InputGroup // set the udp client adress
             placeholder="Client addresses"
             defaultValue={config.udp_clients}
             onChange={(ev: any) => updateUdpClients(ev.currentTarget.value)}
@@ -284,12 +295,12 @@ function Streaming({ config }: PanelProps) {
       <Label>
         RTMP
         <ControlGroup>
-          <Switch
+          <Switch // set if the Rtmp is on or not
             defaultChecked={config.rtmp_enabled === "1"}
             onChange={(ev) => updateRtmp(ev.currentTarget.checked)}
           />
           <InputGroup
-            placeholder="URL"
+            placeholder="URL" // set the url of rtmp
             defaultValue={config.rtmp_url}
             onChange={(ev: any) => updateRtmpurl(ev.currentTarget.value)}
             fill
@@ -299,11 +310,11 @@ function Streaming({ config }: PanelProps) {
       <Label>
         MPEG-TS
         <ControlGroup>
-          <Switch
+          <Switch // set if Mpeg-ts is on or not
             defaultChecked={config.mpegts_enabled === "1"}
             onChange={(ev) => updateMpegts(ev.currentTarget.checked)}
           />
-          <InputGroup
+          <InputGroup // set the Mpeg-ts client adress
             placeholder="Clients addresses"
             defaultValue={config.mpegts_clients}
             onChange={(ev: any) => updateMpegtsClients(ev.currentTarget.value)}
@@ -311,7 +322,7 @@ function Streaming({ config }: PanelProps) {
           />
         </ControlGroup>
       </Label>
-      <Switch
+      <Switch // set if rtsp is on or not
         defaultChecked={config.rtsp_enabled === "1"}
         label="RTSP enabled"
         onChange={(ev) => updateRtsp(ev.currentTarget.checked)}
@@ -326,7 +337,7 @@ function Lighting({ config }: PanelProps) {
 
   return (
     <div className="Menubar-content">
-      <RadioGroup
+      <RadioGroup // set the preset you will choose for lighting setting
         onChange={(event) => {
           const value = event.currentTarget.value;
           const settings = LIGHTING[value];
@@ -341,21 +352,26 @@ function Lighting({ config }: PanelProps) {
         <Radio label="Night inside" value="nightInside" />
         <Radio label="Day outside" value="dayOutside" />
       </RadioGroup>
-      <PictureInner config={configPreview} disabled key={`${JSON.stringify(configPreview)}`} />
+      <PictureInner // display a preview of the video settings (the lighting preset is set by the video settings)
+        config={configPreview}
+        disabled
+        key={`${JSON.stringify(configPreview)}`}
+      />
     </div>
   );
 }
 
 function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
+  // component of the advanced parameters
   return (
     <div className="Menubar-content">
       <Menu>
-        <MenuItem
+        <MenuItem // open the video settings panel
           icon="media"
           text="Video settings"
           onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
         />
-        <MenuItem
+        <MenuItem // open the wifi settings panel
           icon="globe-network"
           text="WiFi settings"
           onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
@@ -373,6 +389,7 @@ function Picture({ closePanel, config }: PanelProps) {
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
 
   const updateFramerate = useDebounceCallback(
+    // set the framerate setting and change it in the configuration file
     (value: number) =>
       api.updateConfig({
         video_fps: `${value}`,
@@ -381,6 +398,7 @@ function Picture({ closePanel, config }: PanelProps) {
   );
 
   const updateBitrate = useDebounceCallback(
+    // set the bitrate setting and change it in the configuration file
     (value: number) =>
       api.updateConfig({
         video_bitrate: `${value}`,
@@ -393,7 +411,7 @@ function Picture({ closePanel, config }: PanelProps) {
       <PictureInner config={config} onConfigUpdate={api.updateConfig} />
       <Label>
         Bitrate (Mbps)
-        <Slider
+        <Slider // parameter to set the bitrate
           min={0.5}
           max={10.0}
           stepSize={0.5}
@@ -408,7 +426,7 @@ function Picture({ closePanel, config }: PanelProps) {
       </Label>
       <Label>
         Framerate
-        <Slider
+        <Slider // parameter to set the framerate
           min={25}
           max={60}
           stepSize={1}
@@ -421,11 +439,18 @@ function Picture({ closePanel, config }: PanelProps) {
           }}
         />
       </Label>
-      <Button icon="floppy-disk" text="Save" fill onClick={() => closePanel()} disabled />
+      <Button // this button give you the possibility to save a custom preset (not available now)
+        icon="floppy-disk"
+        text="Save"
+        fill
+        onClick={() => closePanel()}
+        disabled
+      />
     </div>
   );
 }
 
+// component of the rest of the video settings (used too by the preview in lighting settings)
 function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   const [whiteBalance, setWhiteBalance] = useState(config.video_wb);
   const [exposure, setExposure] = useState(config.exposure);
@@ -433,26 +458,30 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   const [sharpness, setSharpness] = useState(fromStr(config.sharpness, 0));
   const [gain, setGain] = useState(fromStr(config.digitalgain, 0.0));
 
+  // call to update the configuration if onConfigUpdate is set. otherwise noop
   const updateConfig = useCallback(onConfigUpdate || ((config: Partial<api.Config>) => {}), [
     onConfigUpdate,
   ]);
 
   const updateContrast = useDebounceCallback(
+    // update the contrast parameter with a debounce to avoid spamming the api for each change
     (value: number) => updateConfig({ contrast: `${value}` }),
     DEBOUNCE_TIME
   );
 
   const updateSharpness = useDebounceCallback(
+    // update the sharpness parameter with a debounce to avoid spamming the api for each change
     (value: number) => updateConfig({ sharpness: `${value}` }),
     DEBOUNCE_TIME
   );
 
   const updateGain = useDebounceCallback(
+    // update the digital gain parameter with a debounce to avoid spamming the api for each change
     (value: number) => updateConfig({ digitalgain: `${value}` }),
     DEBOUNCE_TIME
   );
 
-  /*
+  /* we don't know what to do about stabilization parameter
       <Label>
         <Icon icon="pivot-table" />
         Stabilization
@@ -464,7 +493,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       <Label>
         White balance
         <div className="bp3-select">
-          <select
+          <select // select to choose a parameter to the white balance
             disabled={disabled}
             value={whiteBalance}
             onChange={(ev) => {
@@ -488,7 +517,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       <Label>
         Exposure
         <div className="bp3-select">
-          <select
+          <select // select to choose a parameter of the exposure
             disabled={disabled}
             value={exposure}
             onChange={(ev) => {
@@ -514,7 +543,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       </Label>
       <Label>
         Contrast
-        <Slider
+        <Slider // set the contrast parameter
           min={-50}
           max={50}
           stepSize={1}
@@ -530,7 +559,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       </Label>
       <Label>
         Sharpness
-        <Slider
+        <Slider // set the sharpness parameter
           min={-50}
           max={50}
           stepSize={1}
@@ -546,7 +575,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       </Label>
       <Label>
         Digital gain
-        <Slider
+        <Slider // set the digital gain parameter
           min={-5.0}
           max={10.0}
           stepSize={1.0}
@@ -564,6 +593,7 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
   );
 }
 
+// component of the network selection in wifi settings
 function SelectNetwork({ closePanel, setNetwork, ap, setAp }: PanelProps) {
   return (
     <CaptivePortal

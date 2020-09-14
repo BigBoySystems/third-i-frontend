@@ -20,10 +20,12 @@ import { MockApi } from "./App";
 
 const FilemanagerToaster = Toaster.create({});
 
+// wrapper component to get the mockApi property from context
 function Filemanager() {
   return <MockApi.Consumer>{(mockApi) => <FilemanagerInner mockApi={mockApi} />}</MockApi.Consumer>;
 }
 
+// inner component (requires the mockApi property)
 function FilemanagerInner({ mockApi }: MockApi) {
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
@@ -32,10 +34,12 @@ function FilemanagerInner({ mockApi }: MockApi) {
   const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
 
+  // initalize the file manager by retrieving the third-i user files
   useEffect(() => {
     if (!initialized) {
       setInitialized(true);
       if (mockApi) {
+        // return a sample when you are in mockApi mode
         setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 500);
       } else {
         api
@@ -53,6 +57,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     }
   };
 
+  // remove a node (when you remove a file)
   const removeNode = (nodePath: number[]) => {
     const [tail] = nodePath.splice(-1, 1);
 
@@ -84,16 +89,19 @@ function FilemanagerInner({ mockApi }: MockApi) {
     refreshContents();
   };
 
+  // handler for when the user collapse a node (click on the caret)
   const handleNodeCollapse = (nodeData: ITreeNode) => {
     nodeData.isExpanded = false;
     refreshContents();
   };
 
+  // handler for when the user expand a node (click on the caret)
   const handleNodeExpand = (nodeData: ITreeNode) => {
     nodeData.isExpanded = true;
     refreshContents();
   };
 
+  // right click on a node
   const handleContextMenu = (
     node: ITreeNode<api.File>,
     nodePath: number[],
@@ -144,13 +152,16 @@ function FilemanagerInner({ mockApi }: MockApi) {
       throw new Error("assertion error: must not be undefined");
     }
 
+    // reset the state to undefined to disable the renaming dialog (alert)
     setRenameFile(undefined);
 
     const body = {
       dst: `${renameFile.nodeData!.path}/${newName}`,
     };
     const apiCall: Promise<api.RenameFile> = mockApi
-      ? new Promise((resolve) =>
+      ? new Promise((
+          resolve
+        ) =>
           setTimeout(
             () =>
               resolve({
@@ -219,6 +230,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
             throw new Error("assertion error: must not be undefined");
           }
 
+          // reset the state to undefined to disable the alert (dialog)
           setDeleteFile(undefined);
 
           const apiCall: Promise<api.Response> = mockApi
@@ -345,6 +357,7 @@ function getNodeFromPath<T>(nodes: ITreeNode<T>[], path: number[]): ITreeNode<T>
   }
 }
 
+// configuration file sample of the mockApi mode
 const SAMPLE_FILES: api.File = {
   name: "/",
   path: "",

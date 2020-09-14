@@ -1,15 +1,18 @@
 const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
+// response to the "portal" endpoint
 export interface Portal {
-  portal: boolean;
-  essid: string | null;
+  portal: boolean; // true if currently in portal mode
+  essid: string | null; // a string with the essid if connected to a network
 }
 
+// item in the response to the "list networks" endpoint
 export interface Network {
   essid: string;
   password: boolean;
 }
 
+// base API response (every endpoint should return that)
 export interface Response {
   success: boolean;
   reason?: string;
@@ -21,11 +24,13 @@ export interface RenameFile extends Response {
   file: File;
 }
 
+// response with the disk usage of the Third-i
 export interface Storage {
   used: number;
   total: number;
 }
 
+// item of a file (used in the file manager component)
 export interface File {
   name: string;
   path: string;
@@ -34,6 +39,7 @@ export interface File {
   children: File[];
 }
 
+// response with the configuration file (/boot/stereopi.conf)
 export interface Config {
   photo_resolution: string;
   video_width: string;
@@ -67,6 +73,7 @@ export interface Config {
   ws_enabled: string;
 }
 
+// call the API endpoint to retrieve portal information
 export function isPortal(): Promise<Portal> {
   const controller = new AbortController();
   const signal = controller.signal;
@@ -74,10 +81,12 @@ export function isPortal(): Promise<Portal> {
   return fetch(`${API_PREFIX}/portal`, { signal }).then((resp) => resp.json());
 }
 
+// call the API to retrieve a list of networks nearby
 export function networks(): Promise<Network[]> {
   return fetch(`${API_PREFIX}/list-networks`).then((resp) => resp.json());
 }
 
+// call the API to connect the Third-I to a network
 export function connect(essid: string, password?: string): Promise<Connect> {
   const data = {
     essid,
@@ -93,6 +102,7 @@ export function connect(essid: string, password?: string): Promise<Connect> {
   }).then((resp) => resp.json());
 }
 
+// call the API to start the Access point mode
 export function startAp(): Promise<any> {
   const data = {};
 
@@ -105,6 +115,7 @@ export function startAp(): Promise<any> {
   });
 }
 
+// call the API to update the configuration file
 export function updateConfig(patch: Partial<Config>): Promise<any> {
   return fetch(`${API_PREFIX}/config`, {
     method: "PATCH",
@@ -115,14 +126,17 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
   });
 }
 
+// call the API to retrieve the configuration file
 export function getConfig(): Promise<Config> {
   return fetch(`${API_PREFIX}/config`).then((resp) => resp.json());
 }
 
+// call the API to retrieve the third-i user files
 export function getFiles(): Promise<File> {
   return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
 }
 
+// call the API when you take a picture
 export function makePhoto(): Promise<string> {
   const data = {};
 
@@ -137,6 +151,7 @@ export function makePhoto(): Promise<string> {
     .then((data) => data.filename);
 }
 
+// call the API to retrieve the disk usage of the Third-i
 export function getDiskUsage(): Promise<Storage> {
   return fetch(`${API_PREFIX}/disk-usage`).then((resp) => resp.json());
 }
