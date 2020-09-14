@@ -159,9 +159,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
       dst: `${renameFile.nodeData!.path}/${newName}`,
     };
     const apiCall: Promise<api.RenameFile> = mockApi
-      ? new Promise((
-          resolve
-        ) =>
+      ? new Promise((resolve) =>
           setTimeout(
             () =>
               resolve({

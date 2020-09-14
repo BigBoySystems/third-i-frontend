@@ -25,7 +25,7 @@ export interface Network {
   setNetwork: (value: string) => void;
 }
 
-// whether or not calls should be make to the backend or faked 
+// whether or not calls should be make to the backend or faked
 export interface MockApi {
   mockApi: boolean;
 }
@@ -72,7 +72,7 @@ function App() {
   const [config, setConfig] = useState<api.Config | undefined>(undefined);
   const [recordingTime, setRecordingTime] = useState([0, 0]);
 
-// initialize the camera, set the portal mode and retrieve disk usage and the config file
+  // initialize the camera, set the portal mode and retrieve disk usage and the config file
   useEffect(() => {
     if (!initialized) {
       setInitialized(true);
@@ -210,7 +210,7 @@ function App() {
             <Icon
               icon="database"
               iconSize={iconSize}
-              // icon and information of disk usage 
+              // icon and information of disk usage
             />
             {storageInfo}
           </div>
