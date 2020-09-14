@@ -1,19 +1,19 @@
 const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
+// response to the "portal" endpoint
 export interface Portal {
-  // implement if you are in portal mode or not
-  portal: boolean;
-  essid: string | null;
+  portal: boolean; // true if currently in portal mode
+  essid: string | null; // a string with the essid if connected to a network
 }
 
+// item in the response to the "list networks" endpoint
 export interface Network {
-  // implement the network you are connected to
   essid: string;
   password: boolean;
 }
 
+// base API response (every endpoint should return that)
 export interface Response {
-  // implement the api response
   success: boolean;
   reason?: string;
 }
@@ -24,14 +24,14 @@ export interface RenameFile extends Response {
   file: File;
 }
 
+// response with the disk usage of the Third-i
 export interface Storage {
-  // retrieve the disk usage of the Third-i
   used: number;
   total: number;
 }
 
+// item of a file (used in the file manager component)
 export interface File {
-  // retrieve the file you will use in the Filemanager
   name: string;
   path: string;
   url: string;
@@ -39,8 +39,8 @@ export interface File {
   children: File[];
 }
 
+// response with the configuration file (/boot/stereopi.conf)
 export interface Config {
-  // retrieve the configuration file
   photo_resolution: string;
   video_width: string;
   video_mode: string;
@@ -73,21 +73,21 @@ export interface Config {
   ws_enabled: string;
 }
 
+// call the API endpoint to retrieve portal information
 export function isPortal(): Promise<Portal> {
-  // function who set if you are in portal mode or not
   const controller = new AbortController();
   const signal = controller.signal;
   setTimeout(() => controller.abort(), 5000);
   return fetch(`${API_PREFIX}/portal`, { signal }).then((resp) => resp.json());
 }
 
+// call the API to retrieve a list of networks nearby
 export function networks(): Promise<Network[]> {
-  // function who return a list of network nearby
   return fetch(`${API_PREFIX}/list-networks`).then((resp) => resp.json());
 }
 
+// call the API to connect the Third-I to a network
 export function connect(essid: string, password?: string): Promise<Connect> {
-  // function to connect your device to a network nearby
   const data = {
     essid,
     password,
@@ -102,8 +102,8 @@ export function connect(essid: string, password?: string): Promise<Connect> {
   }).then((resp) => resp.json());
 }
 
+// call the API to start the Access point mode
 export function startAp(): Promise<any> {
-  // call to start the Access point mode
   const data = {};
 
   return fetch(`${API_PREFIX}/start-ap`, {
@@ -115,8 +115,8 @@ export function startAp(): Promise<any> {
   });
 }
 
+// call the API to update the configuration file
 export function updateConfig(patch: Partial<Config>): Promise<any> {
-  // call to update the configuration file when you make a change in settings
   return fetch(`${API_PREFIX}/config`, {
     method: "PATCH",
     headers: {
@@ -126,18 +126,18 @@ export function updateConfig(patch: Partial<Config>): Promise<any> {
   });
 }
 
+// call the API to retrieve the configuration file
 export function getConfig(): Promise<Config> {
-  // call to retrieve the configuration file
   return fetch(`${API_PREFIX}/config`).then((resp) => resp.json());
 }
 
+// call the API to retrieve the third-i user files
 export function getFiles(): Promise<File> {
-  // call to retrieve the third-i user files
   return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
 }
 
+// call the API when you take a picture
 export function makePhoto(): Promise<string> {
-  // call api when you take a picture
   const data = {};
 
   return fetch(`${API_PREFIX}/make-photo`, {
@@ -151,7 +151,7 @@ export function makePhoto(): Promise<string> {
     .then((data) => data.filename);
 }
 
+// call the API to retrieve the disk usage of the Third-i
 export function getDiskUsage(): Promise<Storage> {
-  // call to retrieve the disk usage of the Third-i user files
   return fetch(`${API_PREFIX}/disk-usage`).then((resp) => resp.json());
 }

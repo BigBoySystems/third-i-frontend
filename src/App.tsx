@@ -9,28 +9,29 @@ import * as api from "./api";
 import Filemanager from "./Filemanager";
 import numeral from "numeral";
 
-const player = new WSAvcPlayer({ useWorker: false }); // declaration of the video player
+// video player
+const player = new WSAvcPlayer({ useWorker: false });
 const retryInterval = 1000;
 const iconSize = 32;
 
+// photo mode state (will take a picture instead of recording a video)
 export interface PhotoMode {
-  // implement when you are in photo mode or not
   photoMode: boolean;
   setPhotoMode: (value: boolean) => void;
 }
 
+// wifi network state (currently connected network)
 export interface Network {
-  // implement of the network you are connected to
   setNetwork: (value: string) => void;
 }
 
+// whether or not calls should be make to the backend or faked 
 export interface MockApi {
-  // implement a mockApi mode
   mockApi: boolean;
 }
 
+// initialize the video player
 function startVideo() {
-  // component who start the video player and signal if it's connect or not
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
   player.on("disconnected", () => console.log("WS disconnected"));
@@ -39,8 +40,8 @@ function startVideo() {
   connect();
 }
 
+// set the connection of the video player (actually connect)
 function connect() {
-  // component who set the connection of the video player
   const host = document.location.hostname;
   const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
   const uri = `${scheme}://${host}:8080`;
@@ -51,11 +52,11 @@ export const MockApi = React.createContext(false);
 
 export const unixTime = () => Math.floor(Date.now() / 1000);
 
+// root component of the third-i web app
 function App() {
-  // main component of the third-i web app
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
 
-  // declaration of each variable used in the app
+  // true when the component has been initialized (initial data received)
   const [initialized, setInitialized] = useState(false);
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
@@ -71,8 +72,8 @@ function App() {
   const [config, setConfig] = useState<api.Config | undefined>(undefined);
   const [recordingTime, setRecordingTime] = useState([0, 0]);
 
+// initialize the camera, set the portal mode and retrieve disk usage and the config file
   useEffect(() => {
-    // useEffect who initialize the third-i, set the portal mode and retrieve disk usage and the config file
     if (!initialized) {
       setInitialized(true);
       api
@@ -102,8 +103,8 @@ function App() {
     }
   }, [initialized, networkDialog]);
 
+  // triggered once to start the video
   useEffect(() => {
-    // useEffect who restart the video player if the video don't start
     if (!videoStarted) {
       startVideo();
       setVideoStarted(true);
@@ -137,7 +138,7 @@ function App() {
           canOutsideClickClose={false}
           isCloseButtonShown={false}
         >
-          <CaptivePortal // if you choose access point mode
+          <CaptivePortal // list network and allow AP mode
             onConnected={(essid) => {
               setNetworkDialog(false);
               setNetwork(essid);
@@ -209,12 +210,12 @@ function App() {
             <Icon
               icon="database"
               iconSize={iconSize}
-              // icon and display of disk usage information
+              // icon and information of disk usage 
             />
             {storageInfo}
           </div>
           <div className="App-bottom-center">
-            <Icon // icon when you click on to take a picture or take a video
+            <Icon // icon to take a picture or record a video
               icon={recording !== undefined ? "stop" : photoMode ? "camera" : "mobile-video"}
               iconSize={iconSize}
               onClick={() => {
@@ -257,7 +258,7 @@ function App() {
             <Icon
               icon="globe-network"
               iconSize={iconSize}
-              // icon who display the network you are connected to or if you are in access point mode
+              // icon that displays the network you are connected to or if you are in access point mode
             />
             {network || "Access Point"}
           </div>

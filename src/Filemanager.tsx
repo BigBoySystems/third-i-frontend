@@ -20,13 +20,13 @@ import { MockApi } from "./App";
 
 const FilemanagerToaster = Toaster.create({});
 
+// wrapper component to get the mockApi property from context
 function Filemanager() {
-  // implementation of a mockApi mode in the filemanager
   return <MockApi.Consumer>{(mockApi) => <FilemanagerInner mockApi={mockApi} />}</MockApi.Consumer>;
 }
 
+// inner component (requires the mockApi property)
 function FilemanagerInner({ mockApi }: MockApi) {
-  // inner of the filemanager with mockApi mode
   const [initialized, setInitialized] = useState(false);
   const [nodes, setNodes] = useState<ITreeNode<api.File>[]>([]);
   const [renameFile, setRenameFile] = useState<ITreeNode<api.File> | undefined>(undefined);
@@ -34,12 +34,13 @@ function FilemanagerInner({ mockApi }: MockApi) {
   const [deleteFile, setDeleteFile] = useState<[api.File, number[]] | undefined>(undefined);
   const refreshContents = () => setNodes([...nodes]);
 
+  // initalize the file manager by retrieving the third-i user files
   useEffect(() => {
-    // initalize the filemanager and retrive the third-i user files
     if (!initialized) {
       setInitialized(true);
       if (mockApi) {
-        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 500); // return a sample when you are in mockApi mode
+        // return a sample when you are in mockApi mode
+        setTimeout(() => setNodes(fromApi(SAMPLE_FILES)), 500);
       } else {
         api
           .getFiles()
@@ -50,15 +51,14 @@ function FilemanagerInner({ mockApi }: MockApi) {
   }, [initialized, mockApi]);
 
   const forEachNode = (nodes: ITreeNode[], callback: (node: ITreeNode) => void) => {
-    // set the node (a file is represented by a node)
     for (const node of nodes) {
       callback(node);
       forEachNode(node.childNodes || [], callback);
     }
   };
 
+  // remove a node (when you remove a file)
   const removeNode = (nodePath: number[]) => {
-    // add the possibility to remove a node when you remove a file
     const [tail] = nodePath.splice(-1, 1);
 
     if (nodePath.length === 0) {
@@ -77,7 +77,6 @@ function FilemanagerInner({ mockApi }: MockApi) {
   };
 
   const handleNodeClick = (
-    // set when you click on a node
     node: ITreeNode<api.File>,
     _nodePath: number[],
     e: React.MouseEvent<HTMLElement>
@@ -90,20 +89,20 @@ function FilemanagerInner({ mockApi }: MockApi) {
     refreshContents();
   };
 
+  // handler for when the user collapse a node (click on the caret)
   const handleNodeCollapse = (nodeData: ITreeNode) => {
-    // set when you collapse after go up in the node tree
     nodeData.isExpanded = false;
     refreshContents();
   };
 
+  // handler for when the user expand a node (click on the caret)
   const handleNodeExpand = (nodeData: ITreeNode) => {
-    // set when you expend after go down in the node tree
     nodeData.isExpanded = true;
     refreshContents();
   };
 
+  // right click on a node
   const handleContextMenu = (
-    // set the option you can use for each node
     node: ITreeNode<api.File>,
     nodePath: number[],
     e: React.MouseEvent<HTMLElement>
@@ -153,14 +152,15 @@ function FilemanagerInner({ mockApi }: MockApi) {
       throw new Error("assertion error: must not be undefined");
     }
 
-    setRenameFile(undefined); // management when you try to rename a file
+    // reset the state to undefined to disable the renaming dialog (alert)
+    setRenameFile(undefined);
 
     const body = {
       dst: `${renameFile.nodeData!.path}/${newName}`,
     };
     const apiCall: Promise<api.RenameFile> = mockApi
       ? new Promise((
-          resolve // when you are in mockApi mode
+          resolve
         ) =>
           setTimeout(
             () =>
@@ -175,7 +175,6 @@ function FilemanagerInner({ mockApi }: MockApi) {
           )
         )
       : fetch(renameFile.nodeData!.url, {
-          // when you are not in mockApi mode
           method: "PATCH",
           body: JSON.stringify(body),
           headers: {
@@ -184,7 +183,6 @@ function FilemanagerInner({ mockApi }: MockApi) {
         }).then((resp) => resp.json());
 
     apiCall.then((data: any) => {
-      // when the renaming is successfull
       if (data!.success) {
         FilemanagerToaster.show({
           message: (
@@ -199,7 +197,6 @@ function FilemanagerInner({ mockApi }: MockApi) {
         renameFile.nodeData = data.file;
         refreshContents();
       } else {
-        // when the renaming is not successfull
         FilemanagerToaster.show({
           message: (
             <div>
@@ -233,7 +230,8 @@ function FilemanagerInner({ mockApi }: MockApi) {
             throw new Error("assertion error: must not be undefined");
           }
 
-          setDeleteFile(undefined); // management
+          // reset the state to undefined to disable the alert (dialog)
+          setDeleteFile(undefined);
 
           const apiCall: Promise<api.Response> = mockApi
             ? new Promise((resolve) =>
@@ -327,7 +325,6 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
   return root.children.map(transform);
 }
 
-// display the node tree about the path of each file
 function getNodeFromPath<T>(nodes: ITreeNode<T>[], path: number[]): ITreeNode<T> {
   if (path.length === 0) {
     throw new Error("assertion error: getNodeFromPath called with empty path");
@@ -360,8 +357,8 @@ function getNodeFromPath<T>(nodes: ITreeNode<T>[], path: number[]): ITreeNode<T>
   }
 }
 
+// configuration file sample of the mockApi mode
 const SAMPLE_FILES: api.File = {
-  // configuration file sample of the mockApi mode
   name: "/",
   path: "",
   url: "/files",
