@@ -64,7 +64,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     if (nodePath.length === 0) {
       nodes.splice(tail, 1);
     } else {
-      const node = getNodeFromPath(nodes, nodePath);
+      const node = Tree.nodeFromPath(nodePath, nodes);
       const { childNodes } = node;
 
       if (childNodes === undefined) {
@@ -321,38 +321,6 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
   });
 
   return root.children.map(transform);
-}
-
-function getNodeFromPath<T>(nodes: ITreeNode<T>[], path: number[]): ITreeNode<T> {
-  if (path.length === 0) {
-    throw new Error("assertion error: getNodeFromPath called with empty path");
-  }
-
-  const find = (root: ITreeNode<T>, path: number[]): ITreeNode<T> => {
-    const [i, ...rest] = path;
-
-    if (root.childNodes === undefined) {
-      throw new Error("assertion error: childNodes must not be undefined");
-    }
-
-    const node = root.childNodes[i];
-
-    if (rest.length === 0) {
-      return node;
-    } else if (node === undefined) {
-      throw new Error("assertion error: rest is not empty but node is undefined");
-    } else {
-      return find(node, rest);
-    }
-  };
-
-  const [i, ...rest] = path;
-
-  if (rest.length === 0) {
-    return nodes[i];
-  } else {
-    return find(nodes[i], rest);
-  }
 }
 
 // configuration file sample of the mockApi mode
