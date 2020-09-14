@@ -108,7 +108,6 @@ function CaptivePortalInner({
   const waitDisconnected = async (): Promise<api.Portal> => await waitConnected(true);
 
   const connect = async (essid: string, password?: string) => {
-    // handling when you can connect to a network
     setConnecting(true);
     setError(false);
     setNetworks([]);

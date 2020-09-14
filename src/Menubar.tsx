@@ -57,7 +57,6 @@ const LIGHTING: { [k: string]: Partial<api.Config> } = {
 };
 
 interface ConfigProps {
-  // retrieve the props of the config file the Menubar need
   config: api.Config;
 }
 
