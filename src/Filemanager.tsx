@@ -316,7 +316,7 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
     icon: child.directory ? "folder-close" : "document",
     label: child.name,
     hasCaret: child.directory,
-    childNodes: child.children?.map(transform),
+    childNodes: child.children?.map(transform).sort((a, b) => (a.label < b.label ? -1 : 1)),
     nodeData: child,
   });
 
