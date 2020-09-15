@@ -172,16 +172,16 @@ function FilemanagerInner({ mockApi }: MockApi) {
             500
           )
         )
-      : fetch(renameFile.nodeData!.url, {
-          method: "PATCH",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json;charset=utf-8",
+      : api.callApi(
+          renameFile.nodeData!.url,
+          {
+            method: "PATCH",
           },
-        }).then((resp) => resp.json());
+          body
+        );
 
-    apiCall.then((data: any) => {
-      if (data!.success) {
+    apiCall.then((data) => {
+      if (data.success) {
         FilemanagerToaster.show({
           message: (
             <div>
@@ -199,7 +199,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
           message: (
             <div>
               <p>Could not rename file "{renameFile.nodeData!.name}".</p>
-              {data!.reason && <p>{data!.reason}</p>}
+              {data.reason && <p>{data.reason}</p>}
             </div>
           ),
           className: "bp3-dark bp3-large bp3-text-large",
@@ -241,12 +241,12 @@ function FilemanagerInner({ mockApi }: MockApi) {
                   500
                 )
               )
-            : fetch(deleteFile[0].url, {
+            : api.callApi(deleteFile[0].url, {
                 method: "DELETE",
-              }).then((resp) => resp.json());
+              });
 
           apiCall.then((data) => {
-            if (data!.success) {
+            if (data.success) {
               FilemanagerToaster.show({
                 message: <div>"{deleteFile[0].name}" has been deleted.</div>,
                 className: "bp3-dark bp3-large bp3-text-large",
@@ -258,7 +258,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
                 message: (
                   <div>
                     <p>Could not delete file "{deleteFile[0].name}".</p>
-                    {data!.reason && <p>{data!.reason}</p>}
+                    {data.reason && <p>{data.reason}</p>}
                   </div>
                 ),
                 className: "bp3-dark bp3-large bp3-text-large",

@@ -220,11 +220,11 @@ function App() {
               iconSize={iconSize}
               onClick={() => {
                 if (photoMode) {
-                  const apiCall = mockApiDetected
-                    ? Promise.resolve("super-cool-pic.jpeg")
+                  const apiCall: Promise<api.MakePhoto> = mockApiDetected
+                    ? Promise.resolve({ success: true, filename: "super-cool-pic.jpeg" })
                     : api.makePhoto();
 
-                  apiCall.then((filename) => {
+                  apiCall.then(({ filename }) => {
                     AppToaster.show({
                       message: (
                         <div>

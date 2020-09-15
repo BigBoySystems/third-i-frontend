@@ -1,5 +1,28 @@
 const API_PREFIX = process.env.NODE_ENV === "development" ? "" : "/api";
 
+export async function callApi(path: string, options?: RequestInit, data?: any): Promise<any> {
+  const body = data === undefined ? undefined : JSON.stringify(data);
+  const headers: any =
+    data === undefined ? {} : { "Content-Type": "application/json;charset=utf-8" };
+  const all_options: RequestInit = {
+    headers: {
+      ...headers,
+      ...options?.headers,
+    },
+    body,
+    ...options,
+  };
+
+  const url = path.startsWith("/") ? `${API_PREFIX}${path}` : path;
+  const resp = await fetch(url, all_options);
+
+  if (resp.status >= 500) {
+    throw new Error(`Internal server error: ${resp.status}`);
+  }
+
+  return resp.json();
+}
+
 // response to the "portal" endpoint
 export interface Portal {
   portal: boolean; // true if currently in portal mode
@@ -39,6 +62,11 @@ export interface File {
   children: File[];
 }
 
+// make photo response
+export interface MakePhoto extends Response {
+  filename: string;
+}
+
 // response with the configuration file (/boot/stereopi.conf)
 export interface Config {
   photo_resolution: string;
@@ -74,84 +102,64 @@ export interface Config {
 }
 
 // call the API endpoint to retrieve portal information
-export function isPortal(): Promise<Portal> {
+export const isPortal = async (): Promise<Portal> => {
   const controller = new AbortController();
   const signal = controller.signal;
   setTimeout(() => controller.abort(), 5000);
-  return fetch(`${API_PREFIX}/portal`, { signal }).then((resp) => resp.json());
-}
+  return callApi("/portal", { signal });
+};
 
 // call the API to retrieve a list of networks nearby
-export function networks(): Promise<Network[]> {
-  return fetch(`${API_PREFIX}/list-networks`).then((resp) => resp.json());
-}
+export const networks = async (): Promise<Network[]> => callApi("/list-networks");
 
 // call the API to connect the Third-I to a network
-export function connect(essid: string, password?: string): Promise<Connect> {
-  const data = {
-    essid,
-    password,
-  };
-
-  return fetch(`${API_PREFIX}/connect`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
+export const connect = async (essid: string, password?: string): Promise<Connect> =>
+  callApi(
+    "/connect",
+    {
+      method: "POST",
     },
-    body: JSON.stringify(data),
-  }).then((resp) => resp.json());
-}
+    {
+      essid,
+      password,
+    }
+  );
 
 // call the API to start the Access point mode
-export function startAp(): Promise<any> {
-  const data = {};
-
-  return fetch(`${API_PREFIX}/start-ap`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
+export const startAp = async (): Promise<any> =>
+  callApi(
+    "/start-ap",
+    {
+      method: "POST",
     },
-    body: JSON.stringify(data),
-  });
-}
+    {}
+  );
 
 // call the API to update the configuration file
-export function updateConfig(patch: Partial<Config>): Promise<any> {
-  return fetch(`${API_PREFIX}/config`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
+export const updateConfig = (patch: Partial<Config>): Promise<any> =>
+  callApi(
+    "/config",
+    {
+      method: "PATCH",
     },
-    body: JSON.stringify(patch),
-  });
-}
+    patch
+  );
 
 // call the API to retrieve the configuration file
-export function getConfig(): Promise<Config> {
-  return fetch(`${API_PREFIX}/config`).then((resp) => resp.json());
-}
+export const getConfig = async (): Promise<Config> => callApi("/config");
 
 // call the API to retrieve the third-i user files
-export function getFiles(): Promise<File> {
-  return fetch(`${API_PREFIX}/files`).then((resp) => resp.json());
-}
+export const getFiles = async (): Promise<File> => callApi("/files");
 
 // call the API when you take a picture
-export function makePhoto(): Promise<string> {
-  const data = {};
-
-  return fetch(`${API_PREFIX}/make-photo`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
+export const makePhoto = async (): Promise<MakePhoto> =>
+  callApi(
+    "/make-photo",
+    {
+      method: "POST",
     },
-    body: JSON.stringify(data),
-  })
-    .then((resp) => resp.json())
-    .then((data) => data.filename);
-}
+    {}
+  );
 
 // call the API to retrieve the disk usage of the Third-i
-export function getDiskUsage(): Promise<Storage> {
-  return fetch(`${API_PREFIX}/disk-usage`).then((resp) => resp.json());
-}
+export const getDiskUsage = async (): Promise<Storage> => callApi("/disk-usage");
