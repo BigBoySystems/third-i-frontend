@@ -203,7 +203,9 @@ function App() {
               onClick={() => setMenubarVisibility(!menubarVisible)}
             />
           </div>
-          <div className="App-top-right" style={{ fontSize: `${iconSize}px` }}></div>
+          <div className="App-top-right" style={{ fontSize: `${iconSize}px` }}>
+            <div className="watermark" />
+          </div>
         </div>
         <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
           <div className="App-bottom-left">

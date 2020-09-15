@@ -2,12 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="3D camera"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
@@ -25,10 +25,47 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Third-I</title>
+    <style>
+      body {
+        background-color: black;
+      }
+
+      #startup {
+        background-color: #231f20;
+        background-image: url(third-i.svg);
+        background-repeat: no-repeat;
+        background-position: center center;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        left: 0;
+        top: 0;
+        opacity: 1;
+        transition: opacity 200ms linear;
+        z-index: 100;
+        pointer-events: none;
+      }
+
+      @media (min-aspect-ratio: 1) {
+        #startup {
+          background-size: auto 100vh;
+        }
+      }
+
+      @media (max-aspect-ratio: 1) {
+        #startup {
+          background-size: 100vw auto;
+        }
+      }
+    </style>
+    <script>
+      window.tick = new Date().getTime();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="startup"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

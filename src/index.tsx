@@ -4,12 +4,20 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+const startTick = (window as any).tick;
+const now = new Date().getTime();
+const startupDelay = 3000 - (now - startTick);
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
   document.getElementById("root")
 );
+
+setTimeout(() => {
+  document.getElementById("startup")!.style.opacity = "0";
+}, startupDelay);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
