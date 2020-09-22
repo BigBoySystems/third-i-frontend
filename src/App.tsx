@@ -70,6 +70,7 @@ function App() {
   const [shutter, setShutter] = useState(false);
   const [mockApiDetected, setMockApi] = useState(false);
   const [config, setConfig] = useState<api.Config | undefined>(undefined);
+  const [presetList, setPresetList] = useState<string[]>([]);
   const [recordingTime, setRecordingTime] = useState([0, 0]);
 
   // initialize the camera, set the portal mode and retrieve disk usage and the config file
@@ -78,14 +79,13 @@ function App() {
       setInitialized(true);
       api
         .isPortal()
-        .then(({ portal, essid }) => {
+        .then(async ({ portal, essid }) => {
           setNetworkDialog(portal);
           setAp(portal);
           setNetwork(essid || "");
-          api.getConfig().then((config) => {
-            setConfig(config);
-          });
-          api.getDiskUsage().then((diskUsage: api.Storage) => setStorage(diskUsage));
+          api.getConfig().then((config) => setConfig(config));
+          api.listPresets().then(({ presets }) => setPresetList(presets));
+          api.getDiskUsage().then((diskUsage) => setStorage(diskUsage));
         })
         .catch(() => {
           // initialize in mockApi mode
@@ -106,10 +106,20 @@ function App() {
   // triggered once to start the video
   useEffect(() => {
     if (!videoStarted) {
-      startVideo();
       setVideoStarted(true);
+      startVideo();
     }
   }, [videoStarted]);
+
+  const addPreset = (name: string) => {
+    if (!presetList.includes(name)) {
+      setPresetList([...presetList, name]);
+    }
+  };
+
+  const deletePreset = (name: string) => {
+    setPresetList(presetList.filter((x) => x !== name));
+  };
 
   const used = numeral(storage.used);
   const total = numeral(storage.total);
@@ -162,16 +172,15 @@ function App() {
             {config !== undefined && (
               <MenuBar
                 config={config}
+                setConfig={setConfig}
+                presetList={presetList}
+                addPreset={addPreset}
+                deletePreset={deletePreset}
                 photoMode={photoMode}
                 setPhotoMode={setPhotoMode}
                 setNetwork={setNetwork}
                 ap={ap}
                 setAp={setAp}
-                // We need this custom key because the props of the Settings component is in the state
-                // of the Menubar component (which makes the Settings not re-render)
-                //
-                // https://github.com/palantir/blueprint/issues/3173
-                key={`menubar-${photoMode}-${ap}`}
               />
             )}
           </div>

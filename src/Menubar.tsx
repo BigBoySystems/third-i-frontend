@@ -16,6 +16,9 @@ import {
   Button,
   InputGroup,
   ControlGroup,
+  Callout,
+  Intent,
+  ContextMenu,
 } from "@blueprintjs/core";
 import { PhotoMode, Network } from "./App";
 import * as api from "./api";
@@ -32,32 +35,12 @@ const fromStr = (value: string, default_: number) => {
   }
 };
 
-// declaration of default preset of the lightning setting
-const LIGHTING: { [k: string]: Partial<api.Config> } = {
-  nightOutside: {
-    contrast: "0",
-    sharpness: "0",
-    digitalgain: "0",
-  },
-  dayInside: {
-    contrast: "1",
-    sharpness: "1",
-    digitalgain: "1",
-  },
-  nightInside: {
-    contrast: "2",
-    sharpness: "2",
-    digitalgain: "2",
-  },
-  dayOutside: {
-    contrast: "3",
-    sharpness: "3",
-    digitalgain: "3",
-  },
-};
-
 interface ConfigProps {
   config: api.Config;
+  setConfig: (config: api.Config) => void;
+  presetList: string[];
+  addPreset: (name: string) => void;
+  deletePreset: (name: string) => void;
 }
 
 // props for the Access Point state
@@ -69,6 +52,8 @@ interface ApProps {
 type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
 type PanelProps = IPanelProps & MenubarProps;
 
+const Context = React.createContext({} as MenubarProps);
+
 interface PictureProps {
   config: api.Config;
   onConfigUpdate?: (config: Partial<api.Config>) => void;
@@ -76,79 +61,86 @@ interface PictureProps {
 }
 
 function Menubar(props: MenubarProps) {
-  const [panels, setPanels] = useState<IPanel<MenubarProps>[]>([
+  const [panels, setPanels] = useState<IPanel<{}>[]>([
     {
       component: Settings,
-      props,
+      props: {},
       title: "Settings",
     },
   ]);
 
   return (
-    <PanelStack // behavior of the menu bar
-      className="Menubar"
-      initialPanel={panels[0]}
-      onOpen={(new_) => setPanels([new_ as IPanel<MenubarProps>, ...panels])}
-      onClose={() => setPanels(panels.slice(1))}
-    />
+    <Context.Provider value={props}>
+      <PanelStack // behavior of the menu bar
+        className="Menubar"
+        initialPanel={panels[0]}
+        onOpen={(new_) => setPanels([new_, ...panels])}
+        onClose={() => setPanels(panels.slice(1))}
+      />
+    </Context.Provider>
   );
 }
 
-function Settings({ openPanel, closePanel, ...props }: PanelProps) {
-  const { photoMode, setPhotoMode } = props;
-  const [viewAngleSquare, setViewAngleSquare] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(props.config.audio_enabled === "1");
+const withContext = (Component: (props: PanelProps) => any) => (panelProps: any) => (
+  <Context.Consumer>{(props) => <Component {...props} {...panelProps} />}</Context.Consumer>
+);
 
-  return (
-    <Menu>
-      <MenuItem // open the panel of display settings
-        icon="desktop"
-        text="Display"
-        onClick={() => openPanel({ component: Display, props, title: "Display" })}
-      />
-      <MenuItem // toggle between photo and video mode
-        icon={photoMode ? "camera" : "mobile-video"}
-        text="Photo/Video mode"
-        labelElement={photoMode ? "Photo" : "Video"}
-        onClick={() => setPhotoMode(!photoMode)}
-      />
-      <MenuItem // open the panel of streaming settings
-        icon="mobile-video"
-        text="Streaming settings"
-        onClick={() => openPanel({ component: Streaming, props, title: "Streaming settings" })}
-      />
-      <MenuItem // toggle audio
-        icon="headset"
-        text="Audio"
-        labelElement={audioEnabled ? "Enabled" : "Disabled"}
-        onClick={() => {
-          api.updateConfig({ audio_enabled: audioEnabled ? "0" : "1" });
-          setAudioEnabled(!audioEnabled);
-        }}
-      />
-      <MenuItem // set the viewing angle parameter
-        icon="square"
-        text="Viewing angle"
-        labelElement={viewAngleSquare ? "Square" : "Extended"}
-        onClick={() => setViewAngleSquare(!viewAngleSquare)}
-        disabled
-      />
-      <MenuItem // open the panel of the lighting settings
-        icon="lightbulb"
-        text="Lighting"
-        onClick={() => openPanel({ component: Lighting, props, title: "Lighting" })}
-      />
-      <MenuDivider />
-      <MenuItem // open the panel of the advanced settings
-        icon="cog"
-        text="Advanced parameters"
-        onClick={() => openPanel({ component: Advanced, props, title: "Advanced parameters" })}
-      />
-    </Menu>
-  );
-}
+const Settings = withContext(
+  ({ openPanel, closePanel, photoMode, setPhotoMode, config }: PanelProps) => {
+    const [viewAngleSquare, setViewAngleSquare] = useState(false);
+    const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
-function Display({ config }: PanelProps) {
+    return (
+      <Menu>
+        <MenuItem // open the panel of display settings
+          icon="desktop"
+          text="Display"
+          onClick={() => openPanel({ component: Display, title: "Display" })}
+        />
+        <MenuItem // toggle between photo and video mode
+          icon={photoMode ? "camera" : "mobile-video"}
+          text="Photo/Video mode"
+          labelElement={photoMode ? "Photo" : "Video"}
+          onClick={() => setPhotoMode(!photoMode)}
+        />
+        <MenuItem // open the panel of streaming settings
+          icon="mobile-video"
+          text="Streaming settings"
+          onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
+        />
+        <MenuItem // toggle audio
+          icon="headset"
+          text="Audio"
+          labelElement={audioEnabled ? "Enabled" : "Disabled"}
+          onClick={() => {
+            api.updateConfig({ audio_enabled: audioEnabled ? "0" : "1" });
+            setAudioEnabled(!audioEnabled);
+          }}
+        />
+        <MenuItem // set the viewing angle parameter
+          icon="square"
+          text="Viewing angle"
+          labelElement={viewAngleSquare ? "Square" : "Extended"}
+          onClick={() => setViewAngleSquare(!viewAngleSquare)}
+          disabled
+        />
+        <MenuItem // open the panel of the lighting settings
+          icon="lightbulb"
+          text="Lighting"
+          onClick={() => openPanel({ component: Lighting, title: "Lighting" })}
+        />
+        <MenuDivider />
+        <MenuItem // open the panel of the advanced settings
+          icon="cog"
+          text="Advanced parameters"
+          onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
+        />
+      </Menu>
+    );
+  }
+);
+
+const Display = withContext(({ config }: PanelProps) => {
   let defaultDisplay = "3dFlat";
   if (config.video_mode === "3D") {
     defaultDisplay = "3dFlat";
@@ -214,9 +206,9 @@ function Display({ config }: PanelProps) {
       <Switch label="Flipped" checked={flipped} onChange={() => setFlipped(!flipped)} disabled />
     </div>
   );
-}
+});
 
-function Streaming({ config }: PanelProps) {
+const Streaming = withContext(({ config }: PanelProps) => {
   // update the configuration to enable/disable the video stream on websocket
   const updateWs = (value: boolean) => {
     api.updateConfig({
@@ -329,39 +321,59 @@ function Streaming({ config }: PanelProps) {
       />
     </div>
   );
-}
+});
 
-function Lighting({ config }: PanelProps) {
-  const [radioCheck, setRadioCheck] = useState("nightOutside");
-  const [configPreview, setConfigPreview] = useState(config);
-
+const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: PanelProps) => {
   return (
     <div className="Menubar-content">
-      <RadioGroup // set the preset you will choose for lighting setting
-        onChange={(event) => {
-          const value = event.currentTarget.value;
-          const settings = LIGHTING[value];
+      {presetList.length === 0 ? (
+        <Callout intent={Intent.PRIMARY}>No preset</Callout>
+      ) : (
+        <Menu>
+          {presetList.map((preset) => (
+            <MenuItem
+              text={preset}
+              key={preset}
+              onClick={async () => {
+                const { config } = await api.updateConfig({
+                  preset,
+                });
+                setConfig(config);
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
 
-          setRadioCheck(value);
-          setConfigPreview({ ...configPreview, ...settings });
-        }}
-        selectedValue={radioCheck}
-      >
-        <Radio label="Night outside" value="nightOutside" />
-        <Radio label="Day inside" value="dayInside" />
-        <Radio label="Night inside" value="nightInside" />
-        <Radio label="Day outside" value="dayOutside" />
-      </RadioGroup>
-      <PictureInner // display a preview of the video settings (the lighting preset is set by the video settings)
-        config={configPreview}
+                ContextMenu.show(
+                  <Menu>
+                    <MenuItem
+                      text="Delete"
+                      icon="trash"
+                      onClick={() => {
+                        deletePreset(preset);
+                        api.deletePreset(preset);
+                      }}
+                    />
+                  </Menu>,
+                  { left: e.clientX, top: e.clientY },
+                  () => {},
+                  true
+                );
+              }}
+            />
+          ))}
+          <MenuDivider />
+        </Menu>
+      )}
+      <PictureInner // display a preview of the video settings (the preset is set by the video settings)
         disabled
-        key={`${JSON.stringify(configPreview)}`}
+        // NOTE: force refresh because the sliders are using state instead of props
+        key={JSON.stringify(config)}
       />
     </div>
   );
-}
+});
 
-function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
+const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => {
   // component of the advanced parameters
   return (
     <div className="Menubar-content">
@@ -382,33 +394,60 @@ function Advanced({ openPanel, closePanel, ...props }: PanelProps) {
       <Button icon="updated" text="Update" fill disabled />
     </div>
   );
-}
+});
 
-function Picture({ closePanel, config }: PanelProps) {
+const Picture = withContext(({ closePanel, config, setConfig, addPreset }: PanelProps) => {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
+  const [presetName, setPresetName] = useState("");
+  const [preset, setPreset] = useState<Partial<api.Config>>({
+    video_wb: config.video_wb,
+    exposure: config.exposure,
+    contrast: config.contrast,
+    sharpness: config.sharpness,
+    digitalgain: config.digitalgain,
+  });
 
   const updateFramerate = useDebounceCallback(
     // set the framerate setting and change it in the configuration file
-    (value: number) =>
-      api.updateConfig({
+    async (value: number) => {
+      const { config } = await api.updateConfig({
         video_fps: `${value}`,
-      }),
+      });
+      setConfig(config);
+    },
     DEBOUNCE_TIME
   );
 
   const updateBitrate = useDebounceCallback(
     // set the bitrate setting and change it in the configuration file
-    (value: number) =>
+    async (value: number) => {
       api.updateConfig({
         video_bitrate: `${value}`,
-      }),
+      });
+      setConfig(config);
+    },
     DEBOUNCE_TIME
   );
 
+  const savePreset = () => {
+    closePanel();
+    addPreset(presetName);
+    api.savePreset(presetName, preset);
+  };
+
   return (
     <div className="Menubar-content">
-      <PictureInner config={config} onConfigUpdate={api.updateConfig} />
+      <PictureInner
+        onConfigUpdate={async (patch: any) => {
+          setPreset({
+            ...preset,
+            ...patch,
+          });
+          const { config } = await api.updateConfig(patch);
+          setConfig(config);
+        }}
+      />
       <Label>
         Bitrate (Mbps)
         <Slider // parameter to set the bitrate
@@ -439,19 +478,24 @@ function Picture({ closePanel, config }: PanelProps) {
           }}
         />
       </Label>
-      <Button // this button give you the possibility to save a custom preset (not available now)
-        icon="floppy-disk"
-        text="Save"
+      <InputGroup // this button give you the possibility to save a custom preset
+        value={presetName}
+        onChange={(ev: any) => setPresetName(ev.currentTarget.value)}
+        onKeyUp={(ev) => {
+          if (ev.key === "Enter") {
+            savePreset();
+          }
+        }}
+        placeholder="Save preset"
         fill
-        onClick={() => closePanel()}
-        disabled
+        rightElement={<Button icon="floppy-disk" onClick={() => savePreset()} />}
       />
     </div>
   );
-}
+});
 
 // component of the rest of the video settings (used too by the preview in lighting settings)
-function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
+const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureProps) => {
   const [whiteBalance, setWhiteBalance] = useState(config.video_wb);
   const [exposure, setExposure] = useState(config.exposure);
   const [contrast, setContrast] = useState(fromStr(config.contrast, 0));
@@ -591,10 +635,10 @@ function PictureInner({ config, onConfigUpdate, disabled }: PictureProps) {
       </Label>
     </div>
   );
-}
+});
 
 // component of the network selection in wifi settings
-function SelectNetwork({ closePanel, setNetwork, ap, setAp }: PanelProps) {
+const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => {
   return (
     <CaptivePortal
       onConnected={(essid) => {
@@ -610,6 +654,6 @@ function SelectNetwork({ closePanel, setNetwork, ap, setAp }: PanelProps) {
       vertical
     />
   );
-}
+});
 
 export default Menubar;

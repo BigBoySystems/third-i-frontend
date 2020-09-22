@@ -99,6 +99,15 @@ export interface Config {
   udp_clients: string;
   udp_enabled: string;
   ws_enabled: string;
+  preset?: string;
+}
+
+export interface UpdateConfig extends Response {
+  config: Config;
+}
+
+export interface Presets extends Response {
+  presets: string[];
 }
 
 // call the API endpoint to retrieve portal information
@@ -136,7 +145,7 @@ export const startAp = async (): Promise<any> =>
   );
 
 // call the API to update the configuration file
-export const updateConfig = (patch: Partial<Config>): Promise<any> =>
+export const updateConfig = (patch: Partial<Config>): Promise<UpdateConfig> =>
   callApi(
     "/config",
     {
@@ -147,6 +156,25 @@ export const updateConfig = (patch: Partial<Config>): Promise<any> =>
 
 // call the API to retrieve the configuration file
 export const getConfig = async (): Promise<Config> => callApi("/config");
+
+// call the API to retrieve the list of presets
+export const listPresets = async (): Promise<Presets> => callApi("/list-presets");
+
+// call the API to save a preset
+export const savePreset = async (name: string, config: Partial<Config>): Promise<Response> =>
+  callApi(
+    `/preset/${encodeURIComponent(name)}`,
+    {
+      method: "POST",
+    },
+    config
+  );
+
+// call the API to delete a preset
+export const deletePreset = async (name: string): Promise<Response> =>
+  callApi(`/preset/${encodeURIComponent(name)}`, {
+    method: "DELETE",
+  });
 
 // call the API to retrieve the third-i user files
 export const getFiles = async (): Promise<File> => callApi("/files");
