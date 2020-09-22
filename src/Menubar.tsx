@@ -20,7 +20,7 @@ import {
   Intent,
   ContextMenu,
 } from "@blueprintjs/core";
-import { PhotoMode, Network } from "./App";
+import { PhotoMode, Network, MockApi } from "./App";
 import * as api from "./api";
 import { useDebounceCallback } from "@react-hook/debounce";
 
@@ -50,7 +50,7 @@ interface ApProps {
 }
 
 type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
-type PanelProps = IPanelProps & MenubarProps;
+type PanelProps = IPanelProps & MenubarProps & MockApi;
 
 const Context = React.createContext({} as MenubarProps);
 
@@ -82,7 +82,13 @@ function Menubar(props: MenubarProps) {
 }
 
 const withContext = (Component: (props: PanelProps) => any) => (panelProps: any) => (
-  <Context.Consumer>{(props) => <Component {...props} {...panelProps} />}</Context.Consumer>
+  <Context.Consumer>
+    {(props) => (
+      <MockApi.Consumer>
+        {(mockApi) => <Component {...props} {...panelProps} mockApi={mockApi} />}
+      </MockApi.Consumer>
+    )}
+  </Context.Consumer>
 );
 
 const Settings = withContext(
@@ -323,55 +329,61 @@ const Streaming = withContext(({ config }: PanelProps) => {
   );
 });
 
-const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: PanelProps) => {
-  return (
-    <div className="Menubar-content">
-      {presetList.length === 0 ? (
-        <Callout intent={Intent.PRIMARY}>No preset</Callout>
-      ) : (
-        <Menu>
-          {presetList.map((preset) => (
-            <MenuItem
-              text={preset}
-              key={preset}
-              onClick={async () => {
-                const { config } = await api.updateConfig({
-                  preset,
-                });
-                setConfig(config);
-              }}
-              onContextMenu={(e) => {
-                e.preventDefault();
+const Preset = withContext(
+  ({ config, setConfig, presetList, deletePreset, mockApi }: PanelProps) => {
+    return (
+      <div className="Menubar-content">
+        {presetList.length === 0 ? (
+          <Callout intent={Intent.PRIMARY}>No preset</Callout>
+        ) : (
+          <Menu>
+            {presetList.map((preset) => (
+              <MenuItem
+                text={preset}
+                key={preset}
+                onClick={async () => {
+                  if (!mockApi) {
+                    const { config } = await api.updateConfig({
+                      preset,
+                    });
+                    setConfig(config);
+                  }
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
 
-                ContextMenu.show(
-                  <Menu>
-                    <MenuItem
-                      text="Delete"
-                      icon="trash"
-                      onClick={() => {
-                        deletePreset(preset);
-                        api.deletePreset(preset);
-                      }}
-                    />
-                  </Menu>,
-                  { left: e.clientX, top: e.clientY },
-                  () => {},
-                  true
-                );
-              }}
-            />
-          ))}
-          <MenuDivider />
-        </Menu>
-      )}
-      <PictureInner // display a preview of the video settings (the preset is set by the video settings)
-        disabled
-        // NOTE: force refresh because the sliders are using state instead of props
-        key={JSON.stringify(config)}
-      />
-    </div>
-  );
-});
+                  ContextMenu.show(
+                    <Menu>
+                      <MenuItem
+                        text="Delete"
+                        icon="trash"
+                        onClick={() => {
+                          deletePreset(preset);
+                          if (!mockApi) {
+                            api.deletePreset(preset);
+                          }
+                        }}
+                      />
+                    </Menu>,
+                    { left: e.clientX, top: e.clientY },
+                    () => {},
+                    true
+                  );
+                }}
+              />
+            ))}
+            <MenuDivider />
+          </Menu>
+        )}
+        <PictureInner // display a preview of the video settings (the preset is set by the video settings)
+          disabled
+          // NOTE: force refresh because the sliders are using state instead of props
+          key={JSON.stringify(config)}
+        />
+      </div>
+    );
+  }
+);
 
 const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => {
   // component of the advanced parameters
@@ -396,7 +408,7 @@ const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) =
   );
 });
 
-const Picture = withContext(({ closePanel, config, setConfig, addPreset }: PanelProps) => {
+const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi }: PanelProps) => {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
   const [presetName, setPresetName] = useState("");
@@ -411,10 +423,12 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const updateFramerate = useDebounceCallback(
     // set the framerate setting and change it in the configuration file
     async (value: number) => {
-      const { config } = await api.updateConfig({
-        video_fps: `${value}`,
-      });
-      setConfig(config);
+      if (!mockApi) {
+        const { config } = await api.updateConfig({
+          video_fps: `${value}`,
+        });
+        setConfig(config);
+      }
     },
     DEBOUNCE_TIME
   );
@@ -422,10 +436,12 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const updateBitrate = useDebounceCallback(
     // set the bitrate setting and change it in the configuration file
     async (value: number) => {
-      api.updateConfig({
-        video_bitrate: `${value}`,
-      });
-      setConfig(config);
+      if (!mockApi) {
+        api.updateConfig({
+          video_bitrate: `${value}`,
+        });
+        setConfig(config);
+      }
     },
     DEBOUNCE_TIME
   );
@@ -433,7 +449,9 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const savePreset = () => {
     closePanel();
     addPreset(presetName);
-    api.savePreset(presetName, preset);
+    if (!mockApi) {
+      api.savePreset(presetName, preset);
+    }
   };
 
   return (
@@ -444,8 +462,10 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
             ...preset,
             ...patch,
           });
-          const { config } = await api.updateConfig(patch);
-          setConfig(config);
+          if (!mockApi) {
+            const { config } = await api.updateConfig(patch);
+            setConfig(config);
+          }
         }}
       />
       <Label>
