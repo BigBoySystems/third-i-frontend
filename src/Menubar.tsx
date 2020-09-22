@@ -104,7 +104,7 @@ const Settings = withContext(
           onClick={() => setPhotoMode(!photoMode)}
         />
         <MenuItem // open the panel of streaming settings
-          icon="mobile-video"
+          icon="settings"
           text="Streaming settings"
           onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
         />
@@ -124,10 +124,10 @@ const Settings = withContext(
           onClick={() => setViewAngleSquare(!viewAngleSquare)}
           disabled
         />
-        <MenuItem // open the panel of the lighting settings
-          icon="lightbulb"
-          text="Lighting"
-          onClick={() => openPanel({ component: Lighting, title: "Lighting" })}
+        <MenuItem // open the panel of the preset settings
+          icon="media"
+          text="Preset"
+          onClick={() => openPanel({ component: Preset, title: "Preset" })}
         />
         <MenuDivider />
         <MenuItem // open the panel of the advanced settings
@@ -494,7 +494,7 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   );
 });
 
-// component of the rest of the video settings (used too by the preview in lighting settings)
+// component of the rest of the video settings (used too by the preview in preset settings)
 const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureProps) => {
   const [whiteBalance, setWhiteBalance] = useState(config.video_wb);
   const [exposure, setExposure] = useState(config.exposure);
