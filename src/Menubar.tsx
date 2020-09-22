@@ -20,7 +20,7 @@ import {
   Intent,
   ContextMenu,
 } from "@blueprintjs/core";
-import { PhotoMode, Network } from "./App";
+import { PhotoMode, Network, MockApi } from "./App";
 import * as api from "./api";
 import { useDebounceCallback } from "@react-hook/debounce";
 
@@ -50,7 +50,7 @@ interface ApProps {
 }
 
 type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
-type PanelProps = IPanelProps & MenubarProps;
+type PanelProps = IPanelProps & MenubarProps & MockApi;
 
 const Context = React.createContext({} as MenubarProps);
 
@@ -82,7 +82,13 @@ function Menubar(props: MenubarProps) {
 }
 
 const withContext = (Component: (props: PanelProps) => any) => (panelProps: any) => (
-  <Context.Consumer>{(props) => <Component {...props} {...panelProps} />}</Context.Consumer>
+  <Context.Consumer>
+    {(props) => (
+      <MockApi.Consumer>
+        {(mockApi) => <Component {...props} {...panelProps} mockApi={mockApi} />}
+      </MockApi.Consumer>
+    )}
+  </Context.Consumer>
 );
 
 const Settings = withContext(
@@ -104,7 +110,7 @@ const Settings = withContext(
           onClick={() => setPhotoMode(!photoMode)}
         />
         <MenuItem // open the panel of streaming settings
-          icon="mobile-video"
+          icon="settings"
           text="Streaming settings"
           onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
         />
@@ -124,10 +130,10 @@ const Settings = withContext(
           onClick={() => setViewAngleSquare(!viewAngleSquare)}
           disabled
         />
-        <MenuItem // open the panel of the lighting settings
-          icon="lightbulb"
-          text="Lighting"
-          onClick={() => openPanel({ component: Lighting, title: "Lighting" })}
+        <MenuItem // open the panel of the preset settings
+          icon="media"
+          text="Preset"
+          onClick={() => openPanel({ component: Preset, title: "Preset" })}
         />
         <MenuDivider />
         <MenuItem // open the panel of the advanced settings
@@ -323,8 +329,8 @@ const Streaming = withContext(({ config }: PanelProps) => {
   );
 });
 
-const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: PanelProps) => {
-  return (
+const Preset = withContext(
+  ({ config, setConfig, presetList, deletePreset, mockApi }: PanelProps) => (
     <div className="Menubar-content">
       {presetList.length === 0 ? (
         <Callout intent={Intent.PRIMARY}>No preset</Callout>
@@ -335,10 +341,12 @@ const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: P
               text={preset}
               key={preset}
               onClick={async () => {
-                const { config } = await api.updateConfig({
-                  preset,
-                });
-                setConfig(config);
+                if (!mockApi) {
+                  const { config } = await api.updateConfig({
+                    preset,
+                  });
+                  setConfig(config);
+                }
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -350,7 +358,9 @@ const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: P
                       icon="trash"
                       onClick={() => {
                         deletePreset(preset);
-                        api.deletePreset(preset);
+                        if (!mockApi) {
+                          api.deletePreset(preset);
+                        }
                       }}
                     />
                   </Menu>,
@@ -370,33 +380,31 @@ const Lighting = withContext(({ config, setConfig, presetList, deletePreset }: P
         key={JSON.stringify(config)}
       />
     </div>
-  );
-});
+  )
+);
 
-const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => {
+const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => (
   // component of the advanced parameters
-  return (
-    <div className="Menubar-content">
-      <Menu>
-        <MenuItem // open the video settings panel
-          icon="media"
-          text="Video settings"
-          onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
-        />
-        <MenuItem // open the wifi settings panel
-          icon="globe-network"
-          text="WiFi settings"
-          onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
-        />
-      </Menu>
-      <MenuDivider />
-      <Button icon="wrench" text="Factory reset" fill />
-      <Button icon="updated" text="Update" fill disabled />
-    </div>
-  );
-});
+  <div className="Menubar-content">
+    <Menu>
+      <MenuItem // open the video settings panel
+        icon="media"
+        text="Video settings"
+        onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
+      />
+      <MenuItem // open the wifi settings panel
+        icon="globe-network"
+        text="WiFi settings"
+        onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
+      />
+    </Menu>
+    <MenuDivider />
+    <Button icon="wrench" text="Factory reset" fill />
+    <Button icon="updated" text="Update" fill disabled />
+  </div>
+));
 
-const Picture = withContext(({ closePanel, config, setConfig, addPreset }: PanelProps) => {
+const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi }: PanelProps) => {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
   const [presetName, setPresetName] = useState("");
@@ -411,10 +419,12 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const updateFramerate = useDebounceCallback(
     // set the framerate setting and change it in the configuration file
     async (value: number) => {
-      const { config } = await api.updateConfig({
-        video_fps: `${value}`,
-      });
-      setConfig(config);
+      if (!mockApi) {
+        const { config } = await api.updateConfig({
+          video_fps: `${value}`,
+        });
+        setConfig(config);
+      }
     },
     DEBOUNCE_TIME
   );
@@ -422,10 +432,12 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const updateBitrate = useDebounceCallback(
     // set the bitrate setting and change it in the configuration file
     async (value: number) => {
-      api.updateConfig({
-        video_bitrate: `${value}`,
-      });
-      setConfig(config);
+      if (!mockApi) {
+        api.updateConfig({
+          video_bitrate: `${value}`,
+        });
+        setConfig(config);
+      }
     },
     DEBOUNCE_TIME
   );
@@ -433,7 +445,9 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   const savePreset = () => {
     closePanel();
     addPreset(presetName);
-    api.savePreset(presetName, preset);
+    if (!mockApi) {
+      api.savePreset(presetName, preset);
+    }
   };
 
   return (
@@ -444,8 +458,10 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
             ...preset,
             ...patch,
           });
-          const { config } = await api.updateConfig(patch);
-          setConfig(config);
+          if (!mockApi) {
+            const { config } = await api.updateConfig(patch);
+            setConfig(config);
+          }
         }}
       />
       <Label>
@@ -494,7 +510,7 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset }: Panel
   );
 });
 
-// component of the rest of the video settings (used too by the preview in lighting settings)
+// component of the rest of the video settings (used too by the preview in preset settings)
 const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureProps) => {
   const [whiteBalance, setWhiteBalance] = useState(config.video_wb);
   const [exposure, setExposure] = useState(config.exposure);
@@ -638,22 +654,20 @@ const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureP
 });
 
 // component of the network selection in wifi settings
-const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => {
-  return (
-    <CaptivePortal
-      onConnected={(essid) => {
-        closePanel();
-        setNetwork(essid);
-      }}
-      onAP={() => {
-        closePanel();
-        setNetwork("");
-      }}
-      ap={ap}
-      setAp={setAp}
-      vertical
-    />
-  );
-});
+const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => (
+  <CaptivePortal
+    onConnected={(essid) => {
+      closePanel();
+      setNetwork(essid);
+    }}
+    onAP={() => {
+      closePanel();
+      setNetwork("");
+    }}
+    ap={ap}
+    setAp={setAp}
+    vertical
+  />
+));
 
 export default Menubar;
