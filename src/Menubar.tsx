@@ -330,83 +330,79 @@ const Streaming = withContext(({ config }: PanelProps) => {
 });
 
 const Preset = withContext(
-  ({ config, setConfig, presetList, deletePreset, mockApi }: PanelProps) => {
-    return (
-      <div className="Menubar-content">
-        {presetList.length === 0 ? (
-          <Callout intent={Intent.PRIMARY}>No preset</Callout>
-        ) : (
-          <Menu>
-            {presetList.map((preset) => (
-              <MenuItem
-                text={preset}
-                key={preset}
-                onClick={async () => {
-                  if (!mockApi) {
-                    const { config } = await api.updateConfig({
-                      preset,
-                    });
-                    setConfig(config);
-                  }
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
+  ({ config, setConfig, presetList, deletePreset, mockApi }: PanelProps) => (
+    <div className="Menubar-content">
+      {presetList.length === 0 ? (
+        <Callout intent={Intent.PRIMARY}>No preset</Callout>
+      ) : (
+        <Menu>
+          {presetList.map((preset) => (
+            <MenuItem
+              text={preset}
+              key={preset}
+              onClick={async () => {
+                if (!mockApi) {
+                  const { config } = await api.updateConfig({
+                    preset,
+                  });
+                  setConfig(config);
+                }
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
 
-                  ContextMenu.show(
-                    <Menu>
-                      <MenuItem
-                        text="Delete"
-                        icon="trash"
-                        onClick={() => {
-                          deletePreset(preset);
-                          if (!mockApi) {
-                            api.deletePreset(preset);
-                          }
-                        }}
-                      />
-                    </Menu>,
-                    { left: e.clientX, top: e.clientY },
-                    () => {},
-                    true
-                  );
-                }}
-              />
-            ))}
-            <MenuDivider />
-          </Menu>
-        )}
-        <PictureInner // display a preview of the video settings (the preset is set by the video settings)
-          disabled
-          // NOTE: force refresh because the sliders are using state instead of props
-          key={JSON.stringify(config)}
-        />
-      </div>
-    );
-  }
+                ContextMenu.show(
+                  <Menu>
+                    <MenuItem
+                      text="Delete"
+                      icon="trash"
+                      onClick={() => {
+                        deletePreset(preset);
+                        if (!mockApi) {
+                          api.deletePreset(preset);
+                        }
+                      }}
+                    />
+                  </Menu>,
+                  { left: e.clientX, top: e.clientY },
+                  () => {},
+                  true
+                );
+              }}
+            />
+          ))}
+          <MenuDivider />
+        </Menu>
+      )}
+      <PictureInner // display a preview of the video settings (the preset is set by the video settings)
+        disabled
+        // NOTE: force refresh because the sliders are using state instead of props
+        key={JSON.stringify(config)}
+      />
+    </div>
+  )
 );
 
-const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => {
+const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) => (
   // component of the advanced parameters
-  return (
-    <div className="Menubar-content">
-      <Menu>
-        <MenuItem // open the video settings panel
-          icon="media"
-          text="Video settings"
-          onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
-        />
-        <MenuItem // open the wifi settings panel
-          icon="globe-network"
-          text="WiFi settings"
-          onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
-        />
-      </Menu>
-      <MenuDivider />
-      <Button icon="wrench" text="Factory reset" fill />
-      <Button icon="updated" text="Update" fill disabled />
-    </div>
-  );
-});
+  <div className="Menubar-content">
+    <Menu>
+      <MenuItem // open the video settings panel
+        icon="media"
+        text="Video settings"
+        onClick={() => openPanel({ component: Picture, props, title: "Video settings" })}
+      />
+      <MenuItem // open the wifi settings panel
+        icon="globe-network"
+        text="WiFi settings"
+        onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
+      />
+    </Menu>
+    <MenuDivider />
+    <Button icon="wrench" text="Factory reset" fill />
+    <Button icon="updated" text="Update" fill disabled />
+  </div>
+));
 
 const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi }: PanelProps) => {
   const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
@@ -658,22 +654,20 @@ const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureP
 });
 
 // component of the network selection in wifi settings
-const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => {
-  return (
-    <CaptivePortal
-      onConnected={(essid) => {
-        closePanel();
-        setNetwork(essid);
-      }}
-      onAP={() => {
-        closePanel();
-        setNetwork("");
-      }}
-      ap={ap}
-      setAp={setAp}
-      vertical
-    />
-  );
-});
+const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => (
+  <CaptivePortal
+    onConnected={(essid) => {
+      closePanel();
+      setNetwork(essid);
+    }}
+    onAP={() => {
+      closePanel();
+      setNetwork("");
+    }}
+    ap={ap}
+    setAp={setAp}
+    vertical
+  />
+));
 
 export default Menubar;
