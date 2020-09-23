@@ -410,7 +410,7 @@ const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) =
 ));
 
 const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi }: PanelProps) => {
-  const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1000000);
+  const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1_000_000);
   const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
   const [presetName, setPresetName] = useState("");
   const [preset, setPreset] = useState<Partial<api.Config>>({
@@ -439,7 +439,7 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi
     async (value: number) => {
       if (!mockApi) {
         api.updateConfig({
-          video_bitrate: `${value}`,
+          video_bitrate: `${value * 1_000_000}`,
         });
         setConfig(config);
       }
