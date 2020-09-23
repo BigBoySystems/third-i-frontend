@@ -92,7 +92,7 @@ const withContext = (Component: (props: PanelProps) => any) => (panelProps: any)
 );
 
 const Settings = withContext(
-  ({ openPanel, closePanel, photoMode, setPhotoMode, config }: PanelProps) => {
+  ({ openPanel, closePanel, photoMode, setPhotoMode, config, setConfig, mockApi }: PanelProps) => {
     const [viewAngleSquare, setViewAngleSquare] = useState(false);
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
@@ -118,9 +118,14 @@ const Settings = withContext(
           icon="headset"
           text="Audio"
           labelElement={audioEnabled ? "Enabled" : "Disabled"}
-          onClick={() => {
-            api.updateConfig({ audio_enabled: audioEnabled ? "0" : "1" });
+          onClick={async () => {
             setAudioEnabled(!audioEnabled);
+            if (!mockApi) {
+              const { config } = await api.updateConfig({
+                audio_enabled: audioEnabled ? "0" : "1",
+              });
+              setConfig(config);
+            }
           }}
         />
         <MenuItem // set the viewing angle parameter
