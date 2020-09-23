@@ -438,7 +438,7 @@ const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi
     // set the bitrate setting and change it in the configuration file
     async (value: number) => {
       if (!mockApi) {
-        api.updateConfig({
+        const { config } = await api.updateConfig({
           video_bitrate: `${value * 1_000_000}`,
         });
         setConfig(config);
