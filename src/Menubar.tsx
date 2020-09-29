@@ -97,7 +97,7 @@ const withContext = (Component: (props: PanelProps) => any) => (panelProps: any)
 );
 
 const Settings = withContext(
-  ({ openPanel, closePanel, photoMode, setPhotoMode, config, setConfig, mockApi }: PanelProps) => {
+  ({ openPanel, closePanel, photoMode, setPhotoMode, config, setConfig, mockApi, serialNumber}: PanelProps) => {
     const [viewAngleSquare, setViewAngleSquare] = useState(false);
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
@@ -154,7 +154,7 @@ const Settings = withContext(
         />
       </Menu>
       <div className="bp3-text-small bp3-text-muted">
-        serial number : {}
+        serial number : {serialNumber}
       </div>
       </>
     );
