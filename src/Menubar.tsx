@@ -97,6 +97,7 @@ const Settings = withContext(
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
     return (
+      <>
       <Menu>
         <MenuItem // open the panel of display settings
           icon="desktop"
@@ -147,6 +148,10 @@ const Settings = withContext(
           onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
         />
       </Menu>
+      <div className="bp3-text-small bp3-text-muted">
+        serial number : {}
+      </div>
+      </>
     );
   }
 );
