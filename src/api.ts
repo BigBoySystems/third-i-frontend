@@ -27,6 +27,7 @@ export async function callApi(path: string, options?: RequestInit, data?: any): 
 export interface Portal {
   portal: boolean; // true if currently in portal mode
   essid: string | null; // a string with the essid if connected to a network
+  serial: string; // serial number of the device
 }
 
 // item in the response to the "list networks" endpoint

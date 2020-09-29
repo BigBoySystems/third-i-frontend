@@ -140,11 +140,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
           icon="trash"
           onClick={() => setDeleteFile([node.nodeData!, nodePath])}
         />
-        <MenuItem
-          text="Export in Zip"
-          icon="compressed"
-          disabled
-        />
+        <MenuItem text="Export in Zip" icon="compressed" disabled />
       </Menu>,
       { left: e.clientX, top: e.clientY },
       () => {},

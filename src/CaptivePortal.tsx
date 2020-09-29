@@ -91,7 +91,7 @@ function CaptivePortalInner({
 
   // helper used when you are waiting to connect the device to a new network
   const waitConnected = async (waitDisconnected?: boolean): Promise<api.Portal> => {
-    let res: api.Portal = { portal: true, essid: null };
+    let res: api.Portal = { portal: true, essid: null, serial: "" };
     let connected = waitDisconnected ? true : false;
     do {
       try {
