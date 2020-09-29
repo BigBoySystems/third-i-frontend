@@ -25,3 +25,10 @@
   display: block;
   width: 100%;
 }
+
+.bp3-text-small {
+  margin-left: 5px;
+  position: fixed;
+  bottom: 0px;
+  padding: 10px;
+}
