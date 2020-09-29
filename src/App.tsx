@@ -185,6 +185,8 @@ function App() {
                 setNetwork={setNetwork}
                 ap={ap}
                 setAp={setAp}
+                serialNumber={serialNumber}
+                setSerialNumber={setSerialNumber}
               />
             )}
           </div>

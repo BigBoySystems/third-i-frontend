@@ -49,7 +49,12 @@ interface ApProps {
   setAp: (value: boolean) => void;
 }
 
-type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
+interface PortalProps {
+  serialNumber: string;
+  setSerialNumber: (value: string) => void;
+}
+
+type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps;
 type PanelProps = IPanelProps & MenubarProps & MockApi;
 
 const Context = React.createContext({} as MenubarProps);
