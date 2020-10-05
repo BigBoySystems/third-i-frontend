@@ -72,6 +72,7 @@ function App() {
   const [config, setConfig] = useState<api.Config | undefined>(undefined);
   const [presetList, setPresetList] = useState<string[]>([]);
   const [recordingTime, setRecordingTime] = useState([0, 0]);
+  const [serialNumber, setSerialNumber] = useState("");
 
   // initialize the camera, set the portal mode and retrieve disk usage and the config file
   useEffect(() => {
@@ -79,10 +80,11 @@ function App() {
       setInitialized(true);
       api
         .isPortal()
-        .then(async ({ portal, essid }) => {
+        .then(async ({ portal, essid, serial }) => {
           setNetworkDialog(portal);
           setAp(portal);
           setNetwork(essid || "");
+          setSerialNumber(serial);
           api.getConfig().then((config) => setConfig(config));
           api.listPresets().then(({ presets }) => setPresetList(presets));
           api.getDiskUsage().then((diskUsage) => setStorage(diskUsage));
@@ -98,6 +100,7 @@ function App() {
             // NOTE: uncomment the line below if you want to work on the CaptivePortal dialog
             //setNetworkDialog(true);
             setConfig(CONFIG_SAMPLE);
+            setSerialNumber("01111");
           }
         });
     }
@@ -181,6 +184,7 @@ function App() {
                 setNetwork={setNetwork}
                 ap={ap}
                 setAp={setAp}
+                serialNumber={serialNumber}
               />
             )}
           </div>

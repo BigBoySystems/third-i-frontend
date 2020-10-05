@@ -49,7 +49,11 @@ interface ApProps {
   setAp: (value: boolean) => void;
 }
 
-type MenubarProps = PhotoMode & Network & ConfigProps & ApProps;
+interface PortalProps {
+  serialNumber: string;
+}
+
+type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps;
 type PanelProps = IPanelProps & MenubarProps & MockApi;
 
 const Context = React.createContext({} as MenubarProps);
@@ -92,61 +96,73 @@ const withContext = (Component: (props: PanelProps) => any) => (panelProps: any)
 );
 
 const Settings = withContext(
-  ({ openPanel, closePanel, photoMode, setPhotoMode, config, setConfig, mockApi }: PanelProps) => {
+  ({
+    openPanel,
+    closePanel,
+    photoMode,
+    setPhotoMode,
+    config,
+    setConfig,
+    mockApi,
+    serialNumber,
+  }: PanelProps) => {
     const [viewAngleSquare, setViewAngleSquare] = useState(false);
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
     return (
-      <Menu>
-        <MenuItem // open the panel of display settings
-          icon="desktop"
-          text="Display"
-          onClick={() => openPanel({ component: Display, title: "Display" })}
-        />
-        <MenuItem // toggle between photo and video mode
-          icon={photoMode ? "camera" : "mobile-video"}
-          text="Photo/Video mode"
-          labelElement={photoMode ? "Photo" : "Video"}
-          onClick={() => setPhotoMode(!photoMode)}
-        />
-        <MenuItem // open the panel of streaming settings
-          icon="settings"
-          text="Streaming settings"
-          onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
-        />
-        <MenuItem // toggle audio
-          icon="headset"
-          text="Audio"
-          labelElement={audioEnabled ? "Enabled" : "Disabled"}
-          onClick={async () => {
-            setAudioEnabled(!audioEnabled);
-            if (!mockApi) {
-              const { config } = await api.updateConfig({
-                audio_enabled: audioEnabled ? "0" : "1",
-              });
-              setConfig(config);
-            }
-          }}
-        />
-        <MenuItem // set the viewing angle parameter
-          icon="square"
-          text="Viewing angle"
-          labelElement={viewAngleSquare ? "Square" : "Extended"}
-          onClick={() => setViewAngleSquare(!viewAngleSquare)}
-          disabled
-        />
-        <MenuItem // open the panel of the preset settings
-          icon="media"
-          text="Preset"
-          onClick={() => openPanel({ component: Preset, title: "Preset" })}
-        />
-        <MenuDivider />
-        <MenuItem // open the panel of the advanced settings
-          icon="cog"
-          text="Advanced parameters"
-          onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
-        />
-      </Menu>
+      <>
+        <Menu>
+          <MenuItem // open the panel of display settings
+            icon="desktop"
+            text="Display"
+            onClick={() => openPanel({ component: Display, title: "Display" })}
+          />
+          <MenuItem // toggle between photo and video mode
+            icon={photoMode ? "camera" : "mobile-video"}
+            text="Photo/Video mode"
+            labelElement={photoMode ? "Photo" : "Video"}
+            onClick={() => setPhotoMode(!photoMode)}
+          />
+          <MenuItem // open the panel of streaming settings
+            icon="settings"
+            text="Streaming settings"
+            onClick={() => openPanel({ component: Streaming, title: "Streaming settings" })}
+          />
+          <MenuItem // toggle audio
+            icon="headset"
+            text="Audio"
+            labelElement={audioEnabled ? "Enabled" : "Disabled"}
+            onClick={async () => {
+              setAudioEnabled(!audioEnabled);
+              if (!mockApi) {
+                const { config } = await api.updateConfig({
+                  audio_enabled: audioEnabled ? "0" : "1",
+                });
+                setConfig(config);
+              }
+            }}
+          />
+          <MenuItem // set the viewing angle parameter
+            icon="square"
+            text="Viewing angle"
+            labelElement={viewAngleSquare ? "Square" : "Extended"}
+            onClick={() => setViewAngleSquare(!viewAngleSquare)}
+            disabled
+          />
+          <MenuItem // open the panel of the preset settings
+            icon="media"
+            text="Preset"
+            onClick={() => openPanel({ component: Preset, title: "Preset" })}
+          />
+          <MenuDivider />
+          <MenuItem // open the panel of the advanced settings
+            icon="cog"
+            text="Advanced parameters"
+            onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
+          />
+        </Menu>
+        <div className="Menubar-info bp3-text-small bp3-text-muted">Serial number: {serialNumber}</div>
+      </>
     );
   }
 );
