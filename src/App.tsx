@@ -74,7 +74,6 @@ function App() {
   const [recordingTime, setRecordingTime] = useState([0, 0]);
   const [serialNumber, setSerialNumber] = useState("");
 
-
   // initialize the camera, set the portal mode and retrieve disk usage and the config file
   useEffect(() => {
     if (!initialized) {
