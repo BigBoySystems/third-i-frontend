@@ -51,7 +51,6 @@ interface ApProps {
 
 interface PortalProps {
   serialNumber: string;
-  setSerialNumber: (value: string) => void;
 }
 
 type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps;
