@@ -26,9 +26,6 @@
   width: 100%;
 }
 
-.Menubar-info {
-  margin-left: 5px;
-  position: fixed;
-  bottom: 0px;
-  padding: 10px;
+.Menubar .bp3-panel-stack-view .bp3-menu {
+  flex-grow: 1;
 }
