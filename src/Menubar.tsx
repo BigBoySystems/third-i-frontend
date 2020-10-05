@@ -152,8 +152,8 @@ const Settings = withContext(
           onClick={() => openPanel({ component: Advanced, title: "Advanced parameters" })}
         />
       </Menu>
-      <div className="bp3-text-small bp3-text-muted">
-        serial number : {serialNumber}
+      <div className="menuinfo bp3-text-small bp3-text-muted">
+        serial number: {serialNumber}
       </div>
       </>
     );
