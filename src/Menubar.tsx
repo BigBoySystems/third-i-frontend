@@ -106,7 +106,7 @@ const Settings = withContext(
     mockApi,
     serialNumber,
   }: PanelProps) => {
-    const [viewAngleSquare, setViewAngleSquare] = useState(false);
+    const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
 
     return (
@@ -145,9 +145,16 @@ const Settings = withContext(
           <MenuItem // set the viewing angle parameter
             icon="square"
             text="Viewing angle"
-            labelElement={viewAngleSquare ? "Square" : "Extended"}
-            onClick={() => setViewAngleSquare(!viewAngleSquare)}
-            disabled
+            labelElement={viewAngle ? "Medium" : "Large"}
+            onClick={async () => {
+              setViewAngle(!viewAngle);
+              if (!mockApi) {
+                const { config } = await api.updateConfig({
+                  dec_enabled: viewAngle ? "0" : "1",
+                });
+                setConfig(config);
+              }
+            }}
           />
           <MenuItem // open the panel of the preset settings
             icon="media"
