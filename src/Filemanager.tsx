@@ -331,7 +331,6 @@ function fromApi(root: api.File): ITreeNode<api.File>[] {
 
   const now = new Date();
   const currentNodePath: string[] = [
-    "media",
     "DCIM",
     numeral(now.getFullYear()).format("0000"),
     numeral(now.getMonth() + 1).format("00"),
