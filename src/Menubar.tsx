@@ -54,7 +54,10 @@ interface PortalProps {
 }
 
 type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps;
-type PanelProps = IPanelProps & MenubarProps & MockApi;
+
+interface PanelProps extends IPanelProps, MenubarProps, MockApi {
+  updateConfig: (configPatch: Partial<api.Config>) => void;
+}
 
 const Context = React.createContext({} as MenubarProps);
 
@@ -89,7 +92,26 @@ const withContext = (Component: (props: PanelProps) => any) => (panelProps: any)
   <Context.Consumer>
     {(props) => (
       <MockApi.Consumer>
-        {(mockApi) => <Component {...props} {...panelProps} mockApi={mockApi} />}
+        {(mockApi) => (
+          <Component
+            {...props}
+            {...panelProps}
+            mockApi={mockApi}
+            updateConfig={async (configPatch) => {
+              if (!mockApi) {
+                const { config } = await api.updateConfig(configPatch);
+                props.setConfig(config);
+              } else {
+                // NOTE: do not use that for !mock because presets can change other things
+                const config = {
+                  ...props.config,
+                  ...configPatch,
+                };
+                props.setConfig(config);
+              }
+            }}
+          />
+        )}
       </MockApi.Consumer>
     )}
   </Context.Consumer>
@@ -102,9 +124,9 @@ const Settings = withContext(
     photoMode,
     setPhotoMode,
     config,
-    setConfig,
     mockApi,
     serialNumber,
+    updateConfig,
   }: PanelProps) => {
     const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
@@ -132,28 +154,22 @@ const Settings = withContext(
             icon="headset"
             text="Audio"
             labelElement={audioEnabled ? "Enabled" : "Disabled"}
-            onClick={async () => {
+            onClick={() => {
               setAudioEnabled(!audioEnabled);
-              if (!mockApi) {
-                const { config } = await api.updateConfig({
-                  audio_enabled: audioEnabled ? "0" : "1",
-                });
-                setConfig(config);
-              }
+              updateConfig({
+                audio_enabled: audioEnabled ? "0" : "1",
+              });
             }}
           />
           <MenuItem // set the viewing angle parameter
             icon="square"
             text="Viewing angle"
             labelElement={viewAngle ? "Medium" : "Large"}
-            onClick={async () => {
+            onClick={() => {
               setViewAngle(!viewAngle);
-              if (!mockApi) {
-                const { config } = await api.updateConfig({
-                  dec_enabled: viewAngle ? "0" : "1",
-                });
-                setConfig(config);
-              }
+              updateConfig({
+                dec_enabled: viewAngle ? "0" : "1",
+              });
             }}
           />
           <MenuItem // open the panel of the preset settings
@@ -174,7 +190,7 @@ const Settings = withContext(
   }
 );
 
-const Display = withContext(({ config }: PanelProps) => {
+const Display = withContext(({ config, updateConfig }: PanelProps) => {
   let defaultDisplay = "3dFlat";
   if (config.video_mode === "3D") {
     defaultDisplay = "3dFlat";
@@ -196,19 +212,19 @@ const Display = withContext(({ config }: PanelProps) => {
 
     switch (value) {
       case "3dFlat":
-        api.updateConfig({
+        updateConfig({
           video_mode: "3D",
           swapcams: "",
         });
         break;
       case "2dLeftOnly":
-        api.updateConfig({
+        updateConfig({
           video_mode: "",
           swapcams: "",
         });
         break;
       case "2dRightOnly":
-        api.updateConfig({
+        updateConfig({
           video_mode: "",
           swapcams: "1",
         });
@@ -242,56 +258,56 @@ const Display = withContext(({ config }: PanelProps) => {
   );
 });
 
-const Streaming = withContext(({ config }: PanelProps) => {
+const Streaming = withContext(({ config, updateConfig }: PanelProps) => {
   // update the configuration to enable/disable the video stream on websocket
   const updateWs = (value: boolean) => {
-    api.updateConfig({
+    updateConfig({
       ws_enabled: value ? "1" : "0",
     });
   };
 
   // update the config to enable/disable UDP stream
   const updateUdp = (value: boolean) => {
-    api.updateConfig({
+    updateConfig({
       udp_enabled: value ? "1" : "0",
     });
   };
 
   // update the config file for UDP clients address
   const updateUdpClients = useDebounceCallback(
-    (value: string) => api.updateConfig({ udp_clients: value }),
+    (value: string) => updateConfig({ udp_clients: value }),
     DEBOUNCE_TIME
   );
 
   const updateRtmp = (value: boolean) => {
     // set if the rtmp stream is on or not and change this in the configuration file
-    api.updateConfig({
+    updateConfig({
       rtmp_enabled: value ? "1" : "0",
     });
   };
 
   const updateRtmpurl = useDebounceCallback(
     // update the rtmp url and change it in the configuration file
-    (value: string) => api.updateConfig({ rtmp_url: value }),
+    (value: string) => updateConfig({ rtmp_url: value }),
     DEBOUNCE_TIME
   );
 
   const updateMpegts = (value: boolean) => {
     // update if Mpeg stream is on or not and change that in the configuration file
-    api.updateConfig({
+    updateConfig({
       mpegts_enabled: value ? "1" : "0",
     });
   };
 
   const updateMpegtsClients = useDebounceCallback(
     // update the config file for MPEG clients address
-    (value: string) => api.updateConfig({ mpegts_clients: value }),
+    (value: string) => updateConfig({ mpegts_clients: value }),
     DEBOUNCE_TIME
   );
 
   const updateRtsp = (value: boolean) => {
     // set if Rtsp is on or not and change it in the configuration file
-    api.updateConfig({
+    updateConfig({
       rtsp_enabled: value ? "1" : "0",
     });
   };
@@ -358,7 +374,7 @@ const Streaming = withContext(({ config }: PanelProps) => {
 });
 
 const Preset = withContext(
-  ({ config, setConfig, presetList, deletePreset, mockApi }: PanelProps) => (
+  ({ config, presetList, deletePreset, mockApi, updateConfig }: PanelProps) => (
     <div className="Menubar-content">
       {presetList.length === 0 ? (
         <Callout intent={Intent.PRIMARY}>No preset</Callout>
@@ -368,13 +384,10 @@ const Preset = withContext(
             <MenuItem
               text={preset}
               key={preset}
-              onClick={async () => {
-                if (!mockApi) {
-                  const { config } = await api.updateConfig({
-                    preset,
-                  });
-                  setConfig(config);
-                }
+              onClick={() => {
+                updateConfig({
+                  preset,
+                });
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -432,111 +445,104 @@ const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) =
   </div>
 ));
 
-const Picture = withContext(({ closePanel, config, setConfig, addPreset, mockApi }: PanelProps) => {
-  const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1_000_000);
-  const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
-  const [presetName, setPresetName] = useState("");
-  const [preset, setPreset] = useState<Partial<api.Config>>({
-    video_wb: config.video_wb,
-    exposure: config.exposure,
-    contrast: config.contrast,
-    sharpness: config.sharpness,
-    digitalgain: config.digitalgain,
-  });
+const Picture = withContext(
+  ({ closePanel, config, addPreset, mockApi, updateConfig }: PanelProps) => {
+    const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1_000_000);
+    const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
+    const [presetName, setPresetName] = useState("");
+    const [preset, setPreset] = useState<Partial<api.Config>>({
+      video_wb: config.video_wb,
+      exposure: config.exposure,
+      contrast: config.contrast,
+      sharpness: config.sharpness,
+      digitalgain: config.digitalgain,
+    });
 
-  const updateFramerate = useDebounceCallback(
-    // set the framerate setting and change it in the configuration file
-    async (value: number) => {
-      if (!mockApi) {
-        const { config } = await api.updateConfig({
+    const updateFramerate = useDebounceCallback(
+      // set the framerate setting and change it in the configuration file
+      (value: number) => {
+        updateConfig({
           video_fps: `${value}`,
         });
-        setConfig(config);
-      }
-    },
-    DEBOUNCE_TIME
-  );
+      },
+      DEBOUNCE_TIME
+    );
 
-  const updateBitrate = useDebounceCallback(
-    // set the bitrate setting and change it in the configuration file
-    async (value: number) => {
-      if (!mockApi) {
-        const { config } = await api.updateConfig({
+    const updateBitrate = useDebounceCallback(
+      // set the bitrate setting and change it in the configuration file
+      (value: number) => {
+        updateConfig({
           video_bitrate: `${value * 1_000_000}`,
         });
-        setConfig(config);
+      },
+      DEBOUNCE_TIME
+    );
+
+    const savePreset = () => {
+      closePanel();
+      addPreset(presetName);
+      if (!mockApi) {
+        api.savePreset(presetName, preset);
       }
-    },
-    DEBOUNCE_TIME
-  );
+    };
 
-  const savePreset = () => {
-    closePanel();
-    addPreset(presetName);
-    if (!mockApi) {
-      api.savePreset(presetName, preset);
-    }
-  };
-
-  return (
-    <div className="Menubar-content">
-      <PictureInner
-        onConfigUpdate={async (patch: any) => {
-          setPreset({
-            ...preset,
-            ...patch,
-          });
-          if (!mockApi) {
-            const { config } = await api.updateConfig(patch);
-            setConfig(config);
-          }
-        }}
-      />
-      <Label>
-        Bitrate (Mbps)
-        <Slider // parameter to set the bitrate
-          min={0.5}
-          max={10.0}
-          stepSize={0.5}
-          labelStepSize={1.0}
-          value={bitrate}
-          showTrackFill={false}
-          onChange={(value) => {
-            setBitrate(value);
-            updateBitrate(value);
+    return (
+      <div className="Menubar-content">
+        <PictureInner
+          onConfigUpdate={(patch: any) => {
+            setPreset({
+              ...preset,
+              ...patch,
+            });
+            updateConfig(patch);
           }}
         />
-      </Label>
-      <Label>
-        Framerate
-        <Slider // parameter to set the framerate
-          min={25}
-          max={60}
-          stepSize={1}
-          labelStepSize={5}
-          value={framerate}
-          showTrackFill={false}
-          onChange={(value) => {
-            setFramerate(value);
-            updateFramerate(value);
+        <Label>
+          Bitrate (Mbps)
+          <Slider // parameter to set the bitrate
+            min={0.5}
+            max={10.0}
+            stepSize={0.5}
+            labelStepSize={1.0}
+            value={bitrate}
+            showTrackFill={false}
+            onChange={(value) => {
+              setBitrate(value);
+              updateBitrate(value);
+            }}
+          />
+        </Label>
+        <Label>
+          Framerate
+          <Slider // parameter to set the framerate
+            min={25}
+            max={60}
+            stepSize={1}
+            labelStepSize={5}
+            value={framerate}
+            showTrackFill={false}
+            onChange={(value) => {
+              setFramerate(value);
+              updateFramerate(value);
+            }}
+          />
+        </Label>
+        <InputGroup // this button give you the possibility to save a custom preset
+          value={presetName}
+          onChange={(ev: any) => setPresetName(ev.currentTarget.value)}
+          onKeyUp={(ev) => {
+            if (ev.key === "Enter") {
+              savePreset();
+            }
           }}
+          placeholder="Save preset"
+          fill
+          rightElement={<Button icon="floppy-disk" onClick={() => savePreset()} />}
         />
-      </Label>
-      <InputGroup // this button give you the possibility to save a custom preset
-        value={presetName}
-        onChange={(ev: any) => setPresetName(ev.currentTarget.value)}
-        onKeyUp={(ev) => {
-          if (ev.key === "Enter") {
-            savePreset();
-          }
-        }}
-        placeholder="Save preset"
-        fill
-        rightElement={<Button icon="floppy-disk" onClick={() => savePreset()} />}
-      />
-    </div>
-  );
-});
+      </div>
+    );
+  }
+);
 
 // component of the rest of the video settings (used too by the preview in preset settings)
 const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureProps) => {
