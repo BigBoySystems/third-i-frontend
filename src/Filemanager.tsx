@@ -17,6 +17,7 @@ import {
 import "./Filemanager.css";
 import * as api from "./api";
 import { MockApi } from "./App";
+import numeral from "numeral";
 
 const FilemanagerToaster = Toaster.create({});
 
@@ -312,16 +313,31 @@ function FilemanagerInner({ mockApi }: MockApi) {
 }
 
 function fromApi(root: api.File): ITreeNode<api.File>[] {
-  const transform = (child: api.File): ITreeNode<api.File> => ({
-    id: child.name,
-    icon: child.directory ? "folder-close" : "document",
-    label: child.name,
-    hasCaret: child.directory,
-    childNodes: child.children?.map(transform).sort((a, b) => (a.label < b.label ? -1 : 1)),
-    nodeData: child,
-  });
+  const transform = (child: api.File, currentNodePath: string[]): ITreeNode<api.File> => {
+    const [currentNode, ...currentNodeRest] = currentNodePath;
 
-  return root.children.map(transform);
+    return {
+      id: child.name,
+      icon: child.directory ? "folder-close" : "document",
+      label: child.name,
+      hasCaret: child.directory,
+      childNodes: child.children
+        ?.map((x) => transform(x, currentNodeRest))
+        .sort((a, b) => (a.label < b.label ? -1 : 1)),
+      nodeData: child,
+      isExpanded: child.directory && child.name === currentNode ? true : false,
+    };
+  };
+
+  const now = new Date();
+  const currentNodePath: string[] = [
+    "media",
+    "DCIM",
+    numeral(now.getFullYear()).format("0000"),
+    numeral(now.getMonth() + 1).format("00"),
+    numeral(now.getDate()).format("00"),
+  ];
+  return root.children.map((x) => transform(x, currentNodePath));
 }
 
 // configuration file sample of the mockApi mode
