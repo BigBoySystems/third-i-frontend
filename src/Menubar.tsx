@@ -53,7 +53,11 @@ interface PortalProps {
   serialNumber: string;
 }
 
-type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps;
+interface VideoSettingsUpdate {
+  onVideoSettingsUpdate: () => void;
+}
+
+type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps & VideoSettingsUpdate;
 
 interface PanelProps extends IPanelProps, MenubarProps, MockApi {
   updateConfig: (configPatch: Partial<api.Config>) => void;
@@ -374,7 +378,14 @@ const Streaming = withContext(({ config, updateConfig }: PanelProps) => {
 });
 
 const Preset = withContext(
-  ({ config, presetList, deletePreset, mockApi, updateConfig }: PanelProps) => (
+  ({
+    config,
+    presetList,
+    deletePreset,
+    mockApi,
+    updateConfig,
+    onVideoSettingsUpdate,
+  }: PanelProps) => (
     <div className="Menubar-content">
       {presetList.length === 0 ? (
         <Callout intent={Intent.PRIMARY}>No preset</Callout>
@@ -388,6 +399,7 @@ const Preset = withContext(
                 updateConfig({
                   preset,
                 });
+                onVideoSettingsUpdate();
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -446,7 +458,7 @@ const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) =
 ));
 
 const Picture = withContext(
-  ({ closePanel, config, addPreset, mockApi, updateConfig }: PanelProps) => {
+  ({ closePanel, config, addPreset, mockApi, updateConfig, onVideoSettingsUpdate }: PanelProps) => {
     const [bitrate, setBitrate] = useState(fromStr(config.video_bitrate, 3.0) / 1_000_000);
     const [framerate, setFramerate] = useState(fromStr(config.video_fps, 30));
     const [presetName, setPresetName] = useState("");
@@ -464,6 +476,7 @@ const Picture = withContext(
         updateConfig({
           video_fps: `${value}`,
         });
+        onVideoSettingsUpdate();
       },
       DEBOUNCE_TIME
     );
@@ -474,6 +487,7 @@ const Picture = withContext(
         updateConfig({
           video_bitrate: `${value * 1_000_000}`,
         });
+        onVideoSettingsUpdate();
       },
       DEBOUNCE_TIME
     );
@@ -495,6 +509,7 @@ const Picture = withContext(
               ...patch,
             });
             updateConfig(patch);
+            onVideoSettingsUpdate();
           }}
         />
         <Label>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Overlay, Classes, Dialog, Icon, Toaster, Intent } from "@blueprintjs/core";
+import { Overlay, Classes, Dialog, Icon, Toaster, Intent, Spinner } from "@blueprintjs/core";
 import MenuBar from "./Menubar";
 import WSAvcPlayer from "ws-avc-player";
 import classNames from "classnames";
@@ -31,11 +31,13 @@ export interface MockApi {
 }
 
 // initialize the video player
-function startVideo() {
+function startVideo(setVideoStalling: (value: boolean) => void) {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
   player.on("disconnected", () => console.log("WS disconnected"));
   player.on("connected", () => console.log("WS connected"));
+  player.on("disconnected", () => setVideoStalling(true));
+  player.on("connected", () => setVideoStalling(false));
   player.on("disconnected", () => setTimeout(connect, retryInterval));
   connect();
 }
@@ -61,6 +63,7 @@ function App() {
   const [menubarVisible, setMenubarVisibility] = useState(false);
   const [filemanagerVisible, setFilemanagerVisibility] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [videoStalling, setVideoStalling] = useState(false);
   const [networkDialog, setNetworkDialog] = useState(false);
   const [ap, setAp] = useState(true);
   const [photoMode, setPhotoMode] = useState(false);
@@ -101,6 +104,7 @@ function App() {
             //setNetworkDialog(true);
             setConfig(CONFIG_SAMPLE);
             setSerialNumber("01111");
+            setVideoStalling(false);
           }
         });
     }
@@ -110,7 +114,7 @@ function App() {
   useEffect(() => {
     if (!videoStarted) {
       setVideoStarted(true);
-      startVideo();
+      startVideo(setVideoStalling);
     }
   }, [videoStarted]);
 
@@ -188,6 +192,12 @@ function App() {
                 ap={ap}
                 setAp={setAp}
                 serialNumber={serialNumber}
+                onVideoSettingsUpdate={() => {
+                  setVideoStalling(true);
+                  if (mockApiDetected) {
+                    setTimeout(() => setVideoStalling(false), 3000);
+                  }
+                }}
               />
             )}
           </div>
@@ -203,7 +213,11 @@ function App() {
             <Filemanager />
           </div>
         </Overlay>
-        <div id="video" style={{ width: "100vw" }} />
+        <div id="video">
+          <div className="App-video-stalling" style={{ opacity: videoStalling ? 1 : 0 }}>
+            <Spinner size={Spinner.SIZE_LARGE} />
+          </div>
+        </div>
         <div className="App-top">
           <div className="App-top-left" style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}>
             <Icon // icon of the filemanager
