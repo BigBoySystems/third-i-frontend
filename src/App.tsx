@@ -50,6 +50,16 @@ function connect() {
   player.connect(uri);
 }
 
+export function toggleFullscreen(): boolean {
+  if (document.fullscreenElement === null) {
+    document.body.requestFullscreen();
+    return true;
+  } else {
+    document.exitFullscreen();
+    return false;
+  }
+}
+
 export const MockApi = React.createContext(false);
 
 export const unixTime = () => Math.floor(Date.now() / 1000);
@@ -213,7 +223,7 @@ function App() {
             <Filemanager />
           </div>
         </Overlay>
-        <div id="video">
+        <div id="video" onDoubleClick={toggleFullscreen}>
           <div className="App-video-stalling" style={{ opacity: videoStalling ? 1 : 0 }}>
             <Spinner size={Spinner.SIZE_LARGE} />
           </div>

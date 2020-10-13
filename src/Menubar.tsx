@@ -20,7 +20,7 @@ import {
   Intent,
   ContextMenu,
 } from "@blueprintjs/core";
-import { PhotoMode, Network, MockApi } from "./App";
+import { PhotoMode, Network, MockApi, toggleFullscreen } from "./App";
 import * as api from "./api";
 import { useDebounceCallback } from "@react-hook/debounce";
 
@@ -142,16 +142,7 @@ const Settings = withContext(
           <MenuItem // open the panel of display settings
             icon="fullscreen"
             text={fullscreen ? "Exit fullscreen" : "Fullscreen"}
-            onClick={() => {
-              if (document.fullscreenElement === null) {
-                const element = document.querySelector("body");
-                element?.requestFullscreen();
-                setFullscreen(true);
-              } else {
-                document.exitFullscreen();
-                setFullscreen(false);
-              }
-            }}
+            onClick={() => setFullscreen(toggleFullscreen())}
           />
           <MenuItem // open the panel of display settings
             icon="desktop"
