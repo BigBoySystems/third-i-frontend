@@ -134,10 +134,25 @@ const Settings = withContext(
   }: PanelProps) => {
     const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
+    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== null);
 
     return (
       <>
         <Menu>
+          <MenuItem // open the panel of display settings
+            icon="fullscreen"
+            text={fullscreen ? "Exit fullscreen" : "Fullscreen"}
+            onClick={() => {
+              if (document.fullscreenElement === null) {
+                const element = document.querySelector("body");
+                element?.requestFullscreen();
+                setFullscreen(true);
+              } else {
+                document.exitFullscreen();
+                setFullscreen(false);
+              }
+            }}
+          />
           <MenuItem // open the panel of display settings
             icon="desktop"
             text="Display"
