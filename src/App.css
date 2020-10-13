@@ -1,12 +1,27 @@
-.App-menubar {
-  left: calc(50vw - 200px);
-  width: 400px;
-  top: 0;
-  height: 100vh;
+@media (min-aspect-ratio: 16/9) {
+  .App-menubar {
+    left: calc(50vw - 200px);
+    width: 400px;
+    top: 0;
+    height: 100vh;
+  }
+}
+
+@media (max-aspect-ratio: 16/9) {
+  .App-menubar {
+    left: 0;
+    width: 100vw;
+    bottom: 0;
+    height: calc(100vh - 9 / 16 * 100vw);
+  }
 }
 
 .App-menubar:focus {
   outline: none;
+}
+
+.App-menubar-backdrop {
+  background-color: transparent;
 }
 
 .App-filemanager {

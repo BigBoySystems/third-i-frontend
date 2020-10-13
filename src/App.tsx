@@ -130,6 +130,8 @@ function App() {
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
   const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
 
+  const hiddenByMenubar: React.CSSProperties = menubarVisible ? { visibility: "hidden" } : {};
+
   return (
     // According to the documentation:
     //
@@ -167,7 +169,8 @@ function App() {
         <Overlay // component of the menubar
           className="bp3-dark bp3-large bp3-text-large"
           isOpen={menubarVisible}
-          hasBackdrop={false}
+          hasBackdrop={true}
+          backdropClassName="App-menubar-backdrop"
           onClose={() => setMenubarVisibility(false)}
           transitionDuration={0}
         >
@@ -202,14 +205,14 @@ function App() {
         </Overlay>
         <div id="video" style={{ width: "100vw" }} />
         <div className="App-top">
-          <div className="App-top-left" style={{ fontSize: `${iconSize}px` }}>
+          <div className="App-top-left" style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}>
             <Icon // icon of the filemanager
               icon="folder-close"
               iconSize={iconSize}
               onClick={() => setFilemanagerVisibility(!filemanagerVisible)}
             />
           </div>
-          <div className="App-top-center" style={{ fontSize: `${iconSize}px` }}>
+          <div className="App-top-center" style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}>
             <Icon // icon of the menubar
               icon="cog"
               iconSize={iconSize}
@@ -220,7 +223,7 @@ function App() {
             <div className="watermark" />
           </div>
         </div>
-        <div className="App-bottom" style={{ fontSize: `${iconSize}px` }}>
+        <div className="App-bottom" style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}>
           <div className="App-bottom-left">
             <Icon
               icon="database"
@@ -229,7 +232,10 @@ function App() {
             />
             {storageInfo}
           </div>
-          <div className="App-bottom-center">
+          <div
+            className="App-bottom-center"
+            style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}
+          >
             <Icon // icon to take a picture or record a video
               icon={recording !== undefined ? "stop" : photoMode ? "camera" : "mobile-video"}
               iconSize={iconSize}
@@ -269,7 +275,10 @@ function App() {
             />
             <div className="App-timestamp">{formattedRecordingTime}</div>
           </div>
-          <div className="App-bottom-right">
+          <div
+            className="App-bottom-right"
+            style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}
+          >
             <Icon
               icon="globe-network"
               iconSize={iconSize}
