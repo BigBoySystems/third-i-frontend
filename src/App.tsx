@@ -305,7 +305,7 @@ function App() {
             <Icon
               icon="globe-network"
               iconSize={iconSize}
-              // icon that displays the network you are connected to or if you are in access point mode
+              // icon that displays the network you are connected to or if you are in hotspot mode
             />
             {network || "Hotspot"}
           </div>

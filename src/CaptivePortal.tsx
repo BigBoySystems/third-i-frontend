@@ -221,8 +221,8 @@ function CaptivePortalInner({
             <p>The Third-I device is now using its own WiFi network.</p>
             <p>Please now connect your computer (or mobile device) to the Third-I WiFi network.</p>
             <p>
-              When the hotspot is ready, this message should disappear by itself after your
-              computer (or mobile device) gets connected to the Third-I WiFi network.
+              When the hotspot is ready, this message should disappear by itself after your computer
+              (or mobile device) gets connected to the Third-I WiFi network.
             </p>
             <p>
               <strong>Note:</strong> you should be able to connect to the Third-I device on the same
