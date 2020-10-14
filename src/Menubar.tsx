@@ -134,7 +134,7 @@ const Settings = withContext(
   }: PanelProps) => {
     const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
-    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== null);
+    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== undefined);
 
     return (
       <>
