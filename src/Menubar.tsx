@@ -43,7 +43,7 @@ interface ConfigProps {
   deletePreset: (name: string) => void;
 }
 
-// props for the Access Point state
+// props for the Hotspot state
 interface ApProps {
   ap: boolean;
   setAp: (value: boolean) => void;

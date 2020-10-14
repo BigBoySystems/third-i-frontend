@@ -18,7 +18,7 @@ import { MockApi } from "./App";
 interface CaptivePortalProps {
   // handler that triggers when the user choose to connect to a network
   onConnected: (essid: string) => void;
-  // handler that triggers when the user choose to stay in Access Point (portal) mode
+  // handler that triggers when the user choose to stay in Hotspot (portal) mode
   onAP: () => void;
   vertical?: boolean;
   ap: boolean;
@@ -195,7 +195,7 @@ function CaptivePortalInner({
     }
   };
 
-  // start Access Point mode (when the users wants to connect directly to the thingy)
+  // start Hotspot mode (when the users wants to connect directly to the thingy)
   const startAp = async () => {
     if (ap) {
       onAP();
@@ -221,7 +221,7 @@ function CaptivePortalInner({
             <p>The Third-I device is now using its own WiFi network.</p>
             <p>Please now connect your computer (or mobile device) to the Third-I WiFi network.</p>
             <p>
-              When the access point is ready, this message should disappear by itself after your
+              When the hotspot is ready, this message should disappear by itself after your
               computer (or mobile device) gets connected to the Third-I WiFi network.
             </p>
             <p>
@@ -310,7 +310,7 @@ function CaptivePortalInner({
             <Button text="Hidden network..." />
             <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
           </Popover>
-          <Button text="Use access point" onClick={startAp} />
+          <Button text="Use hotspot" onClick={startAp} />
           <Button text="Refresh" onClick={updateNetworks} />
         </ButtonGroup>
       </div>

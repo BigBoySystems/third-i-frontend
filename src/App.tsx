@@ -307,7 +307,7 @@ function App() {
               iconSize={iconSize}
               // icon that displays the network you are connected to or if you are in access point mode
             />
-            {network || "Access Point"}
+            {network || "Hotspot"}
           </div>
         </div>
         {recording !== undefined && <div className="App-recording-frame" />}
