@@ -44,9 +44,9 @@ interface ConfigProps {
 }
 
 // props for the Hotspot state
-interface HotspotProps {
-  hotspot: boolean;
-  setHotspot: (value: boolean) => void;
+interface ApProps {
+  ap: boolean;
+  setAp: (value: boolean) => void;
 }
 
 interface PortalProps {
@@ -57,7 +57,7 @@ interface VideoSettingsUpdate {
   onVideoSettingsUpdate: () => void;
 }
 
-type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & HotspotProps & VideoSettingsUpdate;
+type MenubarProps = PortalProps & PhotoMode & Network & ConfigProps & ApProps & VideoSettingsUpdate;
 
 interface PanelProps extends IPanelProps, MenubarProps, MockApi {
   updateConfig: (configPatch: Partial<api.Config>) => void;
@@ -709,18 +709,18 @@ const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureP
 });
 
 // component of the network selection in wifi settings
-const SelectNetwork = withContext(({ closePanel, setNetwork, hotspot, setHotspot }: PanelProps) => (
+const SelectNetwork = withContext(({ closePanel, setNetwork, ap, setAp }: PanelProps) => (
   <CaptivePortal
     onConnected={(essid) => {
       closePanel();
       setNetwork(essid);
     }}
-    onHotspot={() => {
+    onAP={() => {
       closePanel();
       setNetwork("");
     }}
-    hotspot={hotspot}
-    setHotspot={setHotspot}
+    ap={ap}
+    setAp={setAp}
     vertical
   />
 ));
