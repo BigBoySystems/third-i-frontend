@@ -55,6 +55,7 @@ export function toggleFullscreen(): boolean {
     document.body.requestFullscreen();
     return true;
   } else {
+    document.exitFullscreen();
     return false;
   }
 }
