@@ -74,7 +74,7 @@ function App() {
   const [videoStarted, setVideoStarted] = useState(false);
   const [videoStalling, setVideoStalling] = useState(false);
   const [networkDialog, setNetworkDialog] = useState(false);
-  const [ap, setAp] = useState(true);
+  const [hotspot, setHotspot] = useState(true);
   const [photoMode, setPhotoMode] = useState(false);
   const [network, setNetwork] = useState("");
   const [storage, setStorage] = useState<api.Storage>({ used: 0, total: 0 });
@@ -94,7 +94,7 @@ function App() {
         .isPortal()
         .then(async ({ portal, essid, serial }) => {
           setNetworkDialog(portal);
-          setAp(portal);
+          setHotspot(portal);
           setNetwork(essid || "");
           setSerialNumber(serial);
           api.getConfig().then((config) => setConfig(config));
@@ -171,12 +171,12 @@ function App() {
               setNetworkDialog(false);
               setNetwork(essid);
             }}
-            onAP={() => {
+            onHotspot={() => {
               setNetworkDialog(false);
               setNetwork("");
             }}
-            ap={ap}
-            setAp={setAp}
+            hotspot={hotspot}
+            setHotspot={setHotspot}
           />
         </Dialog>
         <Overlay // component of the menubar
@@ -198,8 +198,8 @@ function App() {
                 photoMode={photoMode}
                 setPhotoMode={setPhotoMode}
                 setNetwork={setNetwork}
-                ap={ap}
-                setAp={setAp}
+                hotspot={hotspot}
+                setHotspot={setHotspot}
                 serialNumber={serialNumber}
                 onVideoSettingsUpdate={() => {
                   setVideoStalling(true);

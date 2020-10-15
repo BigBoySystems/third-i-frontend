@@ -136,9 +136,9 @@ export const connect = async (essid: string, password?: string): Promise<Connect
   );
 
 // call the API to start the hotspot mode
-export const startAp = async (): Promise<any> =>
+export const startHotspot = async (): Promise<any> =>
   callApi(
-    "/start-ap",
+    "/start-hotspot",
     {
       method: "POST",
     },

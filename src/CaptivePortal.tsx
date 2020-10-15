@@ -19,10 +19,10 @@ interface CaptivePortalProps {
   // handler that triggers when the user choose to connect to a network
   onConnected: (essid: string) => void;
   // handler that triggers when the user choose to stay in Hotspot (portal) mode
-  onAP: () => void;
+  onHotspot: () => void;
   vertical?: boolean;
-  ap: boolean;
-  setAp: (value: boolean) => void;
+  hotspot: boolean;
+  setHotspot: (value: boolean) => void;
 }
 
 // wrapper that provides the mockApi property to the inner CaptivePortal component
@@ -37,11 +37,11 @@ function CaptivePortal(props: CaptivePortalProps) {
 // inner component of the captive portal (requires the property mockApi)
 function CaptivePortalInner({
   onConnected,
-  onAP,
+  onHotspot,
   vertical,
   mockApi,
-  ap,
-  setAp,
+  hotspot,
+  setHotspot,
 }: CaptivePortalProps & MockApi) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
@@ -172,7 +172,7 @@ function CaptivePortalInner({
       setConnecting(false);
 
       if (!portalInfo.portal) {
-        setAp(false);
+        setHotspot(false);
         onConnected(essid);
       } else {
         onFailure(essid);
@@ -196,9 +196,9 @@ function CaptivePortalInner({
   };
 
   // start Hotspot mode (when the users wants to connect directly to the thingy)
-  const startAp = async () => {
-    if (ap) {
-      onAP();
+  const startHotspot = async () => {
+    if (hotspot) {
+      onHotspot();
       return;
     }
 
@@ -208,7 +208,7 @@ function CaptivePortalInner({
 
     try {
       if (!mockApi) {
-        await api.startAp();
+        await api.startHotspot();
       }
 
       if (!mockApi && process.env.NODE_ENV !== "development") {
@@ -245,8 +245,8 @@ function CaptivePortalInner({
 
       CaptivePortalToaster.clear();
       setConnecting(false);
-      setAp(true);
-      onAP();
+      setHotspot(true);
+      onHotspot();
     } catch (err) {
       CaptivePortalToaster.show({
         message: (
@@ -310,7 +310,7 @@ function CaptivePortalInner({
             <Button text="Hidden network..." />
             <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
           </Popover>
-          <Button text="Use hotspot" onClick={startAp} />
+          <Button text="Use hotspot" onClick={startHotspot} />
           <Button text="Refresh" onClick={updateNetworks} />
         </ButtonGroup>
       </div>
