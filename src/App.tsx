@@ -51,6 +51,9 @@ function connect() {
 }
 
 export function toggleFullscreen(): boolean {
+  if (document.fullscreenElement === undefined) {
+    return false;
+  }
   if (document.fullscreenElement === null) {
     document.body.requestFullscreen();
     return true;
@@ -306,9 +309,9 @@ function App() {
             <Icon
               icon="globe-network"
               iconSize={iconSize}
-              // icon that displays the network you are connected to or if you are in access point mode
+              // icon that displays the network you are connected to or if you are in hotspot mode
             />
-            {network || "Access Point"}
+            {network || "Hotspot"}
           </div>
         </div>
         {recording !== undefined && <div className="App-recording-frame" />}

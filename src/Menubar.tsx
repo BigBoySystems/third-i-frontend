@@ -43,7 +43,7 @@ interface ConfigProps {
   deletePreset: (name: string) => void;
 }
 
-// props for the Access Point state
+// props for the Hotspot state
 interface ApProps {
   ap: boolean;
   setAp: (value: boolean) => void;
@@ -134,16 +134,17 @@ const Settings = withContext(
   }: PanelProps) => {
     const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
     const [audioEnabled, setAudioEnabled] = useState(config.audio_enabled === "1");
-    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== null);
+    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== undefined);
 
     return (
       <>
         <Menu>
+          { document.fullscreen !== undefined &&
           <MenuItem // open the panel of display settings
             icon="fullscreen"
-            text={fullscreen ? "Exit fullscreen" : "Fullscreen"}
+            text={fullscreen ? "Fullscreen" : "Exit fullscreen"}
             onClick={() => setFullscreen(toggleFullscreen())}
-          />
+          />}
           <MenuItem // open the panel of display settings
             icon="desktop"
             text="Display"

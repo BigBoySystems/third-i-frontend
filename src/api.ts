@@ -135,7 +135,7 @@ export const connect = async (essid: string, password?: string): Promise<Connect
     }
   );
 
-// call the API to start the Access point mode
+// call the API to start the hotspot mode
 export const startAp = async (): Promise<any> =>
   callApi(
     "/start-ap",
