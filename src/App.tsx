@@ -51,7 +51,10 @@ function connect() {
 }
 
 export function toggleFullscreen(): boolean {
-  if (document.fullscreenElement !== undefined) {
+  if (document.fullscreenElement === undefined) {
+    return false;
+  }
+  if (document.fullscreenElement === null) {
     document.body.requestFullscreen();
     return true;
   } else {
