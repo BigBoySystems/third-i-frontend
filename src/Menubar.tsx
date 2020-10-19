@@ -139,7 +139,7 @@ const Settings = withContext(
     return (
       <>
         <Menu>
-          {document.fullscreenEnabled && (
+          {document.exitFullscreen !== undefined && document.fullscreenEnabled && (
             <MenuItem // open the panel of display settings
               icon="fullscreen"
               text={fullscreen ? "Exit fullscreen" : "Fullscreen"}

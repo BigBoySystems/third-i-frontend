@@ -16,7 +16,9 @@ ReactDOM.render(
 );
 
 setTimeout(() => {
-  document.getElementById("startup")!.style.opacity = "0";
+  const startup = document.getElementById("startup")!;
+  startup.style.opacity = "0";
+  setTimeout(() => (startup.style.display = "none"), 200);
 }, startupDelay);
 
 // If you want your app to work offline and load faster, you can change
