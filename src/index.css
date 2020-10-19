@@ -14,3 +14,13 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+
+@media (pointer: coarse) {
+  .bp3-slider {
+    pointer-events: none;
+  }
+
+  .bp3-slider .bp3-slider-handle {
+    pointer-events: auto;
+  }
+}
