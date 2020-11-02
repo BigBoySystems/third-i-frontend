@@ -51,9 +51,12 @@ function connect() {
   player.connect(uri);
 }
 
+let audioWorker: any;
 let exampleSocket;
 let opusDecoder: any;
 let audioCtx: any;
+let startTime = 0;
+let counter = 0;
 
 function startAudio() {
   /*
@@ -63,6 +66,7 @@ function startAudio() {
   */
   const uri = "ws://third-i.local/api/sound";
   audioCtx = new AudioContext();
+  startTime = 100 / 1000;
   exampleSocket = new WebSocket(uri);
   exampleSocket.binaryType = "arraybuffer";
   opusDecoder = new OpusStreamDecoder({onDecode});
@@ -73,15 +77,22 @@ function startAudio() {
 }
 
 function onDecode({left, right, samplesDecoded, sampleRate}: any) {
+  const source = audioCtx.createBufferSource();
   const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
-  console.log("opus decoded data", left.byteLength, right.byteLength, sampleRate, samplesDecoded, buffer.duration)
   buffer.copyToChannel(left, 0);
   buffer.copyToChannel(right, 1);
-  const source = audioCtx.createBufferSource();
   source.buffer = buffer;
   source.connect(audioCtx.destination);
-  source.start(buffer.duration);
+  source.start(startTime);
+  startTime += buffer.duration;
 }
+
+/*
+function onDecode(e: any) {
+  const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
+  audioWorker.postMessage([e, buffer]);
+}
+*/
 
 export function toggleFullscreen(): boolean {
   if (document.exitFullscreen === undefined || !document.fullscreenEnabled) {
@@ -161,6 +172,7 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
+      audioWorker = new Worker("audio.js");
       startAudio();
     }
   }, [videoStarted]);
