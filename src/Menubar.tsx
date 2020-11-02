@@ -199,7 +199,7 @@ const Settings = withContext(
           />
         </Menu>
         <div className="bp3-text-small bp3-text-muted">Serial number: {serialNumber}</div>
-          <div className="bp3-text-small bp3-text-muted">OS Version: v{osVersion}</div>
+        <div className="bp3-text-small bp3-text-muted">OS Version: v{osVersion}</div>
       </>
     );
   }
