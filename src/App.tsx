@@ -8,6 +8,7 @@ import CaptivePortal from "./CaptivePortal";
 import * as api from "./api";
 import Filemanager from "./Filemanager";
 import numeral from "numeral";
+import { OpusStreamDecoder } from 'opus-stream-decoder';
 
 // video player
 const player = new WSAvcPlayer({ useWorker: false });
@@ -48,6 +49,38 @@ function connect() {
   const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
   const uri = `${scheme}://${host}:8080`;
   player.connect(uri);
+}
+
+let exampleSocket;
+let opusDecoder: any;
+let audioCtx: any;
+
+function startAudio() {
+  /*
+  const host = document.location.hostname;
+  const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
+  const uri = `${scheme}://${host}/api/sound`;
+  */
+  const uri = "ws://third-i.local/api/sound";
+  audioCtx = new AudioContext();
+  exampleSocket = new WebSocket(uri);
+  exampleSocket.binaryType = "arraybuffer";
+  opusDecoder = new OpusStreamDecoder({onDecode});
+  exampleSocket.onmessage = (event) => opusDecoder.ready.then(
+    () => opusDecoder.decode(new Uint8Array(event.data))
+  );
+  exampleSocket.onclose = () => console.log("socket is closed!!");
+}
+
+function onDecode({left, right, samplesDecoded, sampleRate}: any) {
+  const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
+  console.log("opus decoded data", left.byteLength, right.byteLength, sampleRate, samplesDecoded, buffer.duration)
+  buffer.copyToChannel(left, 0);
+  buffer.copyToChannel(right, 1);
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioCtx.destination);
+  source.start(buffer.duration);
 }
 
 export function toggleFullscreen(): boolean {
@@ -128,6 +161,7 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
+      startAudio();
     }
   }, [videoStarted]);
 
