@@ -41,6 +41,7 @@ interface ConfigProps {
   presetList: string[];
   addPreset: (name: string) => void;
   deletePreset: (name: string) => void;
+  osVersion: String;
 }
 
 // props for the Hotspot state
@@ -130,6 +131,7 @@ const Settings = withContext(
     config,
     mockApi,
     serialNumber,
+    osVersion,
     updateConfig,
   }: PanelProps) => {
     const [viewAngle, setViewAngle] = useState(config.dec_enabled === "1");
@@ -197,6 +199,7 @@ const Settings = withContext(
           />
         </Menu>
         <div className="bp3-text-small bp3-text-muted">Serial number: {serialNumber}</div>
+          <div className="bp3-text-small bp3-text-muted">OS Version: v{osVersion}</div>
       </>
     );
   }

@@ -89,6 +89,7 @@ function App() {
   const [presetList, setPresetList] = useState<string[]>([]);
   const [recordingTime, setRecordingTime] = useState([0, 0]);
   const [serialNumber, setSerialNumber] = useState("");
+  const [osVersion, setOsVersion] = useState("");
 
   // initialize the camera, set the portal mode and retrieve disk usage and the config file
   useEffect(() => {
@@ -101,6 +102,7 @@ function App() {
           setAp(portal);
           setNetwork(essid || "");
           setSerialNumber(serial);
+          setOsVersion(osVersion);
           api.getConfig().then((config) => setConfig(config));
           api.listPresets().then(({ presets }) => setPresetList(presets));
           api.getDiskUsage().then((diskUsage) => setStorage(diskUsage));
@@ -117,6 +119,7 @@ function App() {
             //setNetworkDialog(true);
             setConfig(CONFIG_SAMPLE);
             setSerialNumber("01111");
+            setOsVersion("0.1.0");
             setVideoStalling(false);
           }
         });
@@ -205,6 +208,7 @@ function App() {
                 ap={ap}
                 setAp={setAp}
                 serialNumber={serialNumber}
+                osVersion={osVersion}
                 onVideoSettingsUpdate={() => {
                   setVideoStalling(true);
                   if (mockApiDetected) {
