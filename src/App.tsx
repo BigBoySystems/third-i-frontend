@@ -71,6 +71,7 @@ function startAudio() {
   );
   exampleSocket.onclose = () => {
     if(audioCtx !== undefined) {
+      audioCtx.close();
       console.log("Audio stream disconnected");
     }
     setTimeout(startAudio, retryInterval);
@@ -82,7 +83,6 @@ function onDecode({left, right, samplesDecoded, sampleRate}: any) {
     console.log("Audio stream connected")
     audioCtx = new AudioContext();
     startTime = 0.1;
-    return
   }
   const source = audioCtx.createBufferSource();
   const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
@@ -93,13 +93,6 @@ function onDecode({left, right, samplesDecoded, sampleRate}: any) {
   source.start(startTime);
   startTime += buffer.duration;
 }
-
-/*
-function onDecode(e: any) {
-  const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
-  audioWorker.postMessage([e, buffer]);
-}
-*/
 
 export function toggleFullscreen(): boolean {
   if (document.exitFullscreen === undefined || !document.fullscreenEnabled) {
@@ -179,7 +172,6 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
-      //audioWorker = new Worker("audio.js");
       startAudio();
     }
   }, [videoStarted]);
