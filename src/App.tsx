@@ -35,8 +35,8 @@ export interface MockApi {
 function startVideo(setVideoStalling: (value: boolean) => void) {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
-  player.on("disconnected", () => console.log("WS disconnected"));
-  player.on("connected", () => console.log("WS connected"));
+  player.on("disconnected", () => console.log("Video stream disconnected"));
+  player.on("connected", () => console.log("Video stream connected"));
   player.on("disconnected", () => setVideoStalling(true));
   player.on("connected", () => setVideoStalling(false));
   player.on("disconnected", () => setTimeout(connect, retryInterval));
@@ -51,12 +51,10 @@ function connect() {
   player.connect(uri);
 }
 
-let audioWorker: any;
-let exampleSocket;
+let exampleSocket: WebSocket;
 let opusDecoder: any;
 let audioCtx: any;
-let startTime = 0;
-let counter = 0;
+let startTime: number;
 
 function startAudio() {
   /*
@@ -65,18 +63,27 @@ function startAudio() {
   const uri = `${scheme}://${host}/api/sound`;
   */
   const uri = "ws://third-i.local/api/sound";
-  audioCtx = new AudioContext();
-  startTime = 100 / 1000;
   exampleSocket = new WebSocket(uri);
   exampleSocket.binaryType = "arraybuffer";
   opusDecoder = new OpusStreamDecoder({onDecode});
   exampleSocket.onmessage = (event) => opusDecoder.ready.then(
-    () => opusDecoder.decode(new Uint8Array(event.data))
+    () => opusDecoder.decode(new Uint8Array(event.data)),
   );
-  exampleSocket.onclose = () => console.log("socket is closed!!");
+  exampleSocket.onclose = () => {
+    if(audioCtx !== undefined) {
+      console.log("Audio stream disconnected");
+    }
+    setTimeout(startAudio, retryInterval);
+  };
 }
 
 function onDecode({left, right, samplesDecoded, sampleRate}: any) {
+  if(audioCtx === undefined) {
+    console.log("Audio stream connected")
+    audioCtx = new AudioContext();
+    startTime = 0.1;
+    return
+  }
   const source = audioCtx.createBufferSource();
   const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
   buffer.copyToChannel(left, 0);
@@ -172,7 +179,7 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
-      audioWorker = new Worker("audio.js");
+      //audioWorker = new Worker("audio.js");
       startAudio();
     }
   }, [videoStarted]);
