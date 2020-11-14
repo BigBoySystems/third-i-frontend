@@ -168,7 +168,9 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
-      startAudio();
+      // NOTE: this feature is not working very well. When the record starts, the sound stop (which
+      //       is expected) but the sound doesn't come back or it is stuttering
+      //startAudio();
     }
   }, [videoStarted]);
 
