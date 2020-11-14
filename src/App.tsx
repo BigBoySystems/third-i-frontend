@@ -51,25 +51,22 @@ function connect() {
   player.connect(uri);
 }
 
-let exampleSocket: WebSocket;
+let audioStreamSocket;
 let opusDecoder: any;
-let audioCtx: any;
+let audioCtx: AudioContext;
 let startTime: number;
 
 function startAudio() {
-  /*
   const host = document.location.hostname;
   const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
   const uri = `${scheme}://${host}/api/sound`;
-  */
-  const uri = "ws://third-i.local/api/sound";
-  exampleSocket = new WebSocket(uri);
-  exampleSocket.binaryType = "arraybuffer";
+  audioStreamSocket = new WebSocket(uri);
+  audioStreamSocket.binaryType = "arraybuffer";
   opusDecoder = new OpusStreamDecoder({onDecode});
-  exampleSocket.onmessage = (event) => opusDecoder.ready.then(
+  audioStreamSocket.onmessage = (event) => opusDecoder.ready.then(
     () => opusDecoder.decode(new Uint8Array(event.data)),
   );
-  exampleSocket.onclose = () => {
+  audioStreamSocket.onclose = () => {
     if(audioCtx !== undefined) {
       audioCtx.close();
       console.log("Audio stream disconnected");
