@@ -78,7 +78,7 @@ function onDecode({ left, right, samplesDecoded, sampleRate }: any) {
   if (audioCtx === undefined) {
     console.log("Audio stream connected");
     audioCtx = new AudioContext();
-    startTime = 0.1;
+    startTime = 0.3;
   }
   const source = audioCtx.createBufferSource();
   const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
