@@ -1,1 +1,1 @@
-declare module 'opus-stream-decoder';
+declare module "opus-stream-decoder";

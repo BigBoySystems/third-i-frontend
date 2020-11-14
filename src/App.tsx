@@ -8,7 +8,7 @@ import CaptivePortal from "./CaptivePortal";
 import * as api from "./api";
 import Filemanager from "./Filemanager";
 import numeral from "numeral";
-import { OpusStreamDecoder } from 'opus-stream-decoder';
+import { OpusStreamDecoder } from "opus-stream-decoder";
 
 // video player
 const player = new WSAvcPlayer({ useWorker: false });
@@ -62,12 +62,11 @@ function startAudio() {
   const uri = `${scheme}://${host}/api/sound`;
   audioStreamSocket = new WebSocket(uri);
   audioStreamSocket.binaryType = "arraybuffer";
-  opusDecoder = new OpusStreamDecoder({onDecode});
-  audioStreamSocket.onmessage = (event) => opusDecoder.ready.then(
-    () => opusDecoder.decode(new Uint8Array(event.data)),
-  );
+  opusDecoder = new OpusStreamDecoder({ onDecode });
+  audioStreamSocket.onmessage = (event) =>
+    opusDecoder.ready.then(() => opusDecoder.decode(new Uint8Array(event.data)));
   audioStreamSocket.onclose = () => {
-    if(audioCtx !== undefined) {
+    if (audioCtx !== undefined) {
       audioCtx.close();
       console.log("Audio stream disconnected");
     }
@@ -75,9 +74,9 @@ function startAudio() {
   };
 }
 
-function onDecode({left, right, samplesDecoded, sampleRate}: any) {
-  if(audioCtx === undefined) {
-    console.log("Audio stream connected")
+function onDecode({ left, right, samplesDecoded, sampleRate }: any) {
+  if (audioCtx === undefined) {
+    console.log("Audio stream connected");
     audioCtx = new AudioContext();
     startTime = 0.1;
   }
