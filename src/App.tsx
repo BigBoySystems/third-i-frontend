@@ -67,6 +67,7 @@ function startAudio() {
     opusDecoder.ready.then(() => opusDecoder.decode(new Uint8Array(event.data)));
   audioStreamSocket.onclose = () => {
     if (audioCtx !== undefined) {
+      audioCtx.close();
       console.log("Audio stream disconnected");
     }
     setTimeout(startAudio, retryInterval);
