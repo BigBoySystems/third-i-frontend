@@ -8,6 +8,7 @@ import CaptivePortal from "./CaptivePortal";
 import * as api from "./api";
 import Filemanager from "./Filemanager";
 import numeral from "numeral";
+import { OpusStreamDecoder } from "opus-stream-decoder";
 
 // video player
 const player = new WSAvcPlayer({ useWorker: false });
@@ -34,8 +35,8 @@ export interface MockApi {
 function startVideo(setVideoStalling: (value: boolean) => void) {
   const video = document.getElementById("video");
   (video as any).appendChild(player.AvcPlayer.canvas);
-  player.on("disconnected", () => console.log("WS disconnected"));
-  player.on("connected", () => console.log("WS connected"));
+  player.on("disconnected", () => console.log("Video stream disconnected"));
+  player.on("connected", () => console.log("Video stream connected"));
   player.on("disconnected", () => setVideoStalling(true));
   player.on("connected", () => setVideoStalling(false));
   player.on("disconnected", () => setTimeout(connect, retryInterval));
@@ -48,6 +49,45 @@ function connect() {
   const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
   const uri = `${scheme}://${host}:8080`;
   player.connect(uri);
+}
+
+let audioStreamSocket;
+let opusDecoder: any;
+let audioCtx: AudioContext;
+let startTime: number;
+
+function startAudio() {
+  const host = document.location.hostname;
+  const scheme = document.location.protocol.startsWith("https") ? "wss" : "ws";
+  const uri = `${scheme}://${host}/api/sound`;
+  audioStreamSocket = new WebSocket(uri);
+  audioStreamSocket.binaryType = "arraybuffer";
+  opusDecoder = new OpusStreamDecoder({ onDecode });
+  audioStreamSocket.onmessage = (event) =>
+    opusDecoder.ready.then(() => opusDecoder.decode(new Uint8Array(event.data)));
+  audioStreamSocket.onclose = () => {
+    if (audioCtx !== undefined) {
+      audioCtx.close();
+      console.log("Audio stream disconnected");
+    }
+    setTimeout(startAudio, retryInterval);
+  };
+}
+
+function onDecode({ left, right, samplesDecoded, sampleRate }: any) {
+  if (audioCtx === undefined) {
+    console.log("Audio stream connected");
+    audioCtx = new AudioContext();
+    startTime = 0.3;
+  }
+  const source = audioCtx.createBufferSource();
+  const buffer = audioCtx.createBuffer(2, samplesDecoded, sampleRate);
+  buffer.copyToChannel(left, 0);
+  buffer.copyToChannel(right, 1);
+  source.buffer = buffer;
+  source.connect(audioCtx.destination);
+  source.start(startTime);
+  startTime += buffer.duration;
 }
 
 export function toggleFullscreen(): boolean {
@@ -128,6 +168,7 @@ function App() {
     if (!videoStarted) {
       setVideoStarted(true);
       startVideo(setVideoStalling);
+      startAudio();
     }
   }, [videoStarted]);
 
