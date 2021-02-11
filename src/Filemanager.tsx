@@ -18,6 +18,7 @@ import "./Filemanager.css";
 import * as api from "./api";
 import { MockApi } from "./App";
 import numeral from "numeral";
+import '@szhsin/react-menu/dist/index.css';
 
 const FilemanagerToaster = Toaster.create({});
 
@@ -77,6 +78,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     refreshContents();
   };
 
+  //when a node is selected
   const handleNodeClick = (
     node: ITreeNode<api.File>,
     _nodePath: number[],
@@ -101,7 +103,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     nodeData.isExpanded = true;
     refreshContents();
   };
-
+  
   // right click on a node
   const handleContextMenu = (
     node: ITreeNode<api.File>,
@@ -109,7 +111,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
     e: React.MouseEvent<HTMLElement>
   ) => {
     e.preventDefault();
-
+    
     ContextMenu.show(
       <Menu>
         <MenuDivider title={node.label} />
@@ -148,6 +150,7 @@ function FilemanagerInner({ mockApi }: MockApi) {
       true
     );
   };
+  
 
   const confirmRenameFile = () => {
     if (renameFile === undefined) {
@@ -216,10 +219,10 @@ function FilemanagerInner({ mockApi }: MockApi) {
     <div>
       <Tree
         contents={nodes}
-        onNodeClick={handleNodeClick}
-        onNodeCollapse={handleNodeCollapse}
-        onNodeExpand={handleNodeExpand}
-        onNodeContextMenu={handleContextMenu}
+        onNodeClick={handleContextMenu}// Event left click on node
+        onNodeCollapse={handleNodeCollapse}// Event left click on carret of node to collapse
+        onNodeExpand={handleNodeExpand}// Event left click on carret of node to expand
+        onNodeContextMenu={handleContextMenu}// Event right click on node
         className={Classes.ELEVATION_0}
       />
       <Alert

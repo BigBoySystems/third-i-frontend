@@ -10,10 +10,12 @@ import Filemanager from "./Filemanager";
 import numeral from "numeral";
 import { OpusStreamDecoder } from "opus-stream-decoder";
 
+
 // video player
 const player = new WSAvcPlayer({ useWorker: false });
 const retryInterval = 1000;
 const iconSize = 32;
+const littleIconSize = 18;
 
 // photo mode state (will take a picture instead of recording a video)
 export interface PhotoMode {
@@ -106,10 +108,15 @@ export function toggleFullscreen(): boolean {
 export const MockApi = React.createContext(false);
 
 export const unixTime = () => Math.floor(Date.now() / 1000);
-
+  
 // root component of the third-i web app
 function App() {
   const classes = classNames(Classes.CARD, Classes.ELEVATION_4);
+  var OSName="Unknown OS";
+  if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
+  if (navigator.appVersion.indexOf("Mac")!=-1) OSName="MacOS";
+  if (navigator.appVersion.indexOf("X11")!=-1) OSName="UNIX";
+  if (navigator.appVersion.indexOf("Linux")!=-1) OSName="Linux";
 
   // true when the component has been initialized (initial data received)
   const [initialized, setInitialized] = useState(false);
@@ -189,9 +196,10 @@ function App() {
   const pct = numeral(Math.ceil((storage.used / storage.total) * 100) / 100);
   const storageInfo = `${used.format("0 b")} / ${total.format("0 b")} (${pct.format("0 %")})`;
   const formattedRecordingTime = numeral(recordingTime[1] - recordingTime[0]).format("00:00:00");
-
+  const infoOS = OSName;
   const hiddenByMenubar: React.CSSProperties = menubarVisible ? { visibility: "hidden" } : {};
-
+  
+  
   return (
     // According to the documentation:
     //
@@ -293,14 +301,15 @@ function App() {
             <div className="watermark" />
           </div>
         </div>
-        <div className="App-bottom" style={{ fontSize: `${iconSize}px`, ...hiddenByMenubar }}>
+        <div className="App-bottom" style={{ fontSize: `${littleIconSize}px`, ...hiddenByMenubar }}>
           <div className="App-bottom-left">
             <Icon
               icon="database"
-              iconSize={iconSize}
+              iconSize={littleIconSize}
               // icon and information of disk usage
             />
             {storageInfo}
+            {infoOS}
           </div>
           <div
             className="App-bottom-center"
