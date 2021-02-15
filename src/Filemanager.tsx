@@ -18,7 +18,6 @@ import "./Filemanager.css";
 import * as api from "./api";
 import { MockApi } from "./App";
 import numeral from "numeral";
-import '@szhsin/react-menu/dist/index.css';
 
 const FilemanagerToaster = Toaster.create({});
 
