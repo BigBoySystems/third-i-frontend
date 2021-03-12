@@ -459,9 +459,9 @@ const Advanced = withContext(({ openPanel, closePanel, ...props }: PanelProps) =
         onClick={() => openPanel({ component: SelectNetwork, props, title: "Wifi settings" })}
       />
     </Menu>
-    <MenuDivider />
+    {/*<MenuDivider />
     <Button icon="wrench" text="Factory reset" fill />
-    <Button icon="updated" text="Update" fill disabled />
+    <Button icon="updated" text="Update" fill disabled />*/}
   </div>
 ));
 
@@ -618,7 +618,7 @@ const PictureInner = withContext(({ config, onConfigUpdate, disabled }: PictureP
               updateConfig({ video_wb: ev.currentTarget.value });
             }}
           >
-            <option value="off">Off</option>
+           {/*   <option value="off">Off</option> */}
             <option value="auto">Auto</option>
             <option value="sun">Sun</option>
             <option value="cloud">Cloud</option>
