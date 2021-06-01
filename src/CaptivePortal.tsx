@@ -42,34 +42,11 @@ function CaptivePortalInner({
   mockApi,
   ap,
   setAp,
-}: CaptivePortalProps & MockApi) {
+ }: CaptivePortalProps & MockApi) {
   const [networks, setNetworks] = useState([] as api.Network[]);
   const [initialized, setInitialized] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState(false);
-
-  // update the network list the user can connect to
-  const updateNetworks = useCallback(() => {
-    setNetworks([]);
-    setError(false);
-    if (mockApi) {
-      setTimeout(() => setNetworks(SAMPLE_NETWORKS), 1500);
-    } else {
-      api
-        .networks()
-        .then((networks) => {
-          networks.sort((a, b) => (a.essid < b.essid ? -1 : 1));
-          setNetworks(networks);
-          if (networks.length === 0 && !connecting) {
-            setTimeout(updateNetworks, 1000);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          setError(true);
-        });
-    }
-  }, [mockApi, connecting]);
 
   // handle possible error during connection
   const onFailure = (essid: string) => {
@@ -86,7 +63,6 @@ function CaptivePortalInner({
       intent: Intent.WARNING,
       timeout: 10000,
     });
-    updateNetworks();
   };
 
   // helper used when you are waiting to connect the device to a new network
@@ -265,53 +241,19 @@ function CaptivePortalInner({
     }
   };
 
-  // initialize the captive portal by retrieving the networks nearby
-  useEffect(() => {
-    if (!initialized) {
-      updateNetworks();
-      setInitialized(true);
-    }
-  }, [initialized, updateNetworks]);
-
+  //Captive Portal Network interface
   return (
     <div className="CaptivePortal-content">
-      <Overlay isOpen={connecting}>
-        <Spinner size={Spinner.SIZE_LARGE} className="CaptivePortal-spinner" />
-      </Overlay>
       <div className="CaptivePortal-list">
         <Menu>
-          {networks.length === 0 && (
-            <MenuItem
-              icon="refresh"
-              text={error ? "An error occurred" : "No network detected"}
-              disabled
-            />
-          )}
-          {networks.map(({ essid, password }) =>
-            password ? (
-              <Popover className="CaptivePortal-popover" position="left" key={essid}>
-                <MenuItem icon={password ? "lock" : "unlock"} text={essid} />
-                <PasswordEntry onValidate={(password) => connect(essid, password)} />
-              </Popover>
-            ) : (
-              <MenuItem
-                key={essid}
-                icon={password ? "lock" : "unlock"}
-                text={essid}
-                onClick={() => connect(essid)}
-              />
-            )
-          )}
+        Connection to a network
+          <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
+          
         </Menu>
       </div>
       <div className="CaptivePortal-buttons">
         <ButtonGroup vertical={vertical} fill>
-          <Popover className="CaptivePortal-popover" position="left">
-            <Button text="Hidden network..." />
-            <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
-          </Popover>
           <Button text="Use hotspot" onClick={startAp} />
-          <Button text="Refresh" onClick={updateNetworks} />
         </ButtonGroup>
       </div>
     </div>
@@ -354,6 +296,7 @@ function HiddenNetwork({ onValidate }: HiddenNetworkProps) {
 
   return (
     <div className="CaptivePortal-password bp3-large bp3-text-large">
+      
       <Label>
         ESSID:
         <input
