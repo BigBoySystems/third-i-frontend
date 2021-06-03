@@ -242,18 +242,20 @@ function CaptivePortalInner({
   };
 
   //Captive Portal Network interface
+
   return (
-    <div className="CaptivePortal-content">
-      <div className="CaptivePortal-list">
-        <Menu>
-        Connection to a network
-          <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
-          
-        </Menu>
-      </div>
+    <div className="CaptivePortal-content">   
       <div className="CaptivePortal-buttons">
+        
         <ButtonGroup vertical={vertical} fill>
+
+          <Popover className="CaptivePortal-popover" position="left">
+            <Button text="Connection to a network" />
+            <HiddenNetwork onValidate={(essid, password) => connect(essid, password)} />
+          </Popover>
+         <div className="CaptivePortal-middleText">OR</div>
           <Button text="Use hotspot" onClick={startAp} />
+
         </ButtonGroup>
       </div>
     </div>

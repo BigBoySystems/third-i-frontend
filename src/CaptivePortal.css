@@ -27,3 +27,9 @@
   left: 0;
   right: 0;
 }
+.CaptivePortal-middleText{
+  padding: 10px;
+  text-align: center;
+  font-Weight: 'bold';
+  font-size: 15px;
+}
